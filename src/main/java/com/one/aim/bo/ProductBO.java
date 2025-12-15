@@ -59,6 +59,38 @@ public class ProductBO {
 
     private Long categoryId;
 
+    @Column(nullable = false)
+    private boolean featured = false;
+
+
+    private String brand;
+
+    @Column(name = "average_rating")
+    private Double averageRating = 0.0;
+
+    @Column(name = "review_count")
+    private Long reviewCount = 0L;
+
+
+    // Product Specifications/Details
+    private String material;
+    private String sole;
+    private String closure;
+    private String weight;
+    private String color;
+    private String size;
+
+    // Additional specifications as JSON (flexible approach)
+    @Column(columnDefinition = "TEXT")
+    private String specificationsJson;
+
+    // Remove hardcoded values, calculate from reviews
+//    @Transient
+//    private Double averageRating;
+//
+//    @Transient
+//    private Long reviewCount;
+
     @Transient
     private Integer soldItem = 0;
 

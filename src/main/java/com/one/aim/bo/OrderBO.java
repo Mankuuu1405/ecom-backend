@@ -32,7 +32,6 @@ public class OrderBO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name = "orderId", unique = true, nullable = false, updatable = false, length = 20)
     private String orderId;
 
@@ -40,11 +39,13 @@ public class OrderBO {
     private Long taxAmount;
     private Long deliveryCharge;
     private Long discountAmount;
-
+    private Long paymentCharge;
     private Long totalAmount;
+
     private LocalDateTime orderTime;
 
-    private String orderStatus;     // INITIAL, CONFIRMED, SHIPPED, DELIVERED
+    // PLACED, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+    private String orderStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -54,30 +55,22 @@ public class OrderBO {
     @JoinColumn(name = "address_id", nullable = false)
     private AddressBO shippingAddress;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "order_cart_items",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "cart_id")
-    )
-    private List<CartBO> cartItems;
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemBO> orderItems = new ArrayList<>();
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_person_id")
     private DeliveryPersonBO deliveryPerson;
 
-    private String deliveryStatus;
+    // COD, ONLINE
+    private String paymentMethod;
 
-    private String paymentMethod;   // COD, UPI, CARD
+    // ALWAYS "PAID" (payment-first architecture)
     private String paymentStatus;
+
     private String razorpayPaymentId;
     private String razorpaySignature;
-    private String razorpayorderid;
-
+    private String razorpayOrderId;
 
     private String invoiceno;
 
@@ -88,7 +81,7 @@ public class OrderBO {
     private LocalDateTime updatedAt;
 
     // ---------------------------------------------------------
-    // Generate orderCode before insert
+    // Generate orderId before insert
     // ---------------------------------------------------------
     @PrePersist
     protected void onCreate() {
@@ -101,7 +94,6 @@ public class OrderBO {
     }
 
     private String generateOrderCode() {
-        // Format: ORD-XXXXXX (A–Z + 0–9)
         String prefix = "ORD-";
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
@@ -113,5 +105,6 @@ public class OrderBO {
         return sb.toString();
     }
 }
+
 
 

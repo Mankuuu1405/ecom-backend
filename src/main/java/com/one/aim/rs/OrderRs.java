@@ -25,7 +25,9 @@ public class OrderRs implements Serializable {
     private String paymentStatus;
     private LocalDateTime orderTime;
     private UserRs user;
-    private List<CartRs> orderedItems;
+//    private List<CartRs> orderedItems;
     private String orderStatus;
+    private List<OrderItemRs> orderedItems;
+
 }
 

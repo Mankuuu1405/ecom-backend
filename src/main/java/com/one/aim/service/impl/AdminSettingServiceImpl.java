@@ -32,6 +32,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     private final SellerRepo sellerRepo;
     private final EmailService emailService;
     private final FileRepo fileRepo;
+    private final SellerMapper sellerMapper;
 
     @PostConstruct
     public void init() {
@@ -69,59 +70,52 @@ public class AdminSettingServiceImpl implements AdminSettingService {
 
     @Override
     public void initDefaultSettings() {
-        log.info("Initializing default admin settings...");
 
-        // GENERAL SETTINGS
-        save("platform_name", "OneAim Store");
-        save("contact_email", "support@aimdev.com");
-        save("default_language", "en");
-        save("default_currency", "INR");
-        save("time_zone", "Asia/Kolkata");
+        initSettingIfMissing("platform_name", "OneAim Store");
+        initSettingIfMissing("contact_email", "support@aimdev.com");
+        initSettingIfMissing("default_language", "en");
+        initSettingIfMissing("default_currency", "INR");
+        initSettingIfMissing("time_zone", "Asia/Kolkata");
 
-        // FEATURE CONFIGURATION (UI Toggles)
-        save("feature_reviews_enabled", "true");
-        save("feature_wishlist_enabled", "true");
-        save("feature_seller_applications", "true");
+        initSettingIfMissing("feature_reviews_enabled", "true");
+        initSettingIfMissing("feature_wishlist_enabled", "true");
+        initSettingIfMissing("feature_seller_applications", "true");
 
-        // PAYMENT SETTINGS
-        save("accepted_payment_methods", "COD,UPI,CARD");
-        save("payout_schedule_days", "7");
-        save("transaction_fee_percent", "0");
+        initSettingIfMissing("accepted_payment_methods", "COD,UPI,CARD");
+        initSettingIfMissing("payout_schedule_days", "7");
+        initSettingIfMissing("transaction_fee_percent", "0");
 
-        // SHIPPING SETTINGS (NEW + EXISTING)
-        save("default_shipping_provider", "INDIA_POST");
-        save("default_shipping_rate", "50");
-        save("delivery_regions", "INDIA");
+        initSettingIfMissing("default_shipping_provider", "INDIA_POST");
+        initSettingIfMissing("default_shipping_rate", "50");
+        initSettingIfMissing("delivery_regions", "INDIA");
 
-        // CATEGORY BASED CHARGES (KEEPING EXISTING LOGIC)
-        save("default_tax_percent", "0");
-        save("delivery_charges_fixed", "50");
-        save("tax_electronics", "18");
-        save("shipping_electronics", "100");
-        save("tax_fashion", "5");
-        save("shipping_fashion", "50");
-        save("tax_grocery", "0");
-        save("shipping_grocery", "20");
+        // CATEGORY-TAX (DO NOT OVERRIDE ADMIN UPDATED VALUES)
+        initSettingIfMissing("default_tax_percent", "0");
+        initSettingIfMissing("delivery_charges_fixed", "50");
 
-        // POLICY MANAGEMENT
-        save("terms_url", "");
-        save("privacy_url", "");
-        save("return_url", "");
+        initSettingIfMissing("tax_electronics", "18");
+        initSettingIfMissing("shipping_electronics", "100");
 
-        // NOTIFICATION SETTINGS
-        save("notify_new_order", "true");
-        save("notify_user_activity", "false");
+        initSettingIfMissing("tax_fashion", "5");
+        initSettingIfMissing("shipping_fashion", "50");
 
-        // SECURITY SETTINGS
-        save("admin_user_roles", "ADMIN,MANAGER");
-        save("session_timeout_minutes", "30");
+        initSettingIfMissing("tax_grocery", "0");
+        initSettingIfMissing("shipping_grocery", "20");
 
-        // DISCOUNT ENGINE (KEEP)
-        save("global_discount_percent", "0");
-        save("enable_discount_engine", "false");
+        initSettingIfMissing("terms_url", "");
+        initSettingIfMissing("privacy_url", "");
+        initSettingIfMissing("return_url", "");
 
-        log.info("Default admin settings initialized.");
+        initSettingIfMissing("notify_new_order", "true");
+        initSettingIfMissing("notify_user_activity", "false");
+
+        initSettingIfMissing("admin_user_roles", "ADMIN,MANAGER");
+        initSettingIfMissing("session_timeout_minutes", "30");
+
+        initSettingIfMissing("global_discount_percent", "0");
+        initSettingIfMissing("enable_discount_engine", "false");
     }
+
 
     @Override
     public String verifySeller(String idOrCode, Boolean status) {
@@ -174,7 +168,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public List<SellerRs> getUnverifiedSellers() {
         return sellerRepo.findAll().stream()
                 .filter(s -> !s.isVerified() && !s.isRejected())
-                .map(SellerMapper::mapToSellerRs)
+                .map(sellerMapper::mapToSellerRs)
                 .collect(Collectors.toList());
     }
 
@@ -182,7 +176,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public List<SellerRs> getVerifiedSellers() {
         return sellerRepo.findAll().stream()
                 .filter(SellerBO::isVerified)
-                .map(SellerMapper::mapToSellerRs)
+                .map(sellerMapper::mapToSellerRs)
                 .collect(Collectors.toList());
     }
 
@@ -190,7 +184,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     public List<SellerRs> getRejectedSellers() {
         return sellerRepo.findAll().stream()
                 .filter(SellerBO::isRejected)
-                .map(SellerMapper::mapToSellerRs)
+                .map(sellerMapper::mapToSellerRs)
                 .collect(Collectors.toList());
     }
 
@@ -303,6 +297,12 @@ public class AdminSettingServiceImpl implements AdminSettingService {
         }
     }
 
+
+    private void initSettingIfMissing(String key, String defaultValue) {
+        if (repo.findByKey(key).isEmpty()) {
+            save(key, defaultValue);
+        }
+    }
 
 
 }

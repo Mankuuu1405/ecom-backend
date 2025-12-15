@@ -1,75 +1,379 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Invoice - OneAim</title>
-
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; font-size: 14px; color: #333; }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { margin: 0; font-size: 30px; font-weight: bold; }
-        .company { text-align: center; font-size: 16px; margin-bottom: 10px; font-weight: bold; color: #444; }
-        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .details-table td { padding: 10px; border: 1px solid #ddd; background: #f8f8f8; }
-        table.items { width: 100%; border-collapse: collapse; margin-top: 25px; }
-        table.items th, table.items td { border: 1px solid #e0e0e0; padding: 10px; }
-        table.items th { background: #f0f0f0; font-weight: bold; }
-        .summary-table { margin-top: 30px; width: 100%; border-collapse: collapse; }
-        .summary-table td { padding: 8px; }
-        .summary-label { text-align: right; font-weight: bold; }
-        .footer { margin-top: 40px; font-size: 12px; text-align: center; color: #777; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #0B74E5;
+        }
+
+        .company-info h1 {
+            font-size: 36px;
+            color: #0B74E5;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .company-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .invoice-details {
+            text-align: right;
+        }
+
+        .invoice-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .invoice-meta {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .invoice-meta p {
+            margin: 5px 0;
+        }
+
+        .invoice-meta strong {
+            color: #333;
+        }
+
+        /* Info Sections */
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            gap: 30px;
+        }
+
+        .info-box {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #0B74E5;
+        }
+
+        .info-box h3 {
+            font-size: 16px;
+            color: #0B74E5;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            margin: 6px 0;
+            color: #555;
+        }
+
+        .info-box strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Items Table */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .items-table thead {
+            background: linear-gradient(135deg, #0B74E5 0%, #0a5fb8 100%);
+            color: white;
+        }
+
+        .items-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+
+        .items-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .items-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .items-table td {
+            padding: 15px 12px;
+            font-size: 14px;
+        }
+
+        .items-table .item-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .items-table .item-category {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Summary */
+        .summary {
+            margin-top: 40px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .summary-table {
+            width: 350px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-row.subtotal {
+            background: #f8f9fa;
+        }
+
+        .summary-row.tax {
+            background: #f8f9fa;
+        }
+
+        .summary-row.delivery {
+            background: #f8f9fa;
+        }
+
+        .summary-row.discount {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .summary-row.total {
+            background: linear-gradient(135deg, #0B74E5 0%, #0a5fb8 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            margin-top: 10px;
+        }
+
+        .summary-label {
+            font-weight: 600;
+        }
+
+        .summary-value {
+            font-weight: 600;
+        }
+
+        /* Payment Info */
+        .payment-info {
+            margin: 30px 0;
+            padding: 20px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            border-left: 4px solid #0B74E5;
+        }
+
+        .payment-info h3 {
+            color: #0B74E5;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .payment-info p {
+            font-size: 14px;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .payment-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .payment-status.paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .payment-status.cod {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: #777;
+            margin: 5px 0;
+        }
+
+        .footer .thank-you {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0B74E5;
+            margin-bottom: 10px;
+        }
+
+        .footer .contact-info {
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+        }
     </style>
 </head>
-
 <body>
+<div class="invoice-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="company-info">
+            <h1>OneAim</h1>
+            <p>E-Commerce Platform</p>
+            <p>123 Commerce Street, Shopping District</p>
+            <p>XYz, ABC 10001, INDIA</p>
+        </div>
+        <div class="invoice-details">
+            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-meta">
+                <p><strong>Invoice No:</strong> @@invoiceNo@@</p>
+                <p><strong>Order ID:</strong> @@orderId@@</p>
+                <p><strong>Date:</strong> @@orderDate@@</p>
+            </div>
+        </div>
+    </div>
 
-<div class="header"><h1>INVOICE</h1></div>
-<div class="company">OneAim - E-Commerce Platform</div>
+    <!-- Customer & Seller Info -->
+    <div class="info-section">
+        @@customerSection@@
+        @@sellerSection@@
+    </div>
 
-<p><strong>Invoice No:</strong> @@invoiceNo@@</p>
-<p><strong>Order ID:</strong> @@orderId@@</p>
-<p><strong>Date:</strong> @@orderDate@@</p>
+    <!-- Payment Information -->
+    <div class="payment-info">
+        <h3>Payment Information</h3>
+        <p><strong>Payment Method:</strong> @@paymentMethod@@</p>
+        <p><strong>Payment Status:</strong> <span class="payment-status @@paymentStatusClass@@">@@paymentStatus@@</span></p>
+    </div>
 
-<!-- Injected Customer Block -->
-@@customerSection@@
+    <!-- Items Table -->
+    <table class="items-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Product Details</th>
+            <th>Unit Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        @@orderItems@@
+        </tbody>
+    </table>
 
-<!-- Injected Seller Block -->
-@@sellerSection@@
+    <!-- Summary -->
+    <div class="summary">
+        <div class="summary-table">
+            <div class="summary-row subtotal">
+                <span class="summary-label">Subtotal</span>
+                <span class="summary-value">₹ @@subTotal@@</span>
+            </div>
+            <div class="summary-row tax">
+                <span class="summary-label">Tax (@@taxPercent@@%)</span>
+                <span class="summary-value">₹ @@taxAmount@@</span>
+            </div>
+            <div class="summary-row delivery">
+                <span class="summary-label">Delivery Charge</span>
+                <span class="summary-value">₹ @@deliveryCharge@@</span>
+            </div>
+            @@discountSection@@
+            <div class="summary-row total">
+                <span class="summary-label">Grand Total</span>
+                <span class="summary-value">₹ @@totalAmount@@</span>
+            </div>
+        </div>
+    </div>
 
-<table class="items">
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Qty</th>
-        <th>Total</th>
-    </tr>
-    </thead>
-    <tbody>
-    @@orderItems@@
-    </tbody>
-</table>
-
-<table class="summary-table">
-    <tr>
-        <td class="summary-label">Subtotal:</td>
-        <td>@@subTotal@@</td>
-    </tr>
-
-    <tr>
-        <td class="summary-label">Tax (@@taxPercent@@%):</td>
-        <td>@@taxAmount@@</td>
-    </tr>
-
-    <tr>
-        <td class="summary-label" style="font-size:16px;">Grand Total:</td>
-        <td style="font-size:16px;"><strong>@@totalAmount@@</strong></td>
-    </tr>
-</table>
-
-<div class="footer">
-    Generated by OneAim. This is a computer-generated invoice.
+    <!-- Footer -->
+    <div class="footer">
+        <p class="thank-you">Thank you for your business!</p>
+        <p>This is a computer-generated invoice and does not require a signature.</p>
+        <div class="contact-info">
+            <p><strong>Contact Us:</strong> support@oneaim.com | +91 0000000000</p>
+            <p><strong>Website:</strong> www.oneaim.com</p>
+        </div>
+    </div>
 </div>
-
 </body>
 </html>

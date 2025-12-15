@@ -5,10 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public interface ProductRepo extends JpaRepository<ProductBO, Long> {
@@ -35,5 +39,129 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long> {
     @Query("SELECT COUNT(p) FROM ProductBO p WHERE p.seller.id = :sellerId")
     Long countProductsBySeller(Long sellerId);
 
+    Long countByCategoryIdAndActiveTrue(Long categoryId);
+
+
+
+    Page<ProductBO> findByActiveTrueAndCategoryNameIgnoreCase(String category, Pageable pageable);
+
+    Page<ProductBO> findByActiveTrueAndNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Page<ProductBO> findByActiveTrueAndNameContainingIgnoreCaseAndCategoryNameIgnoreCase(
+            String name, String category, Pageable pageable
+    );
+
+
+    @Query("SELECT COUNT(p) FROM ProductBO p WHERE p.active = true AND p.categoryId = :categoryId")
+    Long countActiveProductsByCategory(Long categoryId);
+
+//    @Query("""
+//    SELECT p FROM ProductBO p
+//    WHERE p.active = true
+//    AND (:categories IS NULL OR LOWER(p.categoryName) IN :categories)
+//    AND (:brands IS NULL OR LOWER(p.brand) IN :brands)
+//    AND (:minPrice IS NULL OR p.price >= :minPrice)
+//    AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+//    AND (:rating IS NULL OR p.averageRating >= :rating)
+//""")
+//    Page<ProductBO> filterProducts(
+//            @Param("categories") List<String> categories,
+//            @Param("brands") List<String> brands,
+//            Integer minPrice,
+//            Integer maxPrice,
+//            Integer rating,
+//            Pageable pageable
+//    );
+
+    // ============================================
+    // PRODUCT COUNT PER CATEGORY (ACTIVE ONLY)
+    // ============================================
+    @Query("""
+        SELECT p.categoryId AS categoryId, COUNT(p.id) AS total
+        FROM ProductBO p
+        WHERE p.active = true
+        GROUP BY p.categoryId
+    """)
+    List<Object[]> countProductsGroupedByCategory();
+
+    default Map<Long, Long> countProductsGroupedByCategoryAsMap() {
+        return countProductsGroupedByCategory().stream()
+                .collect(Collectors.toMap(
+                        r -> (Long) r[0],           // categoryId
+                        r -> (Long) r[1]            // productCount
+                ));
+    }
+
+    // ============================================
+    // NEW ARRIVALS (HOMEPAGE)
+    // ============================================
+    @Query("""
+    SELECT DISTINCT p 
+    FROM ProductBO p
+    LEFT JOIN FETCH p.imageFileIds
+    WHERE p.active = true
+    ORDER BY p.createdAt DESC
+""")
+    List<ProductBO> findNewArrivals(Pageable pageable);
+
+
+    @Query("""
+    SELECT DISTINCT p 
+    FROM ProductBO p 
+    LEFT JOIN FETCH p.imageFileIds 
+    WHERE p.active = true AND p.featured = true
+""")
+    List<ProductBO> findFeaturedProducts(Pageable pageable);
+
+
+
+
+    @Query("""
+    SELECT DISTINCT p 
+    FROM ProductBO p 
+    LEFT JOIN FETCH p.imageFileIds 
+    WHERE p.createdAt >= :start 
+    AND p.active = true
+    ORDER BY p.createdAt DESC
+""")
+    List<ProductBO> findTrending(@Param("start") LocalDateTime start, Pageable pageable);
+
+
+    @Query("""
+        SELECT p.categoryId, COUNT(p)
+        FROM ProductBO p
+        WHERE p.active = true
+        GROUP BY p.categoryId
+       """)
+    List<Object[]> countProductsGrouped();
+
+    @Query("""
+    SELECT p FROM ProductBO p
+    WHERE p.active = true
+    AND (:categories IS NULL OR LOWER(p.categoryName) IN :categories)
+    AND (:brands IS NULL OR LOWER(p.brand) IN :brands)
+    AND (:minPrice IS NULL OR p.price >= :minPrice)
+    AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+""")
+    Page<ProductBO> filterProducts(
+            @Param("categories") List<String> categories,
+            @Param("brands") List<String> brands,
+            @Param("minPrice") Integer minPrice,
+            @Param("maxPrice") Integer maxPrice,
+            @Param("rating") Integer rating,
+            Pageable pageable
+    );
+
+    Page<ProductBO> findByActiveTrueAndCategoryNameIgnoreCaseAndIdNot(
+            String categoryName,
+            Long excludeId,
+            Pageable pageable
+    );
+
+
+    Long countByCategoryId(Long categoryId);
+
+    // Count active products by category name (for browse page)
+    Long countByActiveTrueAndCategoryNameIgnoreCase(String categoryName);
 
 }

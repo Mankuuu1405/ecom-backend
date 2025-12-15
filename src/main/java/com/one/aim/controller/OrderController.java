@@ -1,12 +1,13 @@
 package com.one.aim.controller;
 
-import com.one.aim.bo.InvoiceBO;
-import com.one.aim.bo.OrderBO;
+import com.one.aim.bo.*;
 import com.one.aim.mapper.OrderMapper;
+import com.one.aim.repo.AddressRepo;
+import com.one.aim.repo.CartRepo;
 import com.one.aim.repo.OrderRepo;
+import com.one.aim.rs.OrderSummaryRs;
 import com.one.aim.rs.UserRs;
-import com.one.aim.service.FileService;
-import com.one.aim.service.InvoiceService;
+import com.one.aim.service.*;
 import com.one.utils.AuthUtils;
 import com.one.vm.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.one.aim.constants.MessageCodes;
 import com.one.aim.rq.OrderRq;
-import com.one.aim.service.OrderService;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -38,15 +42,90 @@ import java.nio.file.Paths;
 public class OrderController {
 
     private final OrderService orderService;
-    private final InvoiceService  invoiceService;
+    private final FileService fileService;
+    private final AdminSettingService adminSettingService;
+    private final CartRepo cartRepo;
+    private final ChargesService chargesService;
+    private final AddressRepo addressRepo;
 
     // ---------------------------------------------------------
-    // PLACE ORDER (USER)
-    // ---------------------------------------------------------
+// PLACE ORDER (COD ONLY)
+// ---------------------------------------------------------
     @PostMapping("/place")
     public ResponseEntity<?> placeOrder(@RequestBody OrderRq rq) throws Exception {
-        return ResponseEntity.ok(orderService.placeOrder(rq));
+
+        Long userId = AuthUtils.findLoggedInUser().getDocId();
+        if (userId == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("User not authenticated");
+        }
+
+        // Block ONLINE here
+        if (!"COD".equalsIgnoreCase(rq.getPaymentMethod())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("ONLINE payment is not allowed here");
+        }
+
+        //  NEW: Resolve address before placing order
+        AddressBO shippingAddress = resolveShippingAddress(rq, userId);
+
+        OrderBO order = orderService.placeOrderAfterPayment(
+                userId,
+                "COD",
+                null,          // no PaymentBO for COD
+                shippingAddress  //  Pass the address
+        );
+
+        OrderSummaryRs summary =
+                OrderMapper.toOrderSummary(order, fileService);
+
+        return ResponseEntity.ok(
+                ResponseUtils.success(summary)
+        );
     }
+
+    //  NEW: Add this helper method to your controller or move to service
+    private AddressBO resolveShippingAddress(OrderRq rq, Long userId) {
+
+        // 1️⃣ If addressId explicitly provided → use it
+        if (rq.getAddressId() != null) {
+            AddressBO address = addressRepo.findById(rq.getAddressId())
+                    .orElseThrow(() -> new RuntimeException("Invalid addressId"));
+
+            if (!address.getUserid().equals(userId))
+                throw new RuntimeException("Address does not belong to user");
+
+            return address;
+        }
+
+        // 2️⃣ Try default address
+        Optional<AddressBO> defaultAddress =
+                addressRepo.findFirstByUseridAndIsDefault(userId, true);
+
+        if (defaultAddress.isPresent()) {
+            return defaultAddress.get();
+        }
+
+        // 3️⃣ NO DEFAULT → create TEMP address from checkout payload
+        AddressBO temp = new AddressBO();
+        temp.setUserid(userId);
+        temp.setFullName(rq.getFullName());
+        temp.setStreet(rq.getStreet());
+        temp.setCity(rq.getCity());
+        temp.setState(rq.getState());
+        temp.setZip(rq.getZip());
+        temp.setCountry(rq.getCountry());
+        temp.setPhone(rq.getPhone());
+
+        temp.setIsDefault(false); // 🚫 not saved as default
+//        temp.setEnabled(false);   // 🚫 optional: not reusable
+
+        return temp;
+    }
+
+
 
     // ---------------------------------------------------------
     // GET SINGLE ORDER
@@ -113,6 +192,15 @@ public class OrderController {
     @DeleteMapping("/cancel/{orderId}")
     public ResponseEntity<?> cancelOrder(@PathVariable String orderId) throws Exception {
         return ResponseEntity.ok(orderService.cancelOrder(orderId));
+    }
+
+    @GetMapping("/calculate-charges")
+    public ResponseEntity<?> calculateCharges(
+            @RequestParam(required = false) Double subtotal,
+            @RequestParam(required = false) String shippingMethod,
+            @RequestParam(required = false) String state
+    ) {
+        return chargesService.calculate(subtotal, shippingMethod, state);
     }
 
 

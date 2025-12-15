@@ -363,7 +363,18 @@ public class FileServiceImpl implements FileService {
         } catch (Exception ignored) {}
     }
 
+    @Override
+    public String getPublicFileUrl(Long fileId) {
+        return "http://localhost:8989/aimdev/api/files/public/" + fileId + "/view";
+    }
 
+    @Override
+    public String getPublicViewUrl(Long fileId) {
+        if (fileId == null) {
+            return null;
+        }
+        return "/api/files/public/" + fileId + "/view";
+    }
 
 
 }

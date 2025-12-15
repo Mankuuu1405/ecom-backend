@@ -28,8 +28,15 @@ public class CategoryBO {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private String slug;
+
+
     @Column(nullable = false)
     private boolean active = true;
+
+    // Image for home page category cards
+    private Long imageFileId;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -40,5 +47,5 @@ public class CategoryBO {
     private Double taxPercent;
     private Double deliveryCharge;
     private Integer returnPolicyDays;
-
 }
+

@@ -15,8 +15,7 @@ import com.one.aim.rq.SellerFilterRequest;
 import com.one.aim.rq.UpdateRq;
 import com.one.aim.rs.SellerPageResponse;
 import com.one.aim.rs.data.*;
-import com.one.aim.service.AdminSettingService;
-import com.one.aim.service.EmailService;
+import com.one.aim.service.*;
 import com.one.exception.AppException;
 import com.one.security.jwt.JwtUtils;
 import com.one.service.impl.UserDetailsImpl;
@@ -49,8 +48,6 @@ import com.one.aim.rq.SellerRq;
 import com.one.aim.rs.AdminRs;
 import com.one.aim.rs.CartRs;
 import com.one.aim.rs.SellerRs;
-import com.one.aim.service.FileService;
-import com.one.aim.service.SellerService;
 import com.one.constants.StringConstants;
 import com.one.utils.AuthUtils;
 import com.one.utils.Utils;
@@ -73,6 +70,8 @@ public class SellerServiceImpl implements SellerService {
     private final EmailService emailService;
     private final UserRepo userRepo;
     private final AdminSettingService adminSettingService;
+    private final NotificationService notificationService;
+    private final SellerMapper sellerMapper;
 
     // ===========================================================
     // SELLER SIGN-UP
@@ -177,6 +176,19 @@ public class SellerServiceImpl implements SellerService {
 
         sellerRepo.save(seller);
 
+        notificationService.notifyAdmins(
+                "SELLER_REGISTERED",
+                "New Seller Registered",
+                seller.getFullName() + " joined marketplace!",
+                seller,
+                null,
+                null,
+                "/admin/sellers/" + seller.getSellerId()
+        );
+
+
+
+
         emailService.sendVerificationEmail(
                 seller.getEmail(),
                 seller.getFullName(),
@@ -184,7 +196,7 @@ public class SellerServiceImpl implements SellerService {
         );
 
         return ResponseUtils.success(
-                new SellerDataRs(MessageCodes.MC_SAVED_SUCCESSFUL, SellerMapper.mapToSellerRs(seller))
+                new SellerDataRs(MessageCodes.MC_SAVED_SUCCESSFUL, sellerMapper.mapToSellerRs(seller))
         );
     }
 
@@ -203,7 +215,7 @@ public class SellerServiceImpl implements SellerService {
             SellerBO seller = sellerRepo.findById(sellerId)
                     .orElseThrow(() -> new RuntimeException(ErrorCodes.EC_SELLER_NOT_FOUND));
 
-            SellerRs sellerRs = SellerMapper.mapToSellerRs(seller);
+            SellerRs sellerRs = sellerMapper.mapToSellerRs(seller);
 
             return ResponseUtils.success(
                     new SellerDataRs(MessageCodes.MC_RETRIEVED_SUCCESSFUL, sellerRs)
@@ -231,7 +243,7 @@ public class SellerServiceImpl implements SellerService {
 
             List<SellerRs> sellerRsList = sellers.stream()
                     .map(seller -> {
-                        SellerRs rs = SellerMapper.mapToSellerRs(seller);
+                        SellerRs rs = sellerMapper.mapToSellerRs(seller);
                         rs.setDocId(null); // hide DB ID from admin
                         return rs;
                     })
@@ -321,7 +333,7 @@ public class SellerServiceImpl implements SellerService {
         return ResponseUtils.success(
                 new SellerDataRs(
                         MessageCodes.MC_DELETED_SUCCESSFUL,
-                        SellerMapper.mapToSellerRs(seller)
+                        sellerMapper.mapToSellerRs(seller)
                 )
         );
     }

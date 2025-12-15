@@ -24,7 +24,7 @@ public class AddressController {
     // =========================================================
     // ADD NEW ADDRESS
     // =========================================================
-    @PostMapping("/save")
+    @PostMapping("/add")
     public ResponseEntity<?> saveAddress(@RequestBody AddressRq rq) throws Exception {
 
         if (log.isDebugEnabled()) {

@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 import com.one.aim.bo.*;
 import com.one.aim.repo.*;
 import com.one.aim.rs.OrderIdRs;
-import com.one.aim.service.AdminSettingService;
-import com.one.aim.service.InvoiceService;
+import com.one.aim.service.*;
 import com.one.vm.core.BaseDataRs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ import com.one.aim.rs.CartRs;
 import com.one.aim.rs.data.CartDataRs;
 import com.one.aim.rs.data.CartDataRsList;
 import com.one.aim.rs.data.CartMaxDataRsList;
-import com.one.aim.service.CartService;
-import com.one.aim.service.FileService;
 import com.one.constants.StringConstants;
 import com.one.utils.AuthUtils;
 import com.one.utils.Utils;
@@ -49,6 +46,7 @@ public class CartServiceImpl implements CartService {
     private final InvoiceService  invoiceService;
     private final UserActivityService userActivityService;
     private final FileService fileService;
+    private final ChargesService chargesService;
 
     // ==========================================================
     // ADD PRODUCT TO CART  (Flipkart Style)
@@ -209,13 +207,23 @@ public class CartServiceImpl implements CartService {
 
         Long userId = AuthUtils.findLoggedInUser().getDocId();
 
-        // Only show ACTIVE cart items   FIXED
         List<CartBO> cartList =
                 cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
 
+        //  CALCULATE SUMMARY
+        Map<String, Object> summary =
+                (Map<String, Object>) chargesService
+                        .calculate(null, null, null)
+                        .getBody();
+
         return ResponseUtils.success(
-                new CartDataRsList("Cart loaded",
-                        CartMapper.mapToCartRsList(cartList, fileService))
+                Map.of(
+                        "message", "Cart loaded",
+                        "summary", summary,
+                        "carts", CartMapper.mapToCartRsList(cartList, fileService)
+                )
         );
     }
+
+
 }

@@ -7,14 +7,21 @@ import com.one.aim.bo.SellerBO;
 import com.one.aim.bo.VendorBO;
 import com.one.aim.rs.SellerRs;
 import com.one.aim.rs.VendorRs;
+import com.one.utils.UrlUtils;
 import com.one.utils.Utils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
+@Component
 @Slf4j
+@RequiredArgsConstructor
 public class SellerMapper {
 
-    public static SellerRs mapToSellerRs(SellerBO bo) {
+    private final UrlUtils urlUtils;
+
+    public SellerRs mapToSellerRs(SellerBO bo) {
 
         if (bo == null) return null;
 
@@ -37,21 +44,22 @@ public class SellerMapper {
         rs.setCreatedAt(bo.getCreatedAt());
 
         if (bo.getImageFileId() != null) {
-            rs.setImageUrl("/api/files/private/" + bo.getImageFileId() + "/view");
+            rs.setImageUrl(urlUtils.privateFile(bo.getImageFileId()));
         }
+
 
         return rs;
     }
 
 
-    public static List<SellerRs> mapToSellerRsList(List<SellerBO> bos) {
+    public List<SellerRs> mapToSellerRsList(List<SellerBO> bos) {
         if (bos == null || bos.isEmpty()) {
             log.warn("SellerBO list is empty");
-            return new ArrayList<>();
+            return List.of();
         }
 
         return bos.stream()
-                .map(SellerMapper::mapToSellerRs)
+                .map(this::mapToSellerRs)
                 .toList();
     }
 }

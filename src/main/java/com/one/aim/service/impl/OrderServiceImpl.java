@@ -32,6 +32,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static org.apache.commons.compress.utils.ArchiveUtils.sanitize;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -49,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepo productRepo;
     private final SellerRepo sellerRepo;
     private final AdminSettingService adminSettingService;
-    private final CategoryRepo categoryRepo;
+    private final OrderMapper orderMapper;
     //Notification
     private final NotificationService notificationService;
 
@@ -57,188 +59,160 @@ public class OrderServiceImpl implements OrderService {
         List<OrderBO> list = orderRepo.findAll();
         return ResponseUtils.success(
                 new OrderDataRsList("Orders loaded",
-                        OrderMapper.mapToOrderRsList(list, fileService))
-        );
-    }
-
-    @Override
-    @Transactional
-    public BaseRs placeOrder(OrderRq rq) throws Exception {
-
-        Long userId = AuthUtils.findLoggedInUser().getDocId();
-        if (userId == null) {
-            return ResponseUtils.failure("AUTH_REQUIRED", "User not authenticated");
-        }
-
-        // ------------------------------------------------------------
-        // LOAD CART ITEMS
-        // ------------------------------------------------------------
-        List<CartBO> cartItems = cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
-        if (cartItems == null || cartItems.isEmpty()) {
-            return ResponseUtils.failure("CART_EMPTY", "Your cart is empty.");
-        }
-
-        long subTotal = 0L;
-        long totalTax = 0L;
-        long totalShipping = 0L;
-
-        // Admin settings
-        boolean discountEnabled = adminSettingService.isDiscountEngineEnabled();
-        int globalDiscount = discountEnabled ? adminSettingService.getGlobalDiscount() : 0;
-        long freeShippingAbove = adminSettingService.getLongValue("free_shipping_min_order_amount", 999);
-
-        // ------------------------------------------------------------
-        // STOCK VALIDATION + PRICE CALCULATION
-        // ------------------------------------------------------------
-        for (CartBO cart : cartItems) {
-
-            ProductBO product = cart.getProduct();
-            if (product == null || !product.isActive()) {
-                return ResponseUtils.failure("PRODUCT_INVALID",
-                        "Product " + cart.getPname() + " is unavailable");
-            }
-
-            int qty = Math.max(cart.getQuantity(), 1);
-            int available = product.getStock() == null ? 0 : product.getStock();
-
-            if (available < qty) {
-                return ResponseUtils.failure("INSUFFICIENT_STOCK",
-                        product.getName() + " - only " + available + " left.");
-            }
-
-            long linePrice = product.getPrice().longValue() * qty;
-            subTotal += linePrice;
-
-            // Category-based TAX & SHIPPING
-            String category = product.getCategoryName().toLowerCase().replace(" ", "_");
-
-            double taxPercent = adminSettingService.getDoubleValue("tax_" + category, 0.0);
-            double shippingCharge = adminSettingService.getDoubleValue("shipping_" + category, 50.0);
-
-            totalTax += Math.round(linePrice * taxPercent / 100);
-            totalShipping += Math.round(shippingCharge);
-
-            // Stock update
-            product.setStock(available - qty);
-            product.updateLowStock();
-            productRepo.save(product);
-
-            // Persist final price
-            cart.setPrice(product.getPrice().longValue());
-            cartRepo.save(cart);
-        }
-
-        // ------------------------------------------------------------
-        // DISCOUNT
-        // ------------------------------------------------------------
-        long discountAmount = 0;
-        if (globalDiscount > 0) {
-            discountAmount = Math.round(subTotal * globalDiscount / 100);
-        }
-
-        // ------------------------------------------------------------
-        // FREE SHIPPING RULE
-        // ------------------------------------------------------------
-        if (subTotal >= freeShippingAbove) {
-            totalShipping = 0;
-        }
-
-        // ------------------------------------------------------------
-        // FINAL TOTAL
-        // ------------------------------------------------------------
-        long grandTotal = subTotal + totalTax + totalShipping - discountAmount;
-
-        // ------------------------------------------------------------
-        // SHIPPING ADDRESS
-        // ------------------------------------------------------------
-        AddressBO shippingAddress = resolveShippingAddress(rq, userId);
-
-        // ------------------------------------------------------------
-        // CREATE ORDER
-        // ------------------------------------------------------------
-        UserBO user = userRepo.findById(userId).orElseThrow();
-
-        OrderBO order = new OrderBO(); // orderId auto generated
-        order.setUser(user);
-        order.setOrderStatus("INITIAL");
-        order.setOrderTime(LocalDateTime.now());
-        order.setSubTotal(subTotal);
-        order.setTaxAmount(totalTax);
-        order.setDeliveryCharge(totalShipping);
-        order.setDiscountAmount(discountAmount);
-        order.setTotalAmount(grandTotal);
-        order.setShippingAddress(shippingAddress);
-
-        String pm = normalizePaymentMethod(rq.getPaymentMethod());
-        order.setPaymentMethod(pm);
-        order.setPaymentStatus(paymentStatusFromMethod(pm));
-
-        // Generate invoice number BEFORE save
-        String invoiceNo = adminSettingService.get("order_prefix")
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
-
-        order.setInvoiceno(invoiceNo);
-
-        orderRepo.save(order);  //  orderId auto-created here
-
-        // ------------------------------------------------------------
-        // ORDER ITEMS
-        // ------------------------------------------------------------
-        List<OrderItemBO> orderItemList = new ArrayList<>();
-
-        for (CartBO cart : cartItems) {
-            ProductBO product = cart.getProduct();
-
-            OrderItemBO item = OrderItemBO.builder()
-                    .order(order)
-                    .product(product)
-                    .sellerId(product.getSeller().getId())
-                    .productName(product.getName())
-                    .productCategory(product.getCategoryName())
-                    .unitPrice(cart.getPrice())
-                    .quantity(cart.getQuantity())
-                    .totalPrice(cart.getPrice() * cart.getQuantity())
-                    .build();
-
-            orderItemList.add(item);
-        }
-
-        order.setOrderItems(orderItemList);
-        orderRepo.save(order);
-
-        // ------------------------------------------------------------
-        // DISABLE CART ITEMS
-        // ------------------------------------------------------------
-        cartItems.forEach(c -> c.setEnabled(false));
-        cartRepo.saveAll(cartItems);
-
-        // ------------------------------------------------------------
-        // GENERATE & STORE INVOICE PDF
-        // ------------------------------------------------------------
-        invoiceService.generateInvoice(order.getOrderId());
-
-        // ------------------------------------------------------------
-        // ACTIVITY LOG + RESPONSE
-        // ------------------------------------------------------------
-        userActivityService.log(
-                userId,
-                "ORDER_PLACED",
-                "Order " + order.getOrderId() + " placed"
+                        orderMapper.mapToOrderRsList(list))
         );
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("orderId", order.getOrderId());
-        response.put("subTotal", subTotal);
-        response.put("taxAmount", totalTax);
-        response.put("shipping", totalShipping);
-        response.put("discount", discountAmount);
-        response.put("grandTotal", grandTotal);
-        response.put("paymentMethod", pm);
-        response.put("paymentStatus", order.getPaymentStatus());
-
-        return ResponseUtils.success(response);
     }
 
+//    @Override
+//    @Transactional
+//    public BaseRs placeOrder(OrderRq rq) throws Exception {
+//
+//        Long userId = AuthUtils.findLoggedInUser().getDocId();
+//        if (userId == null) {
+//            return ResponseUtils.failure("AUTH_REQUIRED", "User not authenticated");
+//        }
+//
+//        List<CartBO> cartItems = cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
+//        if (cartItems == null || cartItems.isEmpty()) {
+//            return ResponseUtils.failure("CART_EMPTY", "Your cart is empty.");
+//        }
+//
+//        long subTotal = 0L;
+//        long totalTax = 0L;
+//        long totalShipping = 0L;
+//
+//        long freeShippingAbove =
+//                adminSettingService.getLongValue("free_shipping_min_order_amount", 0);
+//
+//        long discountPercent =
+//                adminSettingService.getLongValue("global_discount_percent", 0);
+//
+//        for (CartBO cart : cartItems) {
+//
+//            ProductBO product = cart.getProduct();
+//            if (product == null || !product.isActive()) {
+//                return ResponseUtils.failure("PRODUCT_INVALID",
+//                        "Product " + cart.getPname() + " is unavailable");
+//            }
+//
+//            int qty = Math.max(cart.getQuantity(), 1);
+//            int available = Optional.ofNullable(product.getStock()).orElse(0);
+//
+//            if (available < qty) {
+//                return ResponseUtils.failure("INSUFFICIENT_STOCK",
+//                        product.getName() + " - only " + available + " left.");
+//            }
+//
+//            long linePrice = product.getPrice().longValue() * qty;
+//            subTotal += linePrice;
+//
+//            String category = sanitize(product.getCategoryName());
+//
+//            double taxPercent = adminSettingService.getDoubleValue(
+//                    "tax_" + category,
+//                    adminSettingService.getDoubleValue("default_tax_percent", 0)
+//            );
+//
+//            double shippingCharge = adminSettingService.getDoubleValue(
+//                    "shipping_" + category,
+//                    adminSettingService.getDoubleValue("delivery_charges_fixed", 0)
+//            );
+//
+//            totalTax += Math.round(linePrice * taxPercent / 100);
+//            totalShipping += Math.round(shippingCharge * qty);
+//
+//            product.setStock(available - qty);
+//            product.updateLowStock();
+//            productRepo.save(product);
+//
+//            cart.setPrice(product.getPrice().longValue());
+//            cartRepo.save(cart);
+//        }
+//
+//        long discountAmount = Math.round(subTotal * discountPercent / 100);
+//
+//        if (subTotal >= freeShippingAbove) {
+//            totalShipping = 0;
+//        }
+//
+//        // Payment gateway fee support (for Razorpay / card payments)
+//        double pgFeePercent =
+//                adminSettingService.getDoubleValue("payment_charge_percent", 0.0);
+//
+//        long pgFeeAmount = Math.round(subTotal * pgFeePercent / 100);
+//
+//        long grandTotal = subTotal + totalTax + totalShipping + pgFeeAmount - discountAmount;
+//
+//        AddressBO shippingAddress = resolveShippingAddress(rq, userId);
+//        UserBO user = userRepo.findById(userId).orElseThrow();
+//
+//        OrderBO order = new OrderBO();
+//        order.setUser(user);
+//        order.setOrderTime(LocalDateTime.now());
+//        order.setOrderStatus("INITIAL");
+//        order.setSubTotal(subTotal);
+//        order.setTaxAmount(totalTax);
+//        order.setDeliveryCharge(totalShipping);
+//        order.setDiscountAmount(discountAmount);
+//        order.setPaymentCharge(pgFeeAmount);
+//        order.setTotalAmount(grandTotal);
+//        order.setShippingAddress(shippingAddress);
+//
+//        String pm = normalizePaymentMethod(rq.getPaymentMethod());
+//        order.setPaymentMethod(pm);
+//        order.setPaymentStatus(paymentStatusFromMethod(pm));
+//
+//        order.setInvoiceno(
+//                adminSettingService.get("order_prefix")
+//                        + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"))
+//        );
+//
+//        orderRepo.save(order);
+//
+//        List<OrderItemBO> items = new ArrayList<>();
+//        for (CartBO cart : cartItems) {
+//            ProductBO product = cart.getProduct();
+//            items.add(OrderItemBO.builder()
+//                    .order(order)
+//                    .product(product)
+//                    .sellerId(product.getSeller().getId())
+//                    .productName(product.getName())
+//                    .productCategory(product.getCategoryName())
+//                    .unitPrice(cart.getPrice())
+//                    .quantity(cart.getQuantity())
+//                    .totalPrice(cart.getPrice() * cart.getQuantity())
+//                    .build());
+//        }
+//
+//        order.setOrderItems(items);
+//        orderRepo.save(order);
+//
+//        cartItems.forEach(c -> c.setEnabled(false));
+//        cartRepo.saveAll(cartItems);
+//
+//        invoiceService.generateInvoice(order.getOrderId());
+//
+//        userActivityService.log(
+//                userId,
+//                "ORDER_PLACED",
+//                "Order " + order.getOrderId() + " placed"
+//        );
+//
+//        sendOrderNotifications(order);
+//
+//        return ResponseUtils.success(Map.of(
+//                "orderId", order.getOrderId(),
+//                "subTotal", subTotal,
+//                "taxAmount", totalTax,
+//                "shipping", totalShipping,
+//                "discount", discountAmount,
+//                "paymentCharge", pgFeeAmount,
+//                "grandTotal", grandTotal,
+//                "paymentMethod", pm,
+//                "paymentStatus", order.getPaymentStatus()
+//        ));
+//    }
 
 
 
@@ -249,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             return orderRepo.findById(orderId)
                     .map(order -> {
-                        OrderRs orderRs = OrderMapper.mapToOrderRs(order, fileService);
+                        OrderRs orderRs = orderMapper.mapToOrderRs(order);
                         return ResponseUtils.success(
                                 new OrderDataRs(MessageCodes.MC_RETRIEVED_SUCCESSFUL, orderRs)
                         );
@@ -359,7 +333,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         return ResponseUtils.success(
-                OrderMapper.mapToOrderRsList(orders, fileService)
+                orderMapper.mapToOrderRsList(orders)
         );
     }
 
@@ -388,20 +362,18 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // restore stock
-        for (CartBO cart : order.getCartItems()) {
+        for (OrderItemBO item : order.getOrderItems()) {
 
-            cart.setEnabled(true);
-
-            ProductBO product = cart.getProduct();
+            ProductBO product = item.getProduct();
             if (product != null) {
                 int current = product.getStock() == null ? 0 : product.getStock();
-                int qty = cart.getQuantity() <= 0 ? 1 : cart.getQuantity();
+                int qty = item.getQuantity();
                 product.setStock(current + qty);
                 product.updateLowStock();
                 productRepo.save(product);
             }
         }
-        cartRepo.saveAll(order.getCartItems());
+
 
         order.setOrderStatus("CANCELLED");
         order.setPaymentStatus("CANCELLED");
@@ -447,7 +419,7 @@ public class OrderServiceImpl implements OrderService {
                 orderRepo.findOrdersForSeller(sellerId, status, pageable);
 
         List<OrderRs> orderList =
-                OrderMapper.mapToOrderRsList(pagedOrders.getContent(), fileService);
+                orderMapper.mapToOrderRsList(pagedOrders.getContent());
 
         Map<String, Object> response = new HashMap<>();
         response.put("orders", orderList);
@@ -461,25 +433,34 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    private double getTaxPercent(ProductBO product) {
-        String cat = product.getCategoryName() == null ? "" : product.getCategoryName().toLowerCase();
-        return switch (cat) {
-            case "electronics" -> parseDoubleSafe("tax_electronics", 18);
-            case "fashion"     -> parseDoubleSafe("tax_fashion", 5);
-            case "grocery"     -> parseDoubleSafe("tax_grocery", 0);
-            default            -> parseDoubleSafe("default_tax_percent", 0);
-        };
+    private double getAdminValue(String key, double defaultValue) {
+        try {
+            String v = adminSettingService.get(key);
+            return (v == null || v.isBlank()) ? defaultValue : Double.parseDouble(v);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
-    private double getDeliveryCharge(ProductBO product) {
-        String cat = product.getCategoryName() == null ? "" : product.getCategoryName().toLowerCase();
-        return switch (cat) {
-            case "electronics" -> parseDoubleSafe("shipping_electronics", 100);
-            case "fashion"     -> parseDoubleSafe("shipping_fashion", 50);
-            case "grocery"     -> parseDoubleSafe("shipping_grocery", 20);
-            default            -> parseDoubleSafe("delivery_charges_fixed", 50);
-        };
+    private double getTaxPercent(ProductBO product) {
+        String cat = Optional.ofNullable(product.getCategoryName())
+                .orElse("")
+                .toLowerCase()
+                .replace(" ", "_");
+
+        return getAdminValue("tax_" + cat,
+                getAdminValue("default_tax_percent", 0));
     }
+
+    private double getShippingCharge(ProductBO product) {
+        String cat = Optional.ofNullable(product.getCategoryName())
+                .orElse("")
+                .toLowerCase()
+                .replace(" ", "_");
+
+        return 0;
+    }
+
 
     private double parseDoubleSafe(String key, double defaultValue) {
         try {
@@ -516,13 +497,248 @@ public class OrderServiceImpl implements OrderService {
 
 
     private SellerBO findSellerFromOrder(OrderBO order) {
-        if (order.getCartItems() == null || order.getCartItems().isEmpty())
+
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
             return null;
+        }
 
-        CartBO cart = order.getCartItems().get(0);
-        ProductBO product = cart.getProduct();
+        OrderItemBO item = order.getOrderItems().get(0);
+        ProductBO product = item.getProduct();
 
-        return (product == null) ? null : product.getSeller();
+        return product != null ? product.getSeller() : null;
     }
+
+
+    private void sendOrderNotifications(OrderBO order) {
+
+        UserBO buyer = order.getUser();
+        OrderItemBO item = order.getOrderItems().get(0); // 1st product
+        ProductBO product = item.getProduct();
+        SellerBO seller = product.getSeller();
+
+        Long productImageId = null;
+        if (product.getImageFileIds() != null && !product.getImageFileIds().isEmpty()) {
+            productImageId = product.getImageFileIds().get(0);
+        }
+
+        String orderNo = order.getOrderId(); // <-- String ID
+        String orderRedirect = "/orders/" + orderNo;
+// USER → Order Confirmed
+        notificationService.notifyUser(
+                buyer.getId(),
+                "ORDER_PLACED",
+                "Order Confirmed",
+                "Your order #" + order.getOrderId() + " has been placed successfully",
+                productImageId,
+                order.getId(),
+                "/account/orders"
+        );
+
+
+
+        // SELLER → New Order Received
+        notificationService.notifyUser(
+                seller.getId(),
+                "NEW_ORDER",
+                "New Order for " + product.getName(),
+                "Order received for product: " + product.getName(),
+                productImageId,
+                null,
+                "/seller/orders/" + orderNo
+        );
+
+        // ADMIN → Track new order
+        notificationService.notifyAdmins(
+                "ORDER_PLACED",
+                "New Order Placed",
+                order.getUser().getFullName() + " bought " + product.getName(),
+                null,                 // seller
+                product,              // product reference
+                order,                // full order data
+                "/admin/orders/" + order.getId()
+        );
+
+
+    }
+
+    @Override
+    public long calculateCartTotal(Long userId) {
+
+        List<CartBO> carts =
+                cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
+
+        if (carts == null || carts.isEmpty()) {
+            return 0;
+        }
+
+        long total = 0;
+        for (CartBO cart : carts) {
+            int qty = Math.max(cart.getQuantity(), 1);
+            total += cart.getProduct().getPrice().longValue() * qty;
+        }
+        return total;
+    }
+
+    @Override
+    @Transactional
+    public OrderBO placeOrderAfterPayment(
+            Long userId,
+            String paymentMethod,
+            PaymentBO payment, AddressBO shippingAddress) throws Exception {
+
+
+
+        // --------------------------------------------------
+        // 1. FETCH CART
+        // --------------------------------------------------
+        List<CartBO> cartItems =
+                cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
+
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new RuntimeException("CART_EMPTY");
+        }
+
+        long subTotal = 0L;
+        long totalTax = 0L;
+        long totalShipping = 0L;
+
+        long freeShippingAbove =
+                adminSettingService.getLongValue("free_shipping_min_order_amount", 0);
+
+        long discountPercent =
+                adminSettingService.getLongValue("global_discount_percent", 0);
+
+        // --------------------------------------------------
+        // 2. VALIDATE STOCK + CALCULATE PRICE
+        // --------------------------------------------------
+        for (CartBO cart : cartItems) {
+
+            ProductBO product = cart.getProduct();
+            if (product == null || !product.isActive()) {
+                throw new RuntimeException(
+                        "Product " + cart.getPname() + " unavailable"
+                );
+            }
+
+            int qty = Math.max(cart.getQuantity(), 1);
+            int available = Optional.ofNullable(product.getStock()).orElse(0);
+
+            if (available < qty) {
+                throw new RuntimeException(
+                        product.getName() + " - only " + available + " left."
+                );
+            }
+
+            long linePrice = product.getPrice().longValue() * qty;
+            subTotal += linePrice;
+
+            String category = sanitize(product.getCategoryName());
+
+            double taxPercent = adminSettingService.getDoubleValue(
+                    "tax_" + category,
+                    adminSettingService.getDoubleValue("default_tax_percent", 0)
+            );
+
+            double shippingCharge = adminSettingService.getDoubleValue(
+                    "shipping_" + category,
+                    adminSettingService.getDoubleValue("delivery_charges_fixed", 0)
+            );
+
+            totalTax += Math.round(linePrice * taxPercent / 100);
+            totalShipping += Math.round(shippingCharge * qty);
+
+            //  STOCK REDUCTION (SAFE NOW – PAYMENT DONE)
+            product.setStock(available - qty);
+            product.updateLowStock();
+            productRepo.save(product);
+
+            cart.setPrice(product.getPrice().longValue());
+            cartRepo.save(cart);
+        }
+
+        long discountAmount = Math.round(subTotal * discountPercent / 100);
+
+        if (subTotal >= freeShippingAbove) {
+            totalShipping = 0;
+        }
+
+        long pgFeeAmount = 0; // payment already done
+
+        long grandTotal =
+                subTotal + totalTax + totalShipping + pgFeeAmount - discountAmount;
+
+        // --------------------------------------------------
+        // 3. CREATE ORDER
+        // --------------------------------------------------
+        UserBO user = userRepo.findById(userId).orElseThrow();
+
+        OrderBO order = new OrderBO();
+        order.setUser(user);
+        order.setShippingAddress(shippingAddress);
+        order.setOrderTime(LocalDateTime.now());
+        order.setOrderStatus("PLACED");
+        order.setPaymentMethod(paymentMethod);
+        order.setPaymentStatus(paymentMethod.equals("COD") ? "COD_PENDING" : "PAID");
+        order.setSubTotal(subTotal);
+        order.setTaxAmount(totalTax);
+        order.setDeliveryCharge(totalShipping);
+        order.setDiscountAmount(discountAmount);
+        order.setPaymentCharge(pgFeeAmount);
+        order.setTotalAmount(grandTotal);
+
+        order.setInvoiceno(
+                adminSettingService.get("order_prefix")
+                        + LocalDateTime.now().format(
+                        DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")
+                )
+        );
+
+        orderRepo.save(order);
+
+        // --------------------------------------------------
+        // 4. ORDER ITEMS
+        // --------------------------------------------------
+        List<OrderItemBO> items = new ArrayList<>();
+        for (CartBO cart : cartItems) {
+            ProductBO product = cart.getProduct();
+
+            items.add(OrderItemBO.builder()
+                    .order(order)
+                    .product(product)
+                    .sellerId(product.getSeller().getId())
+                    .productName(product.getName())
+                    .productCategory(product.getCategoryName())
+                    .unitPrice(cart.getPrice())
+                    .quantity(cart.getQuantity())
+                    .totalPrice(cart.getPrice() * cart.getQuantity())
+                    .build());
+        }
+
+        order.setOrderItems(items);
+        orderRepo.save(order);
+
+        // --------------------------------------------------
+        // 5. DISABLE CART
+        // --------------------------------------------------
+        cartItems.forEach(c -> c.setEnabled(false));
+        cartRepo.saveAll(cartItems);
+
+        // --------------------------------------------------
+        // 6. POST-ORDER ACTIONS
+        // --------------------------------------------------
+        invoiceService.generateInvoice(order.getOrderId());
+
+        userActivityService.log(
+                userId,
+                "ORDER_PLACED",
+                "Order " + order.getOrderId() + " placed"
+        );
+
+        sendOrderNotifications(order);
+
+        return order;
+    }
+
+
 
 }

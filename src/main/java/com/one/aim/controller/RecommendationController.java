@@ -4,12 +4,13 @@ import com.one.aim.rs.RecommendationRs;
 import com.one.aim.service.RecommendationService;
 import com.one.vm.core.BaseDataRs;
 import com.one.vm.core.BaseRs;
-import com.one.vm.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/recommend")
@@ -18,57 +19,84 @@ public class RecommendationController {
 
     private final RecommendationService recService;
 
-    @GetMapping("/fbt/{productId}")
-    public BaseRs fbt(@PathVariable Long productId,
-                      @RequestParam(defaultValue = "5") int limit) {
-        List<RecommendationRs> list = recService.getFrequentlyBoughtTogether(productId, limit);
-        BaseRs base = new BaseRs();
-        base.setStatus("SUCCESS");
-        base.setData(new BaseDataRs("Frequently bought together", list));
-        return base;
+    @GetMapping("/frequently-bought-together/{productId}")
+    public ResponseEntity<BaseRs> fbt(
+            @PathVariable Long productId,
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+
+        List<RecommendationRs> list =
+                recService.getFrequentlyBoughtTogetherSimple(productId, limit);
+
+        BaseRs rs = new BaseRs();
+        rs.setStatus("SUCCESS");
+        rs.setData(new BaseDataRs("Frequently bought together", list));
+
+        return ResponseEntity.ok(rs);
     }
 
-    @GetMapping("/pab/{productId}")
-    public BaseRs pab(@PathVariable Long productId,
-                      @RequestParam(defaultValue = "10") int limit) {
-        List<RecommendationRs> list = recService.getPeopleAlsoBought(productId, limit);
-        BaseRs base = new BaseRs();
-        base.setStatus("SUCCESS");
-        base.setData(new BaseDataRs("People also bought", list));
-        return base;
+    @GetMapping("/people-also-bought/{productId}")
+    public ResponseEntity<BaseRs> pab(
+            @PathVariable Long productId,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+
+        List<RecommendationRs> list =
+                recService.getPeopleAlsoBoughtSimple(productId, limit);
+
+        BaseRs rs = new BaseRs();
+        rs.setStatus("SUCCESS");
+        rs.setData(new BaseDataRs("People also bought", list));
+
+        return ResponseEntity.ok(rs);
     }
 
     @GetMapping("/recommended")
     @PreAuthorize("hasAuthority('USER')")
-    public BaseRs recommended(@RequestParam(defaultValue = "10") int limit) {
+    public ResponseEntity<BaseRs> recommended(
+            @RequestParam(defaultValue = "10") int limit
+    ) {
 
-        List<RecommendationRs> list = recService.getRecommendedForUser(limit);
+        List<RecommendationRs> list =
+                recService.getRecommendedForUserSimple(limit);
 
-        BaseRs base = new BaseRs();
-        base.setStatus("SUCCESS");
-        base.setData(new BaseDataRs("Recommended for you", list));
-        return base;
+        BaseRs rs = new BaseRs();
+        rs.setStatus("SUCCESS");
+        rs.setData(new BaseDataRs("Recommended for you", list));
+
+        return ResponseEntity.ok(rs);
     }
-
-
 
     @GetMapping("/trending")
-    public BaseRs trending(@RequestParam(defaultValue = "7") int days,
-                           @RequestParam(defaultValue = "10") int limit) {
-        List<RecommendationRs> list = recService.getTrending(days, limit);
-        BaseRs base = new BaseRs();
-        base.setStatus("SUCCESS");
-        base.setData(new BaseDataRs("Trending products", list));
-        return base;
+    public ResponseEntity<BaseRs> trending(
+            @RequestParam(defaultValue = "7") int days,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+
+        List<RecommendationRs> list =
+                recService.getTrendingSimple(days, limit);
+
+        BaseRs rs = new BaseRs();
+        rs.setStatus("SUCCESS");
+        rs.setData(new BaseDataRs("Trending products", list));
+
+        return ResponseEntity.ok(rs);
     }
 
-    @GetMapping("/category/{category}")
-    public BaseRs topByCategory(@PathVariable String category,
-                                @RequestParam(defaultValue = "10") int limit) {
-        List<RecommendationRs> list = recService.getTopByCategory(category, limit);
-        BaseRs base = new BaseRs();
-        base.setStatus("SUCCESS");
-        base.setData(new BaseDataRs("Top products in category", list));
-        return base;
+    @GetMapping("/category/{categorySlug}")
+    public ResponseEntity<BaseRs> topByCategory(
+            @PathVariable String categorySlug,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+
+        List<RecommendationRs> list =
+                recService.getTopByCategorySimple(categorySlug, limit);
+
+        BaseRs rs = new BaseRs();
+        rs.setStatus("SUCCESS");
+        rs.setData(new BaseDataRs("Top products in category", list));
+
+        return ResponseEntity.ok(rs);
     }
 }
+
