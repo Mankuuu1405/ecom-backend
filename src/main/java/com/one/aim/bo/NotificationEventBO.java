@@ -8,33 +8,46 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notification_events")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class NotificationEventBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type;          // SALE, ORDER_UPDATE etc.
-    private String title;
+    private String type;          // ORDER_PLACED, PRODUCT_ADDED, SELLER_REGISTERED, SYSTEM
 
-    @Column(length = 500)
+    private String title;
     private String description;
 
     private Long imageFileId;
-    private Long redirectRefId;
     private String redirectUrl;
-
     private String targetRole;    // USER / SELLER / ADMIN / ALL
+
+    @Column(name = "redirect_ref_id")
+    private Long redirectRefId;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private OrderBO order;        //  (Purchase notification)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private ProductBO product;    //  (Product added/updated notification)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    private SellerBO seller;        //  (Seller registration notification)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "triggered_by_user_id")
+    private UserBO triggeredByUser;  //  Who caused the event
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-
     private LocalDateTime expiryAt;
 }
+
 

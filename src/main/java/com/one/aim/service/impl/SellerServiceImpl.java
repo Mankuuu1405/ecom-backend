@@ -71,6 +71,7 @@ public class SellerServiceImpl implements SellerService {
     private final UserRepo userRepo;
     private final AdminSettingService adminSettingService;
     private final NotificationService notificationService;
+    private final SellerMapper sellerMapper;
 
     // ===========================================================
     // SELLER SIGN-UP
@@ -178,11 +179,13 @@ public class SellerServiceImpl implements SellerService {
         notificationService.notifyAdmins(
                 "SELLER_REGISTERED",
                 "New Seller Registered",
-                seller.getFullName() + " (" + seller.getEmail() + ")",
-                seller.getImageFileId(),
-                seller.getId(),
-                "/admin/sellers/" + seller.getId()
+                seller.getFullName() + " joined marketplace!",
+                seller,
+                null,
+                null,
+                "/admin/sellers/" + seller.getSellerId()
         );
+
 
 
 
@@ -193,7 +196,7 @@ public class SellerServiceImpl implements SellerService {
         );
 
         return ResponseUtils.success(
-                new SellerDataRs(MessageCodes.MC_SAVED_SUCCESSFUL, SellerMapper.mapToSellerRs(seller))
+                new SellerDataRs(MessageCodes.MC_SAVED_SUCCESSFUL, sellerMapper.mapToSellerRs(seller))
         );
     }
 
@@ -212,7 +215,7 @@ public class SellerServiceImpl implements SellerService {
             SellerBO seller = sellerRepo.findById(sellerId)
                     .orElseThrow(() -> new RuntimeException(ErrorCodes.EC_SELLER_NOT_FOUND));
 
-            SellerRs sellerRs = SellerMapper.mapToSellerRs(seller);
+            SellerRs sellerRs = sellerMapper.mapToSellerRs(seller);
 
             return ResponseUtils.success(
                     new SellerDataRs(MessageCodes.MC_RETRIEVED_SUCCESSFUL, sellerRs)
@@ -240,7 +243,7 @@ public class SellerServiceImpl implements SellerService {
 
             List<SellerRs> sellerRsList = sellers.stream()
                     .map(seller -> {
-                        SellerRs rs = SellerMapper.mapToSellerRs(seller);
+                        SellerRs rs = sellerMapper.mapToSellerRs(seller);
                         rs.setDocId(null); // hide DB ID from admin
                         return rs;
                     })
@@ -330,7 +333,7 @@ public class SellerServiceImpl implements SellerService {
         return ResponseUtils.success(
                 new SellerDataRs(
                         MessageCodes.MC_DELETED_SUCCESSFUL,
-                        SellerMapper.mapToSellerRs(seller)
+                        sellerMapper.mapToSellerRs(seller)
                 )
         );
     }

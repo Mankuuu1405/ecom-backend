@@ -1,14 +1,18 @@
 package com.one.aim.mapper;
 
 import com.one.aim.bo.InvoiceBO;
+import com.one.aim.bo.OrderItemBO;
+import com.one.aim.bo.ProductBO;
+import com.one.aim.bo.SellerBO;
 import com.one.aim.rs.AdminInvoiceRs;
 import com.one.aim.rs.InvoiceRs;
 
 import java.util.List;
+import java.util.Objects;
 
 public class InvoiceMapper {
 
-    // Convert entity to DTO
+    // Convert entity to USER invoice DTO
     public static InvoiceRs toDto(InvoiceBO inv) {
         return new InvoiceRs(
                 inv.getId(),
@@ -19,10 +23,16 @@ public class InvoiceMapper {
         );
     }
 
+    // Convert entity to ADMIN invoice DTO
     public static AdminInvoiceRs toAdminDto(InvoiceBO inv) {
-        List<Long> sellerIds = inv.getOrder().getCartItems()
+
+        List<Long> sellerIds = inv.getOrder().getOrderItems()
                 .stream()
-                .map(ci -> ci.getProduct().getSeller().getId())
+                .map(OrderItemBO::getProduct)
+                .filter(Objects::nonNull)
+                .map(ProductBO::getSeller)
+                .filter(Objects::nonNull)
+                .map(SellerBO::getId)
                 .distinct()
                 .toList();
 
@@ -36,5 +46,5 @@ public class InvoiceMapper {
                 sellerIds
         );
     }
-
 }
+

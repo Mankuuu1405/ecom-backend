@@ -5,14 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 public class NotificationWSController {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void sendToUserWS(Long userId, NotificationRS dto) {
+    public void sendToUserWS(Long userId, Map<String, Object> dto) {
         messagingTemplate.convertAndSend("/topic/user-notifications/" + userId, dto);
     }
+
 }
 

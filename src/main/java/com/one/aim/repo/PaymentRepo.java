@@ -14,6 +14,7 @@ public interface PaymentRepo extends JpaRepository<PaymentBO, Long> {
 
     Optional<PaymentBO> findByRazorpayPaymentId(String razorpayPaymentId);
     List<PaymentBO> findByOrder(OrderBO order);
+    Optional<PaymentBO> findByRazorpayOrderId(String razorpayOrderId);
 
 
 

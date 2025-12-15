@@ -11,5 +11,6 @@ public class CategoryCardRs {
     private Long id;
     private String name;
     private String image;     // Public URL
+    private String slug;
     private Long productCount;
 }

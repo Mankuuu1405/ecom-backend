@@ -48,21 +48,21 @@ public class NotificationController {
     // ============================================================
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('SELLER') or hasAuthority('ADMIN')")
-    public ResponseEntity<?> myUnread() {
+    public ResponseEntity<?> myNotifications(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Boolean unread,
+            @RequestParam(required = false) String type
+    ) {
 
         Long userId = AuthUtils.getLoggedUserId();
         String role = getLoggedRole();
 
-        var list = notificationService.getUnreadForUser(userId).stream()
-                .filter(n -> isRoleAllowed(n.getEvent(), role))  // ROLE FILTER APPLIED 🚀
-                .map(n -> NotificationMapper.map(n.getEvent(), n, fileService))
-                .toList();
-
-        if (list.isEmpty()) {
-            return ResponseEntity.ok(Map.of("message", "You have no new notifications"));
-        }
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(
+                notificationService.getMyNotifications(userId, role, page, size, unread, type)
+        );
     }
+
 
     // ============================================================
     // All notifications (read + unread) → Dashboard List

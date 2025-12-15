@@ -22,71 +22,81 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     // ==========================================================
     List<OrderBO> findByUser_Id(Long userId);
 
-    OrderBO findByRazorpayorderid(String razorpayorderid);
+    OrderBO findByRazorpayOrderId(String razorpayOrderId);
 
     OrderBO findByInvoiceno(String invoiceno);
 
     Optional<OrderBO> findByOrderId(String orderId);
+
+    @Query("""
+        SELECT COUNT(o) > 0
+        FROM OrderBO o
+        JOIN o.orderItems oi
+        WHERE o.user.id = :userId
+          AND oi.product.id = :productId
+          AND o.orderStatus = 'DELIVERED'
+    """)
+    boolean hasUserPurchasedProduct(
+            @Param("userId") Long userId,
+            @Param("productId") Long productId
+    );
+
 
 
     // ==========================================================
     // SELLER — Orders Containing Seller Products
     // ==========================================================
     @Query("""
-        SELECT o FROM OrderBO o
-        JOIN o.cartItems c
-        JOIN c.product p
-        JOIN p.seller s
-        WHERE s.id = :sellerId
+        SELECT DISTINCT o
+        FROM OrderBO o
+        JOIN o.orderItems oi
+        JOIN oi.product p
+        WHERE p.seller.id = :sellerId
     """)
     List<OrderBO> findOrdersBySellerId(@Param("sellerId") Long sellerId);
 
 
-
     // ==========================================================
-    //  SELLER DASHBOARD ANALYTICS
+    // SELLER DASHBOARD ANALYTICS
     // ==========================================================
 
     // Total Sales
     @Query("""
-        SELECT SUM(o.totalAmount)
-        FROM OrderBO o
-        JOIN o.cartItems c
-        JOIN c.product p
-        WHERE p.seller.id = :sellerId
+        SELECT SUM(oi.totalPrice)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
     """)
     Long getTotalSalesBySeller(@Param("sellerId") Long sellerId);
 
 
     // Total Orders
     @Query("""
-        SELECT COUNT(DISTINCT o.id)
-        FROM OrderBO o
-        JOIN o.cartItems c
-        JOIN c.product p
-        WHERE p.seller.id = :sellerId
+        SELECT COUNT(DISTINCT oi.order.id)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
     """)
     Long countBySellerId(@Param("sellerId") Long sellerId);
 
 
-    // Last Month Sales (MySQL native)
-    @Query(value = """
-        SELECT SUM(oi.total_price)
-        FROM order_item oi
-        WHERE oi.seller_id = :sellerId
-          AND oi.created_at >= NOW() - INTERVAL 1 MONTH
-    """, nativeQuery = true)
-    Long getLastMonthSalesBySeller(@Param("sellerId") Long sellerId);
+    // Last Month Sales
+    @Query("""
+        SELECT SUM(oi.totalPrice)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+          AND oi.createdAt >= :startDate
+    """)
+    Long getLastMonthSalesBySeller(
+            @Param("sellerId") Long sellerId,
+            @Param("startDate") LocalDateTime startDate
+    );
 
 
     // Last Month Order Count
     @Query("""
-        SELECT COUNT(DISTINCT o.id)
-        FROM OrderBO o
-        JOIN o.cartItems ci
-        JOIN ci.product p
-        WHERE p.seller.id = :sellerId
-          AND o.createdAt >= :startDate
+        SELECT COUNT(DISTINCT oi.order.id)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+          AND oi.createdAt >= :startDate
     """)
     Long getLastMonthOrderCountBySeller(
             @Param("sellerId") Long sellerId,
@@ -100,11 +110,9 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
         FROM OrderBO o
         JOIN o.user u
         WHERE o.id IN (
-            SELECT DISTINCT o2.id
-            FROM OrderBO o2
-            JOIN o2.cartItems ci
-            JOIN ci.product p
-            WHERE p.seller.id = :sellerId
+            SELECT DISTINCT oi.order.id
+            FROM OrderItemBO oi
+            WHERE oi.sellerId = :sellerId
         )
         ORDER BY o.createdAt DESC
     """)
@@ -113,27 +121,23 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
 
     // Sales By Product Per Day
     @Query("""
-        SELECT p.name, DATE(o.createdAt), SUM(o.totalAmount)
-        FROM OrderBO o
-        JOIN o.cartItems c
-        JOIN c.product p
-        WHERE p.seller.id = :sellerId
-        GROUP BY p.name, DATE(o.createdAt)
-        ORDER BY p.name ASC
+        SELECT oi.productName, DATE(oi.createdAt), SUM(oi.totalPrice)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+        GROUP BY oi.productName, DATE(oi.createdAt)
+        ORDER BY oi.productName ASC
     """)
     List<Object[]> getSalesByProductPerDay(@Param("sellerId") Long sellerId);
 
 
     // Today's Sales
     @Query("""
-    SELECT SUM(oi.totalPrice)
-    FROM OrderItemBO oi
-    WHERE oi.sellerId = :sellerId
-      AND DATE(oi.createdAt) = CURRENT_DATE
-""")
+        SELECT SUM(oi.totalPrice)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+          AND DATE(oi.createdAt) = CURRENT_DATE
+    """)
     Double getTodaySales(@Param("sellerId") Long sellerId);
-
-
 
 
     // ==========================================================
@@ -141,12 +145,10 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     // ==========================================================
 
     @Query("""
-        SELECT COUNT(DISTINCT o.id)
-        FROM OrderBO o
-        JOIN o.cartItems ci
-        JOIN ci.product p
-        WHERE p.seller.id = :sellerId
-          AND o.createdAt BETWEEN :start AND :end
+        SELECT COUNT(DISTINCT oi.order.id)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+          AND oi.createdAt BETWEEN :start AND :end
     """)
     Long countSellerOrders(
             @Param("sellerId") Long sellerId,
@@ -156,12 +158,10 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
 
 
     @Query("""
-        SELECT COUNT(DISTINCT o.user.id)
-        FROM OrderBO o
-        JOIN o.cartItems ci
-        JOIN ci.product p
-        WHERE p.seller.id = :sellerId
-          AND o.createdAt BETWEEN :start AND :end
+        SELECT COUNT(DISTINCT oi.order.user.id)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+          AND oi.createdAt BETWEEN :start AND :end
     """)
     Long countSellerUniqueCustomers(
             @Param("sellerId") Long sellerId,
@@ -171,19 +171,15 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
 
 
     @Query("""
-        SELECT COUNT(DISTINCT o.user.id)
-        FROM OrderBO o
-        JOIN o.cartItems ci
-        JOIN ci.product p
-        WHERE p.seller.id = :sellerId
-          AND o.createdAt BETWEEN :start AND :end
-          AND o.user.id IN (
-              SELECT o2.user.id
-              FROM OrderBO o2
-              JOIN o2.cartItems ci2
-              JOIN ci2.product p2
-              WHERE p2.seller.id = :sellerId
-                AND o2.createdAt < :start
+        SELECT COUNT(DISTINCT oi.order.user.id)
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+          AND oi.createdAt BETWEEN :start AND :end
+          AND oi.order.user.id IN (
+              SELECT oi2.order.user.id
+              FROM OrderItemBO oi2
+              WHERE oi2.sellerId = :sellerId
+                AND oi2.createdAt < :start
           )
     """)
     Long countSellerReturningCustomers(
@@ -193,11 +189,9 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     );
 
 
-
     // ==========================================================
-    // ORDER VOLUME (for summary cards)
+    // ORDER VOLUME
     // ==========================================================
-
     @Query("""
         SELECT COUNT(o)
         FROM OrderBO o
@@ -209,11 +203,9 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     );
 
 
-
     // ==========================================================
     // ADMIN DASHBOARD
     // ==========================================================
-
     @Query("""
         SELECT SUM(o.totalAmount)
         FROM OrderBO o
@@ -238,70 +230,41 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     """)
     List<Object[]> getOrderDistribution();
 
+
     boolean existsByShippingAddress(AddressBO address);
 
-    @Query("""
-    SELECT SUM(oi.totalPrice)
-    FROM OrderItemBO oi
-    WHERE oi.sellerId = :sellerId
-      AND oi.createdAt BETWEEN :start AND :end
-""")
-    Double getSalesBetween(
-            @Param("sellerId") Long sellerId,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
-    );
 
-
-
-
-    // Total Revenue by Seller
-    @Query("""
-    SELECT SUM(oi.totalPrice)
-    FROM OrderItemBO oi
-    WHERE oi.sellerId = :sellerId
-""")
-    Long getTotalRevenueBySeller(@Param("sellerId") Long sellerId);
-
-
-    @Query("""
-    SELECT COUNT(DISTINCT o.user.id)
-    FROM OrderBO o
-    WHERE o.orderTime BETWEEN :start AND :end
-""")
-    Long getActiveUsers(
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
-    );
-
+    // ==========================================================
+    // SELLER HELPERS
+    // ==========================================================
     List<OrderBO> findAllByUser_IdOrderByOrderTimeDesc(Long userId);
 
+    Page<OrderBO> findByOrderStatusIgnoreCase(String status, Pageable pageable);
 
-
-    // ========================
-// CORRECT ORDER COUNT
-// ========================
     @Query("""
-    SELECT COUNT(DISTINCT oi.order.id)
-    FROM OrderItemBO oi
-    WHERE oi.sellerId = :sellerId
-""")
-    Long getSellerOrderCount(@Param("sellerId") Long sellerId);
+        SELECT DISTINCT o
+        FROM OrderBO o
+        JOIN o.orderItems oi
+        WHERE oi.sellerId = :sellerId
+          AND (:status IS NULL OR o.orderStatus = :status)
+    """)
+    Page<OrderBO> findOrdersForSeller(
+            @Param("sellerId") Long sellerId,
+            @Param("status") String status,
+            Pageable pageable
+    );
 
 
-    // ========================
-// CORRECT TOP PRODUCTS
-// ========================
     @Query("""
-    SELECT oi.productName, SUM(oi.quantity)
-    FROM OrderItemBO oi
-    WHERE oi.sellerId = :sellerId
-    GROUP BY oi.productName
-    ORDER BY SUM(oi.quantity) DESC
-""")
-    List<Object[]> getTopProductsOfSeller(@Param("sellerId") Long sellerId);
-
-
+        SELECT CASE WHEN COUNT(oi) > 0 THEN TRUE ELSE FALSE END
+        FROM OrderItemBO oi
+        WHERE oi.order.orderId = :orderId
+          AND oi.sellerId = :sellerId
+    """)
+    boolean sellerOwnsOrder(
+            @Param("orderId") String orderId,
+            @Param("sellerId") Long sellerId
+    );
 
     @Query(value = """
     SELECT oi.product_name, SUM(oi.quantity)
@@ -312,36 +275,30 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
 """, nativeQuery = true)
     List<Object[]> getTopProducts(@Param("sellerId") Long sellerId);
 
-
-    List<OrderBO> findAllByOrderByOrderTimeDesc();
-
-    Page<OrderBO> findByOrderStatusIgnoreCase(String status, Pageable pageable);
-
     @Query("""
-    SELECT DISTINCT o
-    FROM OrderBO o
-    JOIN o.orderItems oi
-    WHERE oi.sellerId = :sellerId
-    AND (:status IS NULL OR o.orderStatus = :status)
-""")
-    Page<OrderBO> findOrdersForSeller(
-            Long sellerId,
-            String status,
-            Pageable pageable
-    );
-
-
-
-    @Query("""
-    SELECT CASE WHEN COUNT(oi) > 0 THEN TRUE ELSE FALSE END
+    SELECT SUM(oi.totalPrice)
     FROM OrderItemBO oi
-    WHERE oi.order.orderId = :orderId
-    AND oi.product.seller.id = :sellerId
+    WHERE oi.sellerId = :sellerId
 """)
-    boolean sellerOwnsOrder(@Param("orderId") String orderId,
-                            @Param("sellerId") Long sellerId);
+    Long getTotalRevenueBySeller(@Param("sellerId") Long sellerId);
+
+    @Query("""
+    SELECT COUNT(DISTINCT oi.order.id)
+    FROM OrderItemBO oi
+    WHERE oi.sellerId = :sellerId
+""")
+    Long getSellerOrderCount(@Param("sellerId") Long sellerId);
 
 
+    @Query("""
+    SELECT COUNT(DISTINCT oi.order.user.id)
+    FROM OrderItemBO oi
+    WHERE oi.createdAt BETWEEN :start AND :end
+""")
+    Long getActiveUsers(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 
 
 

@@ -1,6 +1,10 @@
 package com.one.aim.service;
 
 import com.one.aim.bo.NotificationUserStatusBO;
+import com.one.aim.bo.OrderBO;
+import com.one.aim.bo.ProductBO;
+import com.one.aim.bo.SellerBO;
+import com.one.vm.core.BaseRs;
 
 import java.util.List;
 
@@ -13,8 +17,9 @@ public interface NotificationService {
             String type,
             String title,
             String description,
-            Long imageFileId,
-            Long redirectRefId,
+            SellerBO seller,
+            ProductBO product,
+            OrderBO order,
             String redirectUrl
     );
 
@@ -39,7 +44,7 @@ public interface NotificationService {
             String redirectUrl
     );
 
-    // Notify all Sellers (Seller registration/approval events)
+    // Notify all Sellers
     void notifyAllSellers(
             String type,
             String title,
@@ -49,7 +54,7 @@ public interface NotificationService {
             String redirectUrl
     );
 
-    // Notify all (Users + Sellers)
+    // Notify everyone
     void notifyBroadcast(
             String type,
             String title,
@@ -59,14 +64,22 @@ public interface NotificationService {
             String redirectUrl
     );
 
+    BaseRs getMyNotifications(
+            Long userId,
+            String role,
+            int page,
+            int size,
+            Boolean unread,
+            String type
+    );
 
-    // Fetch unread notifications for current user
+
+    // Fetch unread notifications
     List<NotificationUserStatusBO> getUnreadForUser(Long userId);
 
-    // Fetch full notification list for current user
+    // Fetch all notifications
     List<NotificationUserStatusBO> getAllForUser(Long userId);
 
-    // Mark notification (status row) as read
     void markAsRead(Long statusId);
 
     void markAllAsRead(Long userId);

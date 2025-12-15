@@ -2,6 +2,7 @@ package com.one.aim.service;
 
 import com.one.aim.rq.ProductRq;
 import com.one.aim.rs.ProductCardRs;
+import com.one.aim.rs.ProductDetailsRs;
 import com.one.aim.rs.ProductRs;
 import com.one.vm.core.BaseRs;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,21 @@ public interface ProductService {
 
     BaseRs listAdminProducts(int page, int size, String sortBy, String direction) throws Exception;
 
+    ProductDetailsRs getProductDetails(String slug) throws Exception;
+
+    Page<ProductCardRs> filterProducts(
+            String category, String brand,
+            Integer minPrice, Integer maxPrice,
+            Integer rating, String sort,
+            int page, int size
+    );
+
+
+
     Page<ProductCardRs> getProducts(String category, int page, int size, String sort) throws Exception;
 
     Page<ProductCardRs> searchProducts(String q, String category, int page, int size) throws Exception;
+
+    ProductRs getProductDetailsForSeller(Long productId) throws Exception;
+
 }

@@ -33,5 +33,9 @@ public interface FileService {
     String getPublicFileUrl(Long fileId);
 
 
+    String getPublicViewUrl(Long fileId);
+
+
+
 
 }

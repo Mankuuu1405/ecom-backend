@@ -22,7 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,56 +34,65 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepo categoryRepo;
     private final ProductRepo productRepo;
-    private final CategoryMapper mapper;
     private final FileService fileService;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public CategoryRs createCategory(CategoryRq rq) {
-
         if (categoryRepo.existsByNameIgnoreCase(rq.getName())) {
             throw new BaseException(ErrorCodes.EC_CREATE_FAILED, "Category already exists");
         }
 
-        CategoryBO bo = mapper.toEntity(rq);
+        CategoryBO bo = categoryMapper.toEntity(rq);
         CategoryBO saved = categoryRepo.save(bo);
 
-        return mapper.toRs(saved);
+        return categoryMapper.toRs(saved);
     }
 
     @Override
     public CategoryRs updateCategory(CategoryRq rq) {
-
         CategoryBO bo = categoryRepo.findById(rq.getId())
                 .orElseThrow(() -> new BaseException(ErrorCodes.EC_RECORD_NOT_FOUND, "Category not found"));
 
-        mapper.updateEntity(bo, rq);
+        // Check if name is being changed to an existing name
+        if (!bo.getName().equalsIgnoreCase(rq.getName()) &&
+                categoryRepo.existsByNameIgnoreCase(rq.getName())) {
+            throw new BaseException(ErrorCodes.EC_CREATE_FAILED, "Category name already exists");
+        }
+
+        categoryMapper.updateEntity(bo, rq);
         CategoryBO saved = categoryRepo.save(bo);
 
-        return mapper.toRs(saved);
+        return categoryMapper.toRs(saved);
     }
 
     @Override
     public List<CategoryRs> getAllCategories() {
         return categoryRepo.findAll()
                 .stream()
-                .map(CategoryMapper::toRs)
+                .map(categoryMapper::toRs)
                 .toList();
     }
 
     @Override
     public List<CategoryRs> getActiveCategories() {
-        return categoryRepo.findAll()
+        return categoryRepo.findByActiveTrue()
                 .stream()
-                .filter(CategoryBO::isActive)
-                .map(CategoryMapper::toRs)
+                .map(categoryMapper::toRs)
                 .toList();
     }
 
     @Override
     public void deleteCategory(Long id) {
-
         if (!categoryRepo.existsById(id)) {
             throw new BaseException(ErrorCodes.EC_RECORD_NOT_FOUND, "Category not found");
+        }
+
+        // Check if category has products
+        Long productCount = productRepo.countByCategoryId(id);
+        if (productCount > 0) {
+            throw new BaseException(ErrorCodes.EC_DELETE_FAILED,
+                    "Cannot delete category with existing products. Deactivate it instead.");
         }
 
         categoryRepo.deleteById(id);
@@ -88,7 +100,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deactivateCategory(Long id) {
-
         CategoryBO bo = categoryRepo.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCodes.EC_RECORD_NOT_FOUND, "Category not found"));
 
@@ -98,21 +109,26 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryCardRs> getCategories(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        Page<CategoryBO> categories = categoryRepo.findByActiveTrue(pageable);
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        // Bulk count for efficiency (1 query instead of N)
+        List<Object[]> rows = productRepo.countProductsGroupedByCategory();
+        Map<Long, Long> countMap = rows.stream()
+                .collect(Collectors.toMap(
+                        r -> (Long) r[0],
+                        r -> (Long) r[1]
+                ));
 
-        Page<CategoryBO> pageData = categoryRepo.findByActiveTrue(pageable);
-
-        return pageData.map(cat -> {
-            Long count = productRepo.countActiveProductsByCategory(cat.getId());
-            return CategoryMapper.toCardRs(cat, count);
+        return categories.map(cat -> {
+            Long count = countMap.getOrDefault(cat.getId(), 0L);
+            return categoryMapper.toCardRs(cat, count);
         });
     }
 
     @Override
     @Transactional
     public CategoryRs uploadCategoryImage(Long id, MultipartFile file) throws Exception {
-
         if (file == null || file.isEmpty()) {
             throw new RuntimeException("Image file is required");
         }
@@ -133,33 +149,65 @@ public class CategoryServiceImpl implements CategoryService {
 
         // Delete previous image if exists
         if (bo.getImageFileId() != null) {
-            fileService.deleteFileById(String.valueOf(bo.getImageFileId()));
+            try {
+                fileService.deleteFileById(String.valueOf(bo.getImageFileId()));
+            } catch (Exception e) {
+                log.warn("Failed to delete old category image: {}", e.getMessage());
+            }
         }
 
         FileBO uploaded = fileService.uploadAndReturnFile(file);
         bo.setImageFileId(uploaded.getId());
-
         categoryRepo.save(bo);
 
-        return CategoryMapper.toRs(bo);
+        return categoryMapper.toRs(bo);
     }
 
     @Override
     @Transactional
     public CategoryRs deleteCategoryImage(Long id) throws Exception {
-
         CategoryBO bo = categoryRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
         if (bo.getImageFileId() != null) {
-            fileService.deleteFileById(String.valueOf(bo.getImageFileId()));
+            try {
+                fileService.deleteFileById(String.valueOf(bo.getImageFileId()));
+            } catch (Exception e) {
+                log.warn("Failed to delete category image: {}", e.getMessage());
+            }
+            bo.setImageFileId(null);
+            categoryRepo.save(bo);
         }
 
-        bo.setImageFileId(null);  // fallback default image
-        categoryRepo.save(bo);
-
-        return CategoryMapper.toRs(bo);
+        return categoryMapper.toRs(bo);
     }
 
+    @Override
+    public CategoryCardRs getCategoryDetails(String slug) {
+        CategoryBO bo = categoryRepo.findBySlug(slug)
+                .orElseThrow(() -> new BaseException(ErrorCodes.EC_RECORD_NOT_FOUND, "Category not found"));
 
+        if (!bo.isActive()) {
+            throw new BaseException(ErrorCodes.EC_RECORD_NOT_FOUND, "Category is not active");
+        }
+
+        Long count = productRepo.countActiveProductsByCategory(bo.getId());
+        return categoryMapper.toBrowseRs(bo, count);
+
+    }
+
+    @Override
+    public List<CategoryCardRs> getAllForBrowse() {
+        List<CategoryBO> categories = categoryRepo.findByActiveTrue();
+
+        return categories.stream()
+                .map(cat -> {
+                    Long count = productRepo.countByActiveTrueAndCategoryNameIgnoreCase(cat.getName());
+                    return categoryMapper.toBrowseRs(cat, count);
+                })
+                .filter(cat -> cat.getProductCount() > 0)
+                .sorted(Comparator.comparing(CategoryCardRs::getName))
+                .toList();
+
+    }
 }

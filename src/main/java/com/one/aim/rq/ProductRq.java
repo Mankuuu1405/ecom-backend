@@ -15,33 +15,32 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductRq extends BaseVM {
 
-    private static final long serialVersionUID = 1L;
-
     private String docId;
 
-    @NotBlank(message = "Product name is required")
-    @Size(max = 100, message = "Product name must be under 100 characters")
+    @NotBlank
     private String name;
 
-    @NotBlank(message = "Product description is required")
-    @Size(max = 500, message = "Description must be under 500 characters")
+    @NotBlank
     private String description;
 
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be positive")
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = false)
     private Double price;
 
-    @NotNull(message = "Stock is required")
-    @Min(value = 0, message = "Stock cannot be negative")
+    @NotNull
+    @Min(0)
     private Integer stock;
+
+    private String brand;
 
     private Long categoryId;
     private String customCategoryName;
-    private String categoryName;
+
+
+    private String specificationsJson;
 
     private Boolean active;
 
-
-    //  Multiple images for upload
+    // Images
     private List<MultipartFile> images;
 }

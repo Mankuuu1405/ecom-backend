@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
     private final SellerRepo sellerRepo;
     private final AdminRepo adminRepo;
     private final FileService fileService;
+    private final UserMapper userMapper;
 
     // ===========================================================
     // USER SIGN-UP
@@ -108,7 +109,7 @@ public class UserServiceImpl implements UserService {
         return ResponseUtils.success(
                 new UserDataRs(
                         MessageCodes.MC_SAVED_SUCCESSFUL,
-                        UserMapper.mapToUserRs(user)
+                        userMapper.mapToUserRs(user)
                 )
         );
     }
@@ -128,7 +129,7 @@ public class UserServiceImpl implements UserService {
             return ResponseUtils.success(
                     new UserDataRs(
                             MessageCodes.MC_RETRIEVED_SUCCESSFUL,
-                            UserMapper.mapToUserRs(user)
+                            userMapper.mapToUserRs(user)
                     )
             );
 
@@ -158,7 +159,7 @@ public class UserServiceImpl implements UserService {
             return ResponseUtils.success(
                     new UserDataRsList(
                             MessageCodes.MC_RETRIEVED_SUCCESSFUL,
-                            UserMapper.mapToUserRsList(users)
+                            userMapper.mapToUserRsList(users)
                     )
             );
 
@@ -202,7 +203,7 @@ public class UserServiceImpl implements UserService {
         userRepo.save(user);
 
         return ResponseUtils.success(
-                new UserDataRs(MessageCodes.MC_DELETED_SUCCESSFUL, UserMapper.mapToUserRs(user))
+                new UserDataRs(MessageCodes.MC_DELETED_SUCCESSFUL, userMapper.mapToUserRs(user))
         );
     }
 

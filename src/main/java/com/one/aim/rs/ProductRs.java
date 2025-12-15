@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,32 +18,34 @@ public class ProductRs implements Serializable {
 
     private String docId;
     private String name;
+    private String slug;
     private String description;
     private Double price;
     private Integer stock;
+    private String brand;
     private String categoryName;
-    private Long categoryId;        // NEW
-    private Integer quantity = 1;
-
-    // Seller details
-    private String sellerName;
-
-    private String slug;
-    // Multiple image URLs
-    private List<String> imageUrls = new ArrayList<>();
-
-    // Primary image for homepage card
-    private String image;
-
-    // In-stock indicator
+    private Long categoryId;
+    private String image;              // Primary image
+    private List<String> images;       // All images
     private boolean inStock;
+    private boolean active;
+    private boolean featured;
 
-    // Ratings for homepage
+    // Product details
+    private String material;
+    private String sole;
+    private String closure;
+    private String weight;
+    private String color;
+    private String size;
+    private String specificationsJson;
+
+    // Ratings
     private Double averageRating;
     private Long reviewCount;
 
-    // used in shareable links
-    private String shareMessage;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }
 

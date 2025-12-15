@@ -127,15 +127,14 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // ======================================
-                        // PUBLIC AUTH (ALL ROLES)
+                        // PUBLIC AUTH + PUBLIC RESOURCES
                         // ======================================
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/files/public/**",
                                 "/api/files/private/**",
-                                "/api/public/category"
-
-                ).permitAll()
+                                "/api/public/pdp/**"
+                        ).permitAll()
 
                         // ======================================
                         // PUBLIC SIGNUP ROUTES
@@ -147,21 +146,35 @@ public class WebSecurityConfig {
                         ).permitAll()
 
                         // ======================================
-                        // PUBLIC RAZORPAY TEST ROUTES
+                        // PUBLIC HOME PAGE DATA
+                        // ======================================
+                        .requestMatchers("/api/public/home").permitAll()
+
+                        // ======================================
+                        // PUBLIC CATEGORY ROUTES
+                        // ======================================
+                        .requestMatchers("/api/public/category/**").permitAll()
+
+                        // ======================================
+                        // PUBLIC PRODUCT ROUTES
+                        // ======================================
+                        .requestMatchers("/api/public/product/**").permitAll()
+
+                        // ======================================
+                        // SEARCH + CART CATEGORY (PUBLIC)
+                        // ======================================
+                        .requestMatchers(
+                                "/api/search",
+                                "/api/cart/category/**"
+                        ).permitAll()
+
+                        // ======================================
+                        // PAYMENT ROUTES
                         // ======================================
                         .requestMatchers(
                                 "/razorpay-test.html",
                                 "/api/payment/create",
                                 "/api/payment/verify"
-                        ).permitAll()
-
-                        // ======================================
-                        // PUBLIC BROWSING ROUTES
-                        // ======================================
-                        .requestMatchers(
-                                "/api/public/**",
-                                "/api/search",
-                                "/api/cart/category/**"
                         ).permitAll()
 
                         // ======================================
@@ -172,7 +185,8 @@ public class WebSecurityConfig {
                                 "/api/order/**",
                                 "/api/user/me",
                                 "/api/user/profile/update",
-                                "/api/user/download/**"
+                                "/api/user/download/**",
+                                "/api/reviews/**"
                         ).hasAuthority("USER")
 
                         // ======================================
@@ -204,6 +218,7 @@ public class WebSecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

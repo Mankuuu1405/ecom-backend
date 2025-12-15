@@ -1,7 +1,9 @@
 package com.one.aim.controller;
 
 import com.one.aim.rq.ProductRq;
+import com.one.aim.rs.ProductRs;
 import com.one.aim.service.ProductService;
+import com.one.vm.core.BaseDataRs;
 import com.one.vm.core.BaseRs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +107,25 @@ public class ProductController {
         BaseRs response = productService.listSellerProducts(showInactive);
         return ResponseEntity.ok(response);
     }
+
+    // ===========================================================
+// GET PRODUCT DETAILS (SELLER OR ADMIN)
+// ===========================================================
+    @PreAuthorize("hasAnyAuthority('SELLER', 'ADMIN')")
+    @GetMapping("/{productId}")
+    public ResponseEntity<BaseRs> getProductDetailsForSeller(@PathVariable Long productId) throws Exception {
+
+        log.debug("Executing RESTfulService [GET /api/seller/product/{}]", productId);
+
+        ProductRs data = productService.getProductDetailsForSeller(productId);
+
+        BaseRs response = new BaseRs();
+        response.setStatus("SUCCESS");
+        response.setData(new BaseDataRs("Product details loaded", data));
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }

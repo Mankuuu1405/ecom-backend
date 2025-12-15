@@ -9,10 +9,13 @@ import com.one.aim.rs.DeliveryPersonRs;
 import com.one.aim.service.FileService;
 import com.one.utils.Utils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class DeliveryPersonMapper {
+    private final OrderMapper orderMapper;
 
     public static DeliveryPersonRs mapToDeliveryPersonRs(DeliveryPersonBO bo, FileService fileService) {
 
@@ -38,11 +41,11 @@ public class DeliveryPersonMapper {
             rs.setEmail(bo.getEmail());
             rs.setCity(bo.getCity());
 
-            if (Utils.isNotEmpty(bo.getOrders())) {
-                rs.setOrders(
-                        OrderMapper.mapToOrderRsList(bo.getOrders(), fileService)
-                );
-            }
+//            if (Utils.isNotEmpty(bo.getOrders())) {
+//                rs.setOrders(
+//                        orderMapper.mapToOrderRsList(bo.getOrders(), fileService)
+//                );
+//            }
 
             return rs;
 

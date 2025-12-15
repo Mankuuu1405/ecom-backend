@@ -2,11 +2,16 @@ package com.one.aim.service.impl;
 
 import java.time.LocalDateTime;
 
+import com.one.aim.bo.AddressBO;
+import com.one.aim.bo.UserBO;
+import com.one.aim.repo.AddressRepo;
 import com.one.aim.rq.CancelPaymentRq;
 import com.one.aim.rq.CreatePaymentRq;
 import com.one.aim.rq.VerifyPaymentRq;
 import com.one.aim.rs.CreatePaymentRs;
 import com.one.aim.rs.VerifyPaymentRs;
+import com.one.aim.service.OrderService;
+import com.one.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +28,7 @@ import com.one.vm.utils.ResponseUtils;
 import com.razorpay.RazorpayClient;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -34,8 +40,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final UserRepo userRepo;
     private final PaymentRepo paymentRepo;
-    private final OrderRepo orderRepo;
+    private final OrderService orderService;
     private final UserActivityService userActivityService;
+    private final AddressRepo addressRepo;
 
     @Value("${razorpay.key_id}")
     private String razorpayKeyId;
@@ -44,141 +51,170 @@ public class PaymentServiceImpl implements PaymentService {
     private String razorpayKeySecret;
 
     // ============================================================
-    // 1. CREATE RAZORPAY ORDER
+    // 1. CREATE RAZORPAY ORDER (NO ORDER CREATED HERE)
     // ============================================================
     @Override
+    @Transactional
     public BaseRs createRazorpayOrder(CreatePaymentRq rq) throws Exception {
 
-        // Load order using BUSINESS orderId (ORD-XXXXXX)
-        OrderBO order = orderRepo.findByOrderId(rq.getOrderId())
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+        Long userId = AuthUtils.findLoggedInUser().getDocId();
+        UserBO user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if ("COD".equalsIgnoreCase(order.getPaymentMethod())) {
-            return ResponseUtils.failure("COD_NOT_ALLOWED_FOR_ONLINE_PAYMENT");
+        // 🔹 Calculate amount from CART (NOT ORDER)
+        long amount = orderService.calculateCartTotal(userId); // rupees
+
+        if (amount <= 0) {
+            return ResponseUtils.failure("CART_EMPTY");
         }
-
-        Long amount = order.getTotalAmount(); // rupees
 
         RazorpayClient razorpay = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
 
         JSONObject options = new JSONObject();
-        options.put("amount", amount * 100);   // paise
+        options.put("amount", amount * 100); // paise
         options.put("currency", "INR");
-        options.put("receipt", order.getOrderId());
+        options.put("receipt", "PAY_" + System.currentTimeMillis());
 
         com.razorpay.Order razorpayOrder = razorpay.orders.create(options);
         String razorpayOrderId = razorpayOrder.get("id");
 
-        // Save details in DB
-        order.setRazorpayorderid(razorpayOrderId);
-        order.setPaymentStatus("CREATED");
-        orderRepo.save(order);
+        // 🔹 Save PAYMENT ONLY
+        PaymentBO payment = new PaymentBO();
+        payment.setUser(user);
+        payment.setAmount(amount);
+        payment.setStatus("CREATED");
+        payment.setPaymentMethod("ONLINE");
+        payment.setRazorpayOrderId(razorpayOrderId);
+        paymentRepo.save(payment);
 
         userActivityService.log(
-                order.getUser().getId(),
+                userId,
                 "PAYMENT_INITIATED",
-                "Payment started for order: " + order.getOrderId()
+                "Payment initiated. RazorpayOrderId=" + razorpayOrderId
         );
 
-        CreatePaymentRs data = new CreatePaymentRs(
+        CreatePaymentRs rs = new CreatePaymentRs(
                 razorpayOrderId,
                 amount * 100,
                 "INR",
                 razorpayKeyId,
-                order.getOrderId()
+                null
         );
 
-        return ResponseUtils.success(data);
+        return ResponseUtils.success(rs);
     }
 
     // ============================================================
-    // 2. VERIFY PAYMENT SIGNATURE
+    // 2. VERIFY PAYMENT → PLACE ORDER ONLY ON SUCCESS
     // ============================================================
     @Override
+    @Transactional
     public BaseRs verifyRazorpayPayment(VerifyPaymentRq rq) throws Exception {
 
-        OrderBO order = orderRepo.findByOrderId(rq.getOrderId())
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+        PaymentBO payment = paymentRepo
+                .findByRazorpayOrderId(rq.getRazorpayOrderId())
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
 
         String payload = rq.getRazorpayOrderId() + "|" + rq.getRazorpayPaymentId();
         String generatedSignature = hmacSHA256_HEX(payload, razorpayKeySecret);
 
-        log.info("Generated Signature = {}", generatedSignature);
-        log.info("Client Signature    = {}", rq.getRazorpaySignature());
-
         if (!generatedSignature.equals(rq.getRazorpaySignature())) {
 
-            order.setPaymentStatus("FAILED");
-            orderRepo.save(order);
+            payment.setStatus("FAILED");
+            paymentRepo.save(payment);
 
             userActivityService.log(
-                    order.getUser().getId(),
+                    payment.getUser().getId(),
                     "PAYMENT_FAILED",
-                    "Razorpay signature mismatch for order: " + order.getOrderId()
+                    "Signature mismatch for RazorpayOrderId=" + rq.getRazorpayOrderId()
             );
 
             return ResponseUtils.failure("PAYMENT_VERIFICATION_FAILED");
         }
 
-        // Payment successful
-        order.setPaymentStatus("PAID");
-        order.setRazorpayPaymentId(rq.getRazorpayPaymentId());
-        order.setRazorpaySignature(rq.getRazorpaySignature());
-        orderRepo.save(order);
+        // Payment already processed guard
+        if ("PAID".equals(payment.getStatus())) {
+            return ResponseUtils.failure("PAYMENT_ALREADY_PROCESSED");
+        }
 
-        // Save payment record
-        PaymentBO payment = new PaymentBO();
-        payment.setAmount(order.getTotalAmount());
-        payment.setPaymentMethod(order.getPaymentMethod());
-        payment.setPaymentTime(LocalDateTime.now());
-        payment.setUser(order.getUser());
-        payment.setOrder(order);
+// PAYMENT SUCCESS
         payment.setStatus("PAID");
-        payment.setRazorpayOrderId(rq.getRazorpayOrderId());
         payment.setRazorpayPaymentId(rq.getRazorpayPaymentId());
+        payment.setRazorpaySignature(rq.getRazorpaySignature());
+        payment.setPaymentTime(LocalDateTime.now());
         paymentRepo.save(payment);
 
-        userActivityService.log(
-                order.getUser().getId(),
-                "PAYMENT_SUCCESS",
-                "Payment successful for order: " + order.getOrderId()
+        // ✅ Resolve shipping address
+        Long addressId = payment.getAddressId();
+        AddressBO shippingAddress;
+
+        if (addressId != null) {
+            shippingAddress = addressRepo.findById(addressId)
+                    .orElseThrow(() -> new RuntimeException("Address not found"));
+        } else {
+            // Fallback to default address
+            shippingAddress = addressRepo.findFirstByUseridAndIsDefault(
+                    payment.getUser().getId(),
+                    true
+            ).orElseThrow(() -> new RuntimeException("No address found"));
+        }
+
+// CREATE ORDER
+        OrderBO order = orderService.placeOrderAfterPayment(
+                payment.getUser().getId(),
+                "ONLINE",
+                payment,
+                shippingAddress  //  Pass the address
         );
 
-        VerifyPaymentRs rs = new VerifyPaymentRs(order.getOrderId(), "PAID");
-        return ResponseUtils.success(rs);
+
+        userActivityService.log(
+                payment.getUser().getId(),
+                "PAYMENT_SUCCESS",
+                "Payment successful, Order created: " + order.getOrderId()
+        );
+
+        return ResponseUtils.success(
+                new VerifyPaymentRs(order.getOrderId(), "PAID")
+        );
     }
 
     // ============================================================
-    // Razorpay uses HEX-HMAC (NOT Base64)
+    // CANCEL PAYMENT (NO ORDER EXISTS)
+    // ============================================================
+    @Override
+    @Transactional
+    public BaseRs cancelPayment(CancelPaymentRq rq) throws Exception {
+
+        PaymentBO payment = paymentRepo
+                .findByRazorpayOrderId(rq.getOrderId())
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        payment.setStatus("CANCELLED");
+        paymentRepo.save(payment);
+
+        userActivityService.log(
+                payment.getUser().getId(),
+                "PAYMENT_CANCELLED",
+                "User cancelled payment. RazorpayOrderId=" + rq.getOrderId()
+        );
+
+        return ResponseUtils.success("Payment cancelled");
+    }
+
+    // ============================================================
+    // Razorpay uses HEX-HMAC
     // ============================================================
     private String hmacSHA256_HEX(String data, String key) throws Exception {
-        Mac sha256 = Mac.getInstance("HmacSHA256");
+        Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
-        sha256.init(secretKey);
+        mac.init(secretKey);
 
-        byte[] hash = sha256.doFinal(data.getBytes());
-
+        byte[] hash = mac.doFinal(data.getBytes());
         StringBuilder hex = new StringBuilder();
         for (byte b : hash) {
             hex.append(String.format("%02x", b));
         }
         return hex.toString();
     }
-
-    @Override
-    public BaseRs cancelPayment(CancelPaymentRq rq) throws Exception {
-
-        OrderBO order = orderRepo.findByOrderId(rq.getOrderId())
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        // Log user activity
-        userActivityService.log(
-                order.getUser().getId(),
-                "PAYMENT_CANCELLED",
-                "User cancelled payment for order: " + order.getOrderId()
-        );
-
-        return ResponseUtils.success("Payment cancelled logged successfully");
-    }
-
 }

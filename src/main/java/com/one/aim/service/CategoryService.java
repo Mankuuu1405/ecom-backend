@@ -28,5 +28,10 @@ public interface CategoryService {
 
     CategoryRs deleteCategoryImage(Long id) throws Exception;
 
+    CategoryCardRs getCategoryDetails(String slug);
+
+    List<CategoryCardRs> getAllForBrowse();
+
+
 
 }
