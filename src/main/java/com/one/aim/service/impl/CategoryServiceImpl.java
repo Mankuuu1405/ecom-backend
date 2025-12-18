@@ -38,16 +38,36 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public CategoryRs createCategory(CategoryRq rq) {
+    @Transactional
+    public CategoryRs createCategory(CategoryRq rq, MultipartFile image) throws Exception {
+
         if (categoryRepo.existsByNameIgnoreCase(rq.getName())) {
             throw new BaseException(ErrorCodes.EC_CREATE_FAILED, "Category already exists");
         }
 
         CategoryBO bo = categoryMapper.toEntity(rq);
-        CategoryBO saved = categoryRepo.save(bo);
 
+        //  Upload image if provided
+        if (image != null && !image.isEmpty()) {
+
+            // validations (reuse logic)
+            if (image.getSize() > 2 * 1024 * 1024) {
+                throw new RuntimeException("Max image size is 2MB");
+            }
+
+            String type = image.getContentType();
+            if (!List.of("image/jpeg", "image/png").contains(type)) {
+                throw new RuntimeException("Only JPG or PNG allowed");
+            }
+
+            FileBO uploaded = fileService.uploadAndReturnFile(image);
+            bo.setImageFileId(uploaded.getId());
+        }
+
+        CategoryBO saved = categoryRepo.save(bo);
         return categoryMapper.toRs(saved);
     }
+
 
     @Override
     public CategoryRs updateCategory(CategoryRq rq) {
@@ -210,4 +230,66 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
 
     }
+
+    @Override
+    public List<CategoryCardRs> getPopularCategories() {
+
+        List<CategoryBO> categories =
+                categoryRepo.findByActiveTrueAndPopularTrue();
+
+        return categories.stream()
+                .map(cat -> {
+                    Long count =
+                            productRepo.countActiveProductsByCategory(cat.getId());
+                    return categoryMapper.toCardRs(cat, count);
+                })
+                .filter(c -> c.getProductCount() > 0)
+                .sorted(Comparator.comparing(CategoryCardRs::getName))
+                .limit(6)   // UI-friendly limit
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public CategoryRs updateCategoryImage(Long id, MultipartFile file) throws Exception {
+
+        if (file == null || file.isEmpty()) {
+            throw new BaseException(ErrorCodes.EC_UPDATE_FAILED, "Image file is required");
+        }
+
+        // Validate size (2MB)
+        if (file.getSize() > 2 * 1024 * 1024) {
+            throw new BaseException(ErrorCodes.EC_UPDATE_FAILED, "Max image size is 2MB");
+        }
+
+        // Validate type
+        String type = file.getContentType();
+        if (!List.of("image/jpeg", "image/png").contains(type)) {
+            throw new BaseException(ErrorCodes.EC_UPDATE_FAILED, "Only JPG or PNG allowed");
+        }
+
+        CategoryBO bo = categoryRepo.findById(id)
+                .orElseThrow(() ->
+                        new BaseException(ErrorCodes.EC_RECORD_NOT_FOUND, "Category not found")
+                );
+
+        // Delete old image safely
+        if (bo.getImageFileId() != null) {
+            try {
+                fileService.deleteFileById(String.valueOf(bo.getImageFileId()));
+            } catch (Exception e) {
+                log.warn("Old category image delete failed: {}", e.getMessage());
+            }
+        }
+
+        // Upload new image
+        FileBO uploaded = fileService.uploadAndReturnFile(file);
+        bo.setImageFileId(uploaded.getId());
+
+        categoryRepo.save(bo);
+
+        return categoryMapper.toRs(bo);
+    }
+
+
 }

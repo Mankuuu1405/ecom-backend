@@ -51,37 +51,43 @@ public class PublicCategoryController {
     }
 
     // ---------------------------------------------------------
-    // 3. CATEGORY DETAILS BY SLUG (Name, image, productCount)
-    // ---------------------------------------------------------
+// CATEGORY DETAILS (PUBLIC)
+// ---------------------------------------------------------
     @GetMapping("/{slug}")
-    public ResponseEntity<?> getCategoryDetails(@PathVariable String slug) throws Exception {
-
-        CategoryCardRs data = categoryService.getCategoryDetails(slug);
-
-        BaseRs rs = new BaseRs();
-        rs.setStatus("SUCCESS");
-        rs.setData(new BaseDataRs("Category details", data));
-
-        return ResponseEntity.ok(rs);
+    public ResponseEntity<CategoryCardRs> getCategoryDetails(
+            @PathVariable String slug
+    ) {
+        return ResponseEntity.ok(categoryService.getCategoryDetails(slug));
     }
 
-
     // ---------------------------------------------------------
-    // 4. PRODUCTS UNDER CATEGORY (by slug)
-    // ---------------------------------------------------------
+// PRODUCTS UNDER CATEGORY (PUBLIC)
+// ---------------------------------------------------------
     @GetMapping("/{slug}/products")
-    public ResponseEntity<?> getProductsByCategory(
+    public ResponseEntity<Page<ProductCardRs>> getProductsByCategory(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort
     ) throws Exception {
+        return ResponseEntity.ok(
+                productService.getProducts(slug, page, size, sort)
+        );
+    }
 
-        log.debug("REST [GET /api/public/category/{}/products]", slug);
 
-        Page<ProductCardRs> data = productService.getProducts(slug, page, size, sort);
+    // ---------------------------------------------------------
+// 5. POPULAR CATEGORIES
+// ---------------------------------------------------------
+    @GetMapping("/popular")
+    public ResponseEntity<?> getPopularCategories() {
+
+        log.debug("REST [GET /api/public/category/popular]");
+
+        List<CategoryCardRs> data = categoryService.getPopularCategories();
         return ResponseEntity.ok(data);
     }
+
 }
 
 

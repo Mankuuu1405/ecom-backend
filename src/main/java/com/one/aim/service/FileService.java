@@ -1,6 +1,7 @@
 package com.one.aim.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,8 @@ public interface FileService {
 
     String getPublicViewUrl(Long fileId);
 
+
+    FileBO uploadFile(InputStream inputStream, String fileName, String contentType) throws Exception;
 
 
 

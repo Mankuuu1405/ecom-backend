@@ -51,6 +51,13 @@ public interface ProductService {
 
     Page<ProductCardRs> searchProducts(String q, String category, int page, int size) throws Exception;
 
+    Page<ProductCardRs> getBestSellers(int page, int size, String sort);
+
+    Page<ProductCardRs> getNewArrivals(int page, int size, String sort);
+
+    Page<ProductCardRs> getSaleProducts(int page, int size, String sort);
+
+
     ProductRs getProductDetailsForSeller(Long productId) throws Exception;
 
 }

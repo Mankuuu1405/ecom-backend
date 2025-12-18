@@ -27,8 +27,12 @@ public class ProductDetailsRs {
     private boolean lowStock;
     private Boolean inStock;
 
-    // Images
-    private List<String> images;
+    // =====================
+    // IMAGES
+    // =====================
+    private List<String> images;   // images[0] is ALWAYS thumbnail
+    private String thumbnail;      // Explicit thumbnail
+    private Long thumbnailFileId;  // Optional, future-safe
 
     // Product specifications / attributes
     private Map<String, String> details;

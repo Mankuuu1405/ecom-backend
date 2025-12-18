@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CategoryService {
 
-    CategoryRs createCategory(CategoryRq rq);
+    CategoryRs createCategory(CategoryRq rq, MultipartFile image) throws Exception;
 
     CategoryRs updateCategory(CategoryRq rq);
 
@@ -31,6 +31,10 @@ public interface CategoryService {
     CategoryCardRs getCategoryDetails(String slug);
 
     List<CategoryCardRs> getAllForBrowse();
+
+    List<CategoryCardRs> getPopularCategories();
+
+    CategoryRs updateCategoryImage(Long id, MultipartFile file) throws Exception;
 
 
 

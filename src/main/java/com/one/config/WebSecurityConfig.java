@@ -132,7 +132,6 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/files/public/**",
-                                "/api/files/private/**",
                                 "/api/public/pdp/**"
                         ).permitAll()
 
@@ -210,6 +209,8 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/admin/**"
                         ).hasAuthority("ADMIN")
+
+                        .requestMatchers("/api/files/private/**").authenticated()
 
                         .anyRequest().authenticated()
                 );

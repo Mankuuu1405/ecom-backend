@@ -29,6 +29,7 @@ public class ProductMapper {
     // ================================================
     public ProductCardRs toCardRs(ProductBO bo) {
         if (bo == null) return null;
+        bo.ensureThumbnail();
 
         ProductCardRs rs = new ProductCardRs();
 
@@ -41,10 +42,12 @@ public class ProductMapper {
         rs.setCategoryId(bo.getCategoryId());
 
         // Main Image
-        if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
-            Long fileId = bo.getImageFileIds().get(0);
-            rs.setImage(urlUtils.publicFile(fileId));
+        if (bo.getThumbnailFileId() != null) {
+            rs.setImage(urlUtils.publicFile(bo.getThumbnailFileId()));
+        } else if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
+            rs.setImage(urlUtils.publicFile(bo.getImageFileIds().get(0)));
         }
+
 
         // Stock Status
         int stock = bo.getStock() == null ? 0 : bo.getStock();
@@ -88,10 +91,31 @@ public class ProductMapper {
         rs.setInStock(product.getStock() != null && product.getStock() > 0);
 
         // Images
-        List<String> imageUrls = product.getImageFileIds().stream()
+        List<Long> imageIds = new ArrayList<>();
+
+        if (product.getThumbnailFileId() != null) {
+            imageIds.add(product.getThumbnailFileId());
+        }
+
+        if (product.getImageFileIds() != null) {
+            for (Long id : product.getImageFileIds()) {
+                if (!id.equals(product.getThumbnailFileId())) {
+                    imageIds.add(id);
+                }
+            }
+        }
+
+        List<String> imageUrls = imageIds.stream()
                 .map(urlUtils::publicFile)
                 .toList();
+
         rs.setImages(imageUrls);
+        rs.setThumbnail(
+                product.getThumbnailFileId() != null
+                        ? urlUtils.publicFile(product.getThumbnailFileId())
+                        : null
+        );
+
 
         // Product specifications
         Map<String, String> details = new LinkedHashMap<>();
@@ -145,6 +169,8 @@ public class ProductMapper {
             return null;
         }
 
+        bo.ensureThumbnail();
+
         ProductRs rs = new ProductRs();
 
         rs.setDocId(String.valueOf(bo.getId()));
@@ -172,17 +198,36 @@ public class ProductMapper {
         rs.setAverageRating(bo.getAverageRating());
         rs.setReviewCount(bo.getReviewCount());
 
-        // Images
-        if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
-            List<String> imageUrls = bo.getImageFileIds().stream()
-                    .map(urlUtils::publicFile)
-                    .collect(Collectors.toList());
-            rs.setImages(imageUrls);
+        // =====================
+        // IMAGES (THUMBNAIL FIRST)
+        // =====================
+        List<Long> orderedImageIds = new ArrayList<>();
 
-            if (!imageUrls.isEmpty()) {
-                rs.setImage(imageUrls.get(0));
+        if (bo.getThumbnailFileId() != null) {
+            orderedImageIds.add(bo.getThumbnailFileId());
+        }
+
+        if (bo.getImageFileIds() != null) {
+            for (Long id : bo.getImageFileIds()) {
+                if (!id.equals(bo.getThumbnailFileId())) {
+                    orderedImageIds.add(id);
+                }
             }
         }
+
+        List<String> imageUrls = orderedImageIds.stream()
+                .map(urlUtils::publicFile)
+                .collect(Collectors.toList());
+
+        rs.setImages(imageUrls);
+
+        rs.setThumbnail(
+                bo.getThumbnailFileId() != null
+                        ? urlUtils.publicFile(bo.getThumbnailFileId())
+                        : null
+        );
+
+        rs.setImage(rs.getThumbnail());
 
         rs.setInStock(bo.getStock() != null && bo.getStock() > 0);
         rs.setCreatedAt(bo.getCreatedAt());
@@ -190,6 +235,7 @@ public class ProductMapper {
 
         return rs;
     }
+
 
     // ================================================
     // REVIEW MAPPER

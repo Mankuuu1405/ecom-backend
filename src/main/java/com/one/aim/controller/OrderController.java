@@ -89,7 +89,7 @@ public class OrderController {
     //  NEW: Add this helper method to your controller or move to service
     private AddressBO resolveShippingAddress(OrderRq rq, Long userId) {
 
-        // 1️⃣ If addressId explicitly provided → use it
+        // If addressId explicitly provided → use it
         if (rq.getAddressId() != null) {
             AddressBO address = addressRepo.findById(rq.getAddressId())
                     .orElseThrow(() -> new RuntimeException("Invalid addressId"));
@@ -100,7 +100,7 @@ public class OrderController {
             return address;
         }
 
-        // 2️⃣ Try default address
+        //  Try default address
         Optional<AddressBO> defaultAddress =
                 addressRepo.findFirstByUseridAndIsDefault(userId, true);
 
@@ -108,7 +108,7 @@ public class OrderController {
             return defaultAddress.get();
         }
 
-        // 3️⃣ NO DEFAULT → create TEMP address from checkout payload
+        //  NO DEFAULT → create TEMP address from checkout payload
         AddressBO temp = new AddressBO();
         temp.setUserid(userId);
         temp.setFullName(rq.getFullName());
@@ -119,8 +119,8 @@ public class OrderController {
         temp.setCountry(rq.getCountry());
         temp.setPhone(rq.getPhone());
 
-        temp.setIsDefault(false); // 🚫 not saved as default
-//        temp.setEnabled(false);   // 🚫 optional: not reusable
+        temp.setIsDefault(false); //  not saved as default
+//        temp.setEnabled(false);   //  optional: not reusable
 
         return temp;
     }

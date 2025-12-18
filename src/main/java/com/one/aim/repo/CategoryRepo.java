@@ -40,6 +40,9 @@ public interface CategoryRepo extends JpaRepository<CategoryBO, Long> {
 
     Optional<CategoryBO> findByNameIgnoreCase(String name);
 
+    List<CategoryBO> findByActiveTrueAndPopularTrue();
+
+
 
 }
 

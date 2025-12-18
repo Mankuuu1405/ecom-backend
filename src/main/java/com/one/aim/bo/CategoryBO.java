@@ -35,6 +35,9 @@ public class CategoryBO {
     @Column(nullable = false)
     private boolean active = true;
 
+    private boolean popular;
+
+
     // Image for home page category cards
     private Long imageFileId;
 

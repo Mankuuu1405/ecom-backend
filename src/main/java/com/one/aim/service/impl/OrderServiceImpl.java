@@ -1,6 +1,5 @@
 package com.one.aim.service.impl;
 
-import com.itextpdf.html2pdf.HtmlConverter;
 import com.one.aim.bo.*;
 import com.one.aim.constants.ErrorCodes;
 import com.one.aim.constants.MessageCodes;
@@ -9,17 +8,14 @@ import com.one.aim.mapper.OrderMapper;
 import com.one.aim.repo.*;
 import com.one.aim.rq.OrderRq;
 import com.one.aim.rs.OrderRs;
-import com.one.aim.rs.UserRs;
 import com.one.aim.rs.data.OrderDataRs;
 import com.one.aim.rs.data.OrderDataRsList;
 import com.one.aim.service.*;
 import com.one.utils.AuthUtils;
-import com.one.vm.core.BaseDataRs;
 import com.one.vm.core.BaseRs;
 import com.one.vm.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;

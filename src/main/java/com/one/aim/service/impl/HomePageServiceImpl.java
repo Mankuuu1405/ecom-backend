@@ -33,6 +33,8 @@ public class HomePageServiceImpl implements HomePageService {
     private final OrderItemBORepo orderItemBoRepo;
     private final CategoryMapper categoryMapper;
     private final UrlUtils urlUtils;
+    private final ReviewRepository reviewRepo;
+    private final BlogRepo blogRepo;
 
     @Override
     public HomePageRs getHomePage(int limit) {
@@ -76,14 +78,62 @@ public class HomePageServiceImpl implements HomePageService {
         }
 
         // =========================
+// HOT PICKS (FEATURED)
+// =========================
+        List<ProductCardRs> hotPicks = getHotPicks(limit);
+
+        if (!hotPicks.isEmpty()) {
+            sections.add(
+                    HomeSectionRs.products(
+                            "Hot Picks",
+                            hotPicks,
+                            "/products?filter=featured"
+                    )
+            );
+        }
+
+        List<ReviewCardRs> review= getTopReviews(limit);
+
+        if (!review.isEmpty()) {
+            sections.add(
+                    HomeSectionRs.reviews(
+                            "Customer Reviews",
+                            getTopReviews(3)
+                    )
+            );
+
+        }
+
+        // =========================
+// BLOGS
+// =========================
+        List<BlogCardRs> blogs = getBlogs(3);
+
+        if (!blogs.isEmpty()) {
+            sections.add(
+                    HomeSectionRs.blogs(
+                            "From Our Blog",
+                            blogs
+                    )
+            );
+        }
+
+
+
+        // =========================
         // TOP SERVICES
         // =========================
         List<ServiceCardRs> services = serviceModuleService.getTopServices(4);
+
         if (!services.isEmpty()) {
             sections.add(
-                    HomeSectionRs.services("Top Services", services)
+                    HomeSectionRs.services(
+                            "Top Services",
+                            services
+                    )
             );
         }
+
 
         // =========================
         // CATEGORIES
@@ -187,6 +237,41 @@ public class HomePageServiceImpl implements HomePageService {
                 ))
                 .toList();
     }
+
+    private List<ProductCardRs> getHotPicks(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return productRepo.findByActiveTrueAndFeaturedTrue(pageable)
+                .stream()
+                .map(productMapper::toCardRs)
+                .toList();
+    }
+
+    private List<ReviewCardRs> getTopReviews(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return reviewRepo.findTopReviews(pageable)
+                .stream()
+                .map(r -> new ReviewCardRs(
+                        r.getUser().getFullName(),
+                        r.getRating(),
+                        r.getComment()
+                ))
+                .toList();
+    }
+
+
+    private List<BlogCardRs> getBlogs(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return blogRepo.findByActiveTrueOrderByCreatedAtDesc(pageable)
+                .stream()
+                .map(b -> new BlogCardRs(
+                        b.getTitle(),
+                        b.getSlug(),
+                        urlUtils.publicFile(b.getImageFileId())
+                ))
+                .toList();
+    }
+
+
 
 }
 

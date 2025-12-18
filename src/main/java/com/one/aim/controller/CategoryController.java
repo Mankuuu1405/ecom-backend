@@ -8,6 +8,7 @@ import com.one.vm.core.BaseDataRs;
 import com.one.vm.core.BaseRs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,16 +27,24 @@ public class CategoryController {
     // CREATE CATEGORY (ADMIN ONLY)
     // ================================
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/create")
-    public BaseRs create(@RequestBody CategoryRq rq) {
+    @PostMapping(
+            value = "/create",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public BaseRs create(
+            @RequestPart("data") CategoryRq rq,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) throws Exception {
 
-        CategoryRs rs = categoryService.createCategory(rq);
+        CategoryRs rs = categoryService.createCategory(rq, image);
 
         BaseRs base = new BaseRs();
         base.setStatus("SUCCESS");
         base.setData(new BaseDataRs(MessageCodes.MC_CREATED_SUCCESSFUL, rs));
         return base;
     }
+
+
 
     // ================================
     // UPDATE CATEGORY (ADMIN ONLY)
@@ -144,5 +153,22 @@ public class CategoryController {
         base.setData(new BaseDataRs("Image removed successfully", rs));
         return base;
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{id}/image")
+    public BaseRs updateImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ) throws Exception {
+
+        CategoryRs rs = categoryService.updateCategoryImage(id, file);
+
+        BaseRs base = new BaseRs();
+        base.setStatus("SUCCESS");
+        base.setData(new BaseDataRs("Category image updated successfully", rs));
+        return base;
+    }
+
+
 
 }

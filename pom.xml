@@ -153,6 +153,23 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Add ONLY this dependency to your pom.xml -->
+        <!-- Java AWT is already included in JDK, no external dependency needed! -->
+
+        <!-- If you get any issues with ImageIO, add this (optional): -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-jpeg</artifactId>
+            <version>3.9.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-core</artifactId>
+            <version>3.9.4</version>
+        </dependency>
+
+        <!-- That's it! No other dependencies needed. -->
     </dependencies>
 
 

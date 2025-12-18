@@ -43,17 +43,25 @@ public class ReviewBO {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-//    @Column(nullable = false)
-//    private boolean approved = true;
+    @Column(nullable = false)
+    private boolean approved = false;
 
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
         if (likes == null) likes = 0L;
         if (dislikes == null) dislikes = 0L;
     }
+
 }

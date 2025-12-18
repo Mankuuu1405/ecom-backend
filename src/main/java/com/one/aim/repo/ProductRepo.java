@@ -19,6 +19,15 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long> {
 
     List<ProductBO> findAllBySeller_Id(Long sellerId);
 
+    Page<ProductBO> findByActiveTrueAndFeaturedTrue(Pageable pageable);
+
+    Page<ProductBO> findByActiveTrueAndBestSellerTrue(Pageable pageable);
+
+    Page<ProductBO> findByActiveTrueAndNewArrivalTrue(Pageable pageable);
+
+    Page<ProductBO> findByActiveTrueAndOnSaleTrue(Pageable pageable);
+
+
     Optional<ProductBO> findBySlug(String slug);
 
     Page<ProductBO> findByCategoryNameIgnoreCase(String categoryName, Pageable pageable);
@@ -163,5 +172,16 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long> {
 
     // Count active products by category name (for browse page)
     Long countByActiveTrueAndCategoryNameIgnoreCase(String categoryName);
+
+    @Query("""
+SELECT p FROM ProductBO p
+WHERE p.active = true
+AND p.createdAt >= :date
+""")
+    Page<ProductBO> findNewArrivals(
+            @Param("date") LocalDateTime date,
+            Pageable pageable
+    );
+
 
 }

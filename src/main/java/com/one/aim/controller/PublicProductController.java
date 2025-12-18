@@ -143,4 +143,35 @@ public class PublicProductController {
         return ResponseEntity.ok(data);
     }
 
+    // Best Sellers
+    @GetMapping("/best-seller")
+    public ResponseEntity<?> bestSellers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
+    ) {
+        return ResponseEntity.ok(productService.getBestSellers(page, size, sort));
+    }
+
+    // New Arrivals
+    @GetMapping("/new-arrival")
+    public ResponseEntity<?> newArrivals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
+    ) {
+        return ResponseEntity.ok(productService.getNewArrivals(page, size, sort));
+    }
+
+    // Sale Products
+    @GetMapping("/sale")
+    public ResponseEntity<?> saleProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "price,asc") String sort
+    ) {
+        return ResponseEntity.ok(productService.getSaleProducts(page, size, sort));
+    }
+
+
 }

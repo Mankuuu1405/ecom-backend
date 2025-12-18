@@ -33,14 +33,27 @@ public class ProductRq extends BaseVM {
 
     private String brand;
 
+    private boolean bestSeller;
+    private boolean newArrival;
+    private boolean onSale;
+
     private Long categoryId;
     private String customCategoryName;
-
 
     private String specificationsJson;
 
     private Boolean active;
 
-    // Images
+    // =========================
+    // IMAGES
+    // =========================
     private List<MultipartFile> images;
+
+    // 0-based index of thumbnail image in images list
+    private Integer thumbnailIndex;
+
+    // Optional (only if seller selects these)
+    private String color;
+    private String size;
 }
+

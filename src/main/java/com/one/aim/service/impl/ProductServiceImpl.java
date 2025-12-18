@@ -15,7 +15,6 @@ import com.one.aim.service.FileService;
 import com.one.aim.service.NotificationService;
 import com.one.aim.service.ProductService;
 import com.one.aim.service.RecommendationService;
-import com.one.exception.BaseException;
 import com.one.utils.AuthUtils;
 import com.one.utils.Utils;
 import com.one.vm.core.BaseDataRs;
@@ -35,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +56,7 @@ public class ProductServiceImpl implements ProductService {
     private final RecommendationService recommendationService;
     private final ReviewRepository reviewRepo;
     private final ProductMapper productMapper;
+    private final ImageProcessingService imageProcessingService;
 
     @Value("${app.frontend.product.url}")
     private String productFrontUrl;
@@ -88,98 +90,94 @@ public class ProductServiceImpl implements ProductService {
             ProductBO bo = new ProductBO();
             bo.setSeller(seller);
             bo.setName(rq.getName());
-            // ========================
-// SLUG GENERATION (HERE)
-// ========================
+
             String slug = SlugUtils.from(rq.getName());
             int counter = 1;
-
             while (productRepo.existsBySlug(slug)) {
                 slug = SlugUtils.from(rq.getName()) + "-" + counter++;
             }
-
             bo.setSlug(slug);
+
             bo.setDescription(rq.getDescription());
             bo.setPrice(rq.getPrice());
             bo.setStock(rq.getStock());
             bo.setBrand(rq.getBrand());
-
+            bo.setBestSeller(rq.isBestSeller());
+            bo.setNewArrival(rq.isNewArrival());
+            bo.setOnSale(rq.isOnSale());
             bo.setSpecificationsJson(rq.getSpecificationsJson());
 
-
-            // =====================
-// CATEGORY HANDLING
-// =====================
             if (rq.getCategoryId() != null) {
-
                 CategoryBO category = categoryRepo.findById(rq.getCategoryId())
-                        .orElseThrow(() ->
-                                new RuntimeException("Category not found")
-                        );
-
+                        .orElseThrow(() -> new RuntimeException("Category not found"));
                 bo.setCategoryId(category.getId());
                 bo.setCategoryName(category.getName());
-
             } else {
-
-                // Seller selected "Other"
                 if (Utils.isEmpty(rq.getCustomCategoryName())) {
-                    return ResponseUtils.failure(
-                            ErrorCodes.EC_INVALID_INPUT,
-                            "Category name is required"
-                    );
+                    return ResponseUtils.failure(ErrorCodes.EC_INVALID_INPUT, "Category name is required");
                 }
 
-                // Check if category already exists
-                Optional<CategoryBO> existing =
-                        categoryRepo.findByNameIgnoreCase(rq.getCustomCategoryName());
-
-                CategoryBO category;
-                if (existing.isPresent()) {
-                    category = existing.get();
-                } else {
-                    // Create new category (inactive by default)
-                    category = CategoryBO.builder()
-                            .name(rq.getCustomCategoryName().trim())
-                            .slug(SlugUtils.from(rq.getCustomCategoryName()))
-                            .active(false) // admin approval required
-                            .build();
-
-                    categoryRepo.save(category);
-                }
+                CategoryBO category = categoryRepo
+                        .findByNameIgnoreCase(rq.getCustomCategoryName())
+                        .orElseGet(() -> categoryRepo.save(
+                                CategoryBO.builder()
+                                        .name(rq.getCustomCategoryName().trim())
+                                        .slug(SlugUtils.from(rq.getCustomCategoryName()))
+                                        .active(false)
+                                        .build()
+                        ));
 
                 bo.setCategoryId(category.getId());
                 bo.setCategoryName(category.getName());
             }
 
-
-            // Images
+            // ===== IMAGES + THUMBNAIL =====
             List<MultipartFile> images = rq.getImages();
-            if (images != null && !images.isEmpty()) {
-
-                if (images.size() > 5) {
-                    return ResponseUtils.failure("TOO_MANY_IMAGES", "Maximum 5 images allowed");
-                }
-
-                for (MultipartFile file : images) {
-                    if (file.isEmpty()) continue;
-
-                    if (!List.of("image/jpeg", "image/png").contains(file.getContentType())) {
-                        return ResponseUtils.failure("INVALID_FILE_TYPE", "Only JPG and PNG images are allowed");
-                    }
-
-                    if (file.getSize() > 2 * 1024 * 1024) {
-                        return ResponseUtils.failure("FILE_TOO_LARGE", "File size must be <= 2MB");
-                    }
-
-                    FileBO uploaded = fileService.uploadAndReturnFile(file);
-                    bo.getImageFileIds().add(uploaded.getId());
-                }
-            }
-
-            if (bo.getImageFileIds().isEmpty()) {
+            if (images == null || images.isEmpty()) {
                 return ResponseUtils.failure("NO_IMAGE", "Product must have at least one image");
             }
+
+            if (images.size() > 5) {
+                return ResponseUtils.failure("TOO_MANY_IMAGES", "Maximum 5 images allowed");
+            }
+
+            List<Long> imageIds = new ArrayList<>();
+
+            for (MultipartFile file : images) {
+                if (file.isEmpty()) continue;
+
+                if (!List.of("image/jpeg", "image/png").contains(file.getContentType())) {
+                    return ResponseUtils.failure("INVALID_FILE_TYPE", "Only JPG and PNG allowed");
+                }
+
+                if (file.getSize() > 2 * 1024 * 1024) {
+                    return ResponseUtils.failure("FILE_TOO_LARGE", "Max 2MB allowed");
+                }
+
+                InputStream processed =
+                        imageProcessingService.processProductImage(file);
+
+                FileBO uploaded = fileService.uploadFile(
+                        processed,
+                        "product_" + System.currentTimeMillis() + ".png",
+                        "image/png"
+                );
+
+                imageIds.add(uploaded.getId());
+            }
+
+            if (imageIds.isEmpty()) {
+                return ResponseUtils.failure("NO_IMAGE", "At least one valid image required");
+            }
+
+            int thumbIndex = rq.getThumbnailIndex() != null ? rq.getThumbnailIndex() : 0;
+            if (thumbIndex < 0 || thumbIndex >= imageIds.size()) {
+                return ResponseUtils.failure("INVALID_THUMBNAIL", "Invalid thumbnail index");
+            }
+
+            bo.setThumbnailFileId(imageIds.get(thumbIndex));
+            Collections.swap(imageIds, 0, thumbIndex);
+            bo.setImageFileIds(imageIds);
 
             productRepo.save(bo);
 
@@ -195,14 +193,18 @@ public class ProductServiceImpl implements ProductService {
                     "/admin/products/" + bo.getSlug()
             );
 
-            return ResponseUtils.success(new ProductDataRs("Product created successfully",
-                    productMapper.toProductRs(bo)));
+            return ResponseUtils.success(
+                    new ProductDataRs("Product created successfully",
+                            productMapper.toProductRs(bo))
+            );
 
         } catch (Exception e) {
             log.error("addProduct() failed", e);
             return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, e.getMessage());
         }
     }
+
+
 
     // ======================================================================
     // SELLER: UPDATE PRODUCT
@@ -229,7 +231,14 @@ public class ProductServiceImpl implements ProductService {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized");
             }
 
-            // Active toggle only
+            // =================================================
+            // CHANGE TRACKER
+            // =================================================
+            Map<String, String> changes = new LinkedHashMap<>();
+
+            // =================================================
+            // ACTIVE TOGGLE ONLY
+            // =================================================
             if (rq.getActive() != null &&
                     rq.getName() == null &&
                     rq.getDescription() == null &&
@@ -238,79 +247,112 @@ public class ProductServiceImpl implements ProductService {
                     rq.getCategoryId() == null &&
                     rq.getCustomCategoryName() == null) {
 
-                product.setActive(rq.getActive());
+                if (product.isActive() != rq.getActive()) {
+                    changes.put("Active", product.isActive() + " → " + rq.getActive());
+                    product.setActive(rq.getActive());
+                }
+
                 productRepo.save(product);
 
                 if (!product.isActive()) {
                     cartRepo.deleteByProduct_Id(product.getId());
                 }
 
-                return ResponseUtils.success(new ProductDataRs("Product status updated",
-                        productMapper.toProductRs(product)));
+                sendProductUpdateNotification(product, changes);
+
+                return ResponseUtils.success(
+                        new ProductDataRs("Product status updated",
+                                productMapper.toProductRs(product))
+                );
             }
 
-            // Full update
-            if (Utils.isNotEmpty(rq.getName())) {
+            // =================================================
+            // FULL UPDATE
+            // =================================================
+
+            if (Utils.isNotEmpty(rq.getName()) && !rq.getName().equals(product.getName())) {
+                changes.put("Name", product.getName() + " → " + rq.getName());
                 product.setName(rq.getName());
                 product.setSlug(SlugUtils.from(rq.getName()));
             }
 
-            if (Utils.isNotEmpty(rq.getDescription())) {
+            if (Utils.isNotEmpty(rq.getDescription())
+                    && !rq.getDescription().equals(product.getDescription())) {
+                changes.put("Description", "Updated");
                 product.setDescription(rq.getDescription());
             }
 
-            if (rq.getPrice() != null && rq.getPrice() > 0) {
+            if (rq.getPrice() != null && rq.getPrice() > 0
+                    && !rq.getPrice().equals(product.getPrice())) {
+                changes.put("Price", product.getPrice() + " → " + rq.getPrice());
                 product.setPrice(rq.getPrice());
             }
 
             boolean stockChanged = false;
-
-            if (rq.getStock() != null && rq.getStock() >= 0) {
+            if (rq.getStock() != null && !rq.getStock().equals(product.getStock())) {
+                changes.put("Stock", product.getStock() + " → " + rq.getStock());
                 product.setStock(rq.getStock());
                 product.updateLowStock();
                 stockChanged = true;
             }
 
-            if (rq.getCategoryId() != null) {
+            // =================================================
+            // FLAGS (FIGMA FEATURES)
+            // =================================================
+
+            if (rq.isBestSeller() != product.isBestSeller()) {
+                changes.put("Best Seller",
+                        product.isBestSeller() + " → " + rq.isBestSeller());
+                product.setBestSeller(rq.isBestSeller());
+            }
+
+            if (rq.isNewArrival() != product.isNewArrival()) {
+                changes.put("New Arrival",
+                        product.isNewArrival() + " → " + rq.isNewArrival());
+                product.setNewArrival(rq.isNewArrival());
+            }
+
+            if (rq.isOnSale() != product.isOnSale()) {
+                changes.put("On Sale",
+                        product.isOnSale() + " → " + rq.isOnSale());
+                product.setOnSale(rq.isOnSale());
+            }
+
+            // =================================================
+            // CATEGORY
+            // =================================================
+            if (rq.getCategoryId() != null &&
+                    !rq.getCategoryId().equals(product.getCategoryId())) {
+
                 CategoryBO category = categoryRepo.findById(rq.getCategoryId()).orElse(null);
                 if (category == null) {
                     return ResponseUtils.failure(ErrorCodes.EC_RECORD_NOT_FOUND, "Category not found");
                 }
+
+                changes.put("Category",
+                        product.getCategoryName() + " → " + category.getName());
+
                 product.setCategoryId(category.getId());
                 product.setCategoryName(category.getName());
-            } else if (Utils.isNotEmpty(rq.getCustomCategoryName())) {
+
+            } else if (Utils.isNotEmpty(rq.getCustomCategoryName())
+                    && !rq.getCustomCategoryName().equals(product.getCategoryName())) {
+
+                changes.put("Category",
+                        product.getCategoryName() + " → " + rq.getCustomCategoryName());
+
                 product.setCategoryId(null);
                 product.setCategoryName(rq.getCustomCategoryName());
             }
 
-            // Add images
-            if (rq.getImages() != null && !rq.getImages().isEmpty()) {
-                int existing = product.getImageFileIds().size();
-                int incoming = rq.getImages().size();
-
-                if (existing + incoming > 5) {
-                    return ResponseUtils.failure("TOO_MANY_IMAGES", "You can only upload up to 5 images");
-                }
-
-                for (MultipartFile file : rq.getImages()) {
-                    if (file.isEmpty()) continue;
-
-                    if (!List.of("image/jpeg", "image/png").contains(file.getContentType())) {
-                        return ResponseUtils.failure("INVALID_FILE_TYPE", "Only JPG and PNG allowed");
-                    }
-
-                    if (file.getSize() > 2 * 1024 * 1024) {
-                        return ResponseUtils.failure("FILE_TOO_LARGE", "Max size 2MB allowed");
-                    }
-
-                    FileBO uploaded = fileService.uploadAndReturnFile(file);
-                    product.getImageFileIds().add(uploaded.getId());
-                }
-            }
-
+            // =================================================
+            // SAVE
+            // =================================================
             productRepo.save(product);
 
-            // Cart sync
+            // =================================================
+            // CART SYNC
+            // =================================================
             if (stockChanged) {
                 if (product.getStock() <= 0) {
                     cartRepo.deleteByProduct_Id(product.getId());
@@ -324,24 +366,20 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
 
-            notificationService.notifyAdmins(
-                    "PRODUCT_UPDATED",
-                    "Product Updated",
-                    product.getName(),
-                    null,
-                    product,
-                    null,
-                    "/admin/products/" + product.getId()
-            );
+            sendProductUpdateNotification(product, changes);
 
-            return ResponseUtils.success(new ProductDataRs("Product updated successfully",
-                    productMapper.toProductRs(product)));
+            return ResponseUtils.success(
+                    new ProductDataRs("Product updated successfully",
+                            productMapper.toProductRs(product))
+            );
 
         } catch (Exception e) {
             log.error("updateProduct() failed", e);
             return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, e.getMessage());
         }
     }
+
+
 
     // ======================================================================
     // SELLER: IMAGE UPLOAD
@@ -353,7 +391,6 @@ public class ProductServiceImpl implements ProductService {
 
         try {
             ProductBO bo = productRepo.findById(productId).orElse(null);
-
             if (bo == null) {
                 return ResponseUtils.failure(ErrorCodes.EC_PRODUCT_NOT_FOUND, "Product not found");
             }
@@ -363,28 +400,53 @@ public class ProductServiceImpl implements ProductService {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized image upload");
             }
 
-            List<Long> imageIds = new ArrayList<>();
+            if (files == null || files.isEmpty()) {
+                return ResponseUtils.failure(ErrorCodes.EC_INVALID_INPUT, "No images provided");
+            }
 
-            for (MultipartFile f : files) {
-                if (!f.isEmpty()) {
-                    FileBO uploaded = fileService.uploadAndReturnFile(f);
-                    bo.getImageFileIds().add(uploaded.getId());
-                    imageIds.add(uploaded.getId());
+            if (bo.getImageFileIds().size() + files.size() > 5) {
+                return ResponseUtils.failure("TOO_MANY_IMAGES", "Maximum 5 images allowed");
+            }
+
+            List<Long> newImageIds = new ArrayList<>();
+
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) continue;
+
+                if (!List.of("image/jpeg", "image/png").contains(file.getContentType())) {
+                    return ResponseUtils.failure("INVALID_FILE_TYPE", "Only JPG and PNG allowed");
                 }
+
+                if (file.getSize() > 2 * 1024 * 1024) {
+                    return ResponseUtils.failure("FILE_TOO_LARGE", "Max 2MB allowed");
+                }
+
+                InputStream processed =
+                        imageProcessingService.processProductImage(file);
+
+                FileBO uploaded = fileService.uploadFile(
+                        processed,
+                        "product_" + System.currentTimeMillis() + ".png",
+                        "image/png"
+                );
+
+                bo.getImageFileIds().add(uploaded.getId());
+                newImageIds.add(uploaded.getId());
             }
 
             productRepo.save(bo);
 
-            userActivityService.log(sellerId, "PRODUCT_IMAGE_UPLOADED",
-                    "Uploaded images for product: " + bo.getName());
-
-            return ResponseUtils.success(new BaseDataRs("Images uploaded successfully", imageIds));
+            return ResponseUtils.success(
+                    new BaseDataRs("Images uploaded successfully", newImageIds)
+            );
 
         } catch (Exception e) {
             log.error("uploadProductImages() failed", e);
             return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, e.getMessage());
         }
     }
+
+
 
     // ======================================================================
     // SELLER: GET PRODUCT IMAGES
@@ -394,21 +456,28 @@ public class ProductServiceImpl implements ProductService {
         validateSellerAccess();
 
         try {
-            if (productId == null || productId <= 0) {
-                return ResponseUtils.failure(ErrorCodes.EC_INVALID_INPUT, "Invalid product ID");
+            ProductBO bo = productRepo.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            List<Long> ordered = new ArrayList<>();
+
+            if (bo.getThumbnailFileId() != null) {
+                ordered.add(bo.getThumbnailFileId());
             }
 
-            ProductBO bo = productRepo.findById(productId).orElse(null);
-
-            if (bo == null) {
-                return ResponseUtils.failure(ErrorCodes.EC_PRODUCT_NOT_FOUND, "Product not found");
+            for (Long id : bo.getImageFileIds()) {
+                if (!id.equals(bo.getThumbnailFileId())) {
+                    ordered.add(id);
+                }
             }
 
-            List<String> imageUrls = bo.getImageFileIds().stream()
+            List<String> urls = ordered.stream()
                     .map(id -> "/api/files/public/" + id + "/view")
                     .toList();
 
-            return ResponseUtils.success(new BaseDataRs("Product images retrieved", imageUrls));
+            return ResponseUtils.success(
+                    new BaseDataRs("Product images retrieved", urls)
+            );
 
         } catch (Exception e) {
             log.error("getProductImages() failed", e);
@@ -416,13 +485,13 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+
     // ======================================================================
     // SELLER: DELETE PRODUCT IMAGE
     // ======================================================================
     @Override
     @Transactional
     public BaseRs deleteProductImage(Long productId, Long imageId) {
-
         try {
             Long sellerId = AuthUtils.findLoggedInUser().getDocId();
 
@@ -430,39 +499,31 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             if (!product.getSeller().getId().equals(sellerId)) {
-                return ResponseUtils.failure(
-                        ErrorCodes.EC_UNAUTHORIZED, "You are not allowed to modify this product"
-                );
+                return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized");
             }
 
-            List<Long> imgList = product.getImageFileIds();
+            List<Long> images = product.getImageFileIds();
 
-            if (imgList.isEmpty()) {
-                return ResponseUtils.failure(ErrorCodes.EC_IMAGE_NOT_FOUND, "No images found");
-            }
-
-            if (imgList.size() == 1) {
+            if (images.size() <= 1) {
                 return ResponseUtils.failure("LAST_IMAGE", "At least one image must remain");
             }
 
-            if (!imgList.contains(imageId)) {
-                return ResponseUtils.failure(ErrorCodes.EC_IMAGE_NOT_FOUND, "Image does not belong to this product");
+            boolean wasThumbnail = imageId.equals(product.getThumbnailFileId());
+
+            images.remove(imageId);
+
+            if (wasThumbnail) {
+                product.setThumbnailFileId(images.get(0));
             }
 
-            imgList.remove(imageId);
             productRepo.save(product);
-
             fileService.deleteFileById(String.valueOf(imageId));
-
-            userActivityService.log(sellerId,
-                    "PRODUCT_IMAGE_DELETED",
-                    "Deleted image " + imageId + " from product: " + product.getName());
 
             return ResponseUtils.success("Image deleted successfully");
 
         } catch (Exception e) {
             log.error("deleteProductImage() failed", e);
-            return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, "Failed to delete product image");
+            return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, e.getMessage());
         }
     }
 
@@ -809,6 +870,35 @@ public class ProductServiceImpl implements ProductService {
         return pageData.map(productMapper::toCardRs);  // ← CHANGED
     }
 
+    @Override
+    public Page<ProductCardRs> getBestSellers(int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, parseSort(sort));
+
+        return productRepo.findByActiveTrueAndBestSellerTrue(pageable)
+                .map(productMapper::toCardRs);
+    }
+
+    @Override
+    public Page<ProductCardRs> getNewArrivals(int page, int size, String sort) {
+
+        LocalDateTime fromDate = LocalDateTime.now().minusDays(30);
+        Pageable pageable = PageRequest.of(page, size, parseSort(sort));
+
+        return productRepo.findNewArrivals(fromDate, pageable)
+                .map(productMapper::toCardRs);
+    }
+
+
+    @Override
+    public Page<ProductCardRs> getSaleProducts(int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size, parseSort(sort));
+
+        return productRepo.findByActiveTrueAndOnSaleTrue(pageable)
+                .map(productMapper::toCardRs);
+    }
+
 
     // ======================================================================
     // INTERNAL HELPERS
@@ -861,5 +951,68 @@ public class ProductServiceImpl implements ProductService {
 
         return seller;
     }
+
+    private void sendProductUpdateNotification(ProductBO product, Map<String, String> changes) {
+
+        String changeSummary = changes.isEmpty()
+                ? "No significant fields changed"
+                : changes.entrySet().stream()
+                .map(e -> "• " + e.getKey() + ": " + e.getValue())
+                .collect(Collectors.joining("\n"));
+
+        notificationService.notifyAdmins(
+                "PRODUCT_UPDATED",
+                "Product Updated",
+                product.getName() + "\n\nChanges:\n" + changeSummary,
+                null,
+                product,
+                null,
+                "/admin/products/" + product.getId()
+        );
+    }
+
+    private Sort parseSort(String sort) {
+
+        // Default sort
+        if (sort == null || sort.isBlank()) {
+            return Sort.by("createdAt").descending();
+        }
+
+        String[] parts = sort.split(",");
+
+        // Safety fallback
+        if (parts.length != 2) {
+            return Sort.by("createdAt").descending();
+        }
+
+        String field = parts[0];
+        String direction = parts[1];
+
+        // Whitelist allowed sort fields (VERY IMPORTANT)
+        Set<String> allowedFields = Set.of(
+                "price",
+                "salePrice",
+                "createdAt",
+                "totalSold"
+        );
+
+        if (!allowedFields.contains(field)) {
+            return Sort.by("createdAt").descending();
+        }
+
+        return "asc".equalsIgnoreCase(direction)
+                ? Sort.by(field).ascending()
+                : Sort.by(field).descending();
+    }
+
+    private FileBO saveProcessedImage(byte[] image) throws Exception {
+        return fileService.uploadFile(
+                new ByteArrayInputStream(image),
+                "product_" + System.currentTimeMillis() + ".png",
+                "image/png"
+        );
+    }
+
+
 
 }
