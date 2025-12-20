@@ -363,7 +363,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String getPublicFileUrl(Long fileId) {
-        return "http://localhost:8989/aimdev/api/files/public/" + fileId + "/view";
+        return "/aimdev/api/files/public/" + fileId + "/view";
     }
 
     @Override

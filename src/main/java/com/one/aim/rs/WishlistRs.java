@@ -10,6 +10,7 @@ public class WishlistRs {
 
     private Long productId;
     private String productName;
+    private String slug;
     private Double price;
     private boolean inStock;
     private boolean lowStock;

@@ -28,6 +28,7 @@ public class WishlistMapper {
         return WishlistRs.builder()
                 .productId(product.getId())
                 .productName(product.getName())
+                .slug(product.getSlug())
                 .price(product.getPrice())
                 .inStock(product.getStock() != null && product.getStock() > 0)
                 .lowStock(product.isLowStock())

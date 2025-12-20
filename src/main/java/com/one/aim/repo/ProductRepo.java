@@ -19,7 +19,8 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long> {
 
     List<ProductBO> findAllBySeller_Id(Long sellerId);
 
-    Page<ProductBO> findByActiveTrueAndFeaturedTrue(Pageable pageable);
+    Page<ProductBO> findByActiveTrueAndFeaturedTrueOrderByUpdatedAtDesc(Pageable pageable);
+
 
     Page<ProductBO> findByActiveTrueAndBestSellerTrue(Pageable pageable);
 
@@ -38,7 +39,22 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long> {
     
     long count();
 
-    Page<ProductBO> findByActiveTrue(Pageable pageable);
+    @Query("""
+    SELECT p
+    FROM ProductBO p
+    WHERE p.active = true
+      AND p.createdAt >= :cutoff
+    ORDER BY p.createdAt DESC
+""")
+    Page<ProductBO> findHomeNewArrivals(
+            @Param("cutoff") LocalDateTime cutoff,
+            Pageable pageable
+    );
+
+
+
+    Page<ProductBO> findByActiveTrueOrderByCreatedAtDesc(Pageable pageable);
+
 
 
     Page<ProductBO> findByCategoryId(Long categoryId, Pageable pageable);
@@ -126,14 +142,21 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long> {
 
 
     @Query("""
-    SELECT DISTINCT p 
-    FROM ProductBO p 
-    LEFT JOIN FETCH p.imageFileIds 
-    WHERE p.createdAt >= :start 
-    AND p.active = true
-    ORDER BY p.createdAt DESC
+    SELECT p
+    FROM OrderItemBO oi
+    JOIN oi.product p
+    WHERE oi.order.orderStatus = 'DELIVERED'
+      AND oi.createdAt BETWEEN :start AND :end
+      AND p.active = true
+    GROUP BY p
+    ORDER BY SUM(oi.quantity) DESC
 """)
-    List<ProductBO> findTrending(@Param("start") LocalDateTime start, Pageable pageable);
+    Page<ProductBO> findTrendingProducts(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            Pageable pageable
+    );
+
 
 
     @Query("""

@@ -130,14 +130,14 @@ public class OrderController {
     // ---------------------------------------------------------
     // GET SINGLE ORDER
     // ---------------------------------------------------------
-    @GetMapping("/order/{id}")
-    public ResponseEntity<?> retrieveCart(@PathVariable("id") long id) throws Exception {
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<?> retrieveOrder(@PathVariable String orderId) throws Exception {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing RESTfulService [GET /order/id]");
-        }
-        return new ResponseEntity<>(orderService.retrieveOrder(id), HttpStatus.OK);
+        log.debug("Executing RESTfulService [GET /orders/{}]", orderId);
+
+        return ResponseEntity.ok(orderService.retrieveOrder(orderId));
     }
+
 
 
     // ---------------------------------------------------------
@@ -196,12 +196,14 @@ public class OrderController {
 
     @GetMapping("/calculate-charges")
     public ResponseEntity<?> calculateCharges(
-            @RequestParam(required = false) Double subtotal,
-            @RequestParam(required = false) String shippingMethod,
-            @RequestParam(required = false) String state
-    ) {
-        return chargesService.calculate(subtotal, shippingMethod, state);
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long addressId,
+            @RequestParam(required = false) String promoCode
+    ) throws Exception {
+
+        return chargesService.calculate(userId, addressId, promoCode);
     }
+
 
 
 //    @GetMapping("/invoice/{fileName:.+}")

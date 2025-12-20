@@ -11,7 +11,8 @@ public interface OrderService {
 //	public BaseRs placeOrder(OrderRq rq) throws Exception;
 
     // Get single order by orderId (ORD-XXXXXX)
-    BaseRs retrieveOrder(Long orderId) throws Exception;
+    BaseRs retrieveOrder(String orderId) throws Exception;
+
 
     // Get paginated, sorted, filtered orders (Admin)
   public BaseRs retrieveOrders(

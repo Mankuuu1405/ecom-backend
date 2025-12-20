@@ -21,22 +21,27 @@ public class LoginDataRs extends BaseDataRs {
     private String email;    // actual email
     private String role;     // USER / SELLER / ADMIN
 
-    public LoginDataRs(String message,
-                       String accessToken,
-                       String refreshToken,
-                       Long empId,
-                       String email,
-                       String fullname,
-                       String role) {
-        super(message);
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.empId = empId;
-        this.username = email;   // keep as email (same as before)
-        this.fullname = fullname;
-        this.email = email;
-        this.role = role;
-    }
+
+    private Boolean emailVerified;    // null for USER / ADMIN
+    private Boolean sellerApproved;   // null for USER / ADMIN
+    private Boolean sellerLocked;     // null for USER / ADMIN
+
+//    public LoginDataRs(String message,
+//                       String accessToken,
+//                       String refreshToken,
+//                       Long empId,
+//                       String email,
+//                       String fullname,
+//                       String role) {
+//        super(message);
+//        this.accessToken = accessToken;
+//        this.refreshToken = refreshToken;
+//        this.empId = empId;
+//        this.username = email;   // keep as email (same as before)
+//        this.fullname = fullname;
+//        this.email = email;
+//        this.role = role;
+//    }
 
     public LoginDataRs(String message) {
         super(message);

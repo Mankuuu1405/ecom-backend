@@ -49,13 +49,7 @@ public class HomePageServiceImpl implements HomePageService {
         trending.forEach(p -> shownProductIds.add(Long.valueOf(p.getDocId())));
 
         if (!trending.isEmpty()) {
-            sections.add(
-                    HomeSectionRs.products(
-                            "Trending Now",
-                            trending,
-                            "/products?sort=trending"
-                    )
-            );
+            sections.add(HomeSectionRs.products("Trending Now", getTrendingProducts(limit), "/products?sort=trending"));
         }
 
         // =========================
@@ -68,13 +62,7 @@ public class HomePageServiceImpl implements HomePageService {
                         .toList();
 
         if (!newArrivals.isEmpty()) {
-            sections.add(
-                    HomeSectionRs.products(
-                            "New Arrivals",
-                            newArrivals,
-                            "/products?sort=new"
-                    )
-            );
+            sections.add(HomeSectionRs.products("New Arrivals", getNewArrivals(limit), "/products?sort=new"));
         }
 
         // =========================
@@ -83,26 +71,17 @@ public class HomePageServiceImpl implements HomePageService {
         List<ProductCardRs> hotPicks = getHotPicks(limit);
 
         if (!hotPicks.isEmpty()) {
+            sections.add(HomeSectionRs.products("Hot Picks", getHotPicks(limit), "/products?filter=featured"));
+        }
+
+        List<ReviewCardRs> reviews = getTopReviews(3);
+
+        if (!reviews.isEmpty()) {
             sections.add(
-                    HomeSectionRs.products(
-                            "Hot Picks",
-                            hotPicks,
-                            "/products?filter=featured"
-                    )
+                    HomeSectionRs.reviews("Customer Reviews", reviews)
             );
         }
 
-        List<ReviewCardRs> review= getTopReviews(limit);
-
-        if (!review.isEmpty()) {
-            sections.add(
-                    HomeSectionRs.reviews(
-                            "Customer Reviews",
-                            getTopReviews(3)
-                    )
-            );
-
-        }
 
         // =========================
 // BLOGS
@@ -161,20 +140,14 @@ public class HomePageServiceImpl implements HomePageService {
 
         LocalDateTime start = LocalDateTime.now().minusDays(30);
 
-        List<Long> productIds =
-                orderItemBoRepo.findTopSelling(
-                                start,
-                                LocalDateTime.now(),
-                                PageRequest.of(0, limit)
-                        ).stream()
-                        .map(r -> ((Number) r[0]).longValue())
-                        .distinct()
-                        .toList();
+        Pageable pageable = PageRequest.of(0, limit);
 
-        if (productIds.isEmpty()) return Collections.emptyList();
-
-        return productRepo.findAllById(productIds).stream()
-                .filter(ProductBO::isActive)
+        return productRepo.findTrendingProducts(
+                        start,
+                        LocalDateTime.now(),
+                        pageable
+                )
+                .stream()
                 .map(productMapper::toCardRs)
                 .toList();
     }
@@ -184,14 +157,16 @@ public class HomePageServiceImpl implements HomePageService {
     // ======================================================
     private List<ProductCardRs> getNewArrivals(int limit) {
 
-        Pageable pageable =
-                PageRequest.of(0, limit, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(0, limit);
 
-        return productRepo.findByActiveTrue(pageable)
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+
+        return productRepo.findHomeNewArrivals(cutoff, pageable)
                 .stream()
                 .map(productMapper::toCardRs)
                 .toList();
     }
+
 
     // ======================================================
     // FEATURED CATEGORIES
@@ -200,12 +175,7 @@ public class HomePageServiceImpl implements HomePageService {
 
         Pageable pageable = PageRequest.of(0, limit);
 
-        Map<Long, Long> countMap = productRepo.countProductsGrouped()
-                .stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
+        Map<Long, Long> countMap = productRepo.countProductsGroupedByCategoryAsMap();
 
         return categoryRepo.findTopActiveCategories(pageable)
                 .stream()
@@ -240,11 +210,13 @@ public class HomePageServiceImpl implements HomePageService {
 
     private List<ProductCardRs> getHotPicks(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
-        return productRepo.findByActiveTrueAndFeaturedTrue(pageable)
+        return productRepo
+                .findByActiveTrueAndFeaturedTrueOrderByUpdatedAtDesc(pageable)
                 .stream()
                 .map(productMapper::toCardRs)
                 .toList();
     }
+
 
     private List<ReviewCardRs> getTopReviews(int limit) {
         Pageable pageable = PageRequest.of(0, limit);

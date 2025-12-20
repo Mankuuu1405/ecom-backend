@@ -105,8 +105,13 @@ public class AuthServiceImpl implements AuthService {
             rs.setEmail(seller.getEmail());
             rs.setRole("SELLER");
 
+            rs.setEmailVerified(seller.isEmailVerified());
+            rs.setSellerApproved(seller.isVerified());   // admin approval
+            rs.setSellerLocked(seller.isLocked());
+
             return ResponseUtils.success(rs);
         }
+
 
         rs.setEmpId(user.getId());
         rs.setUsername(user.getEmail());

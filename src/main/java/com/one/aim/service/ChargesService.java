@@ -3,6 +3,16 @@ package com.one.aim.service;
 import org.springframework.http.ResponseEntity;
 
 public interface ChargesService {
-    ResponseEntity<?> calculate(Double subtotal, String shippingMethod, String state);
+
+    /**
+     * Calculate all charges for user's cart
+     * Includes category-wise tax, shipping, discount, payment charge
+     */
+    ResponseEntity<?> calculate(
+            Long userId,
+            Long addressId,
+            String promoCode
+    ) throws Exception;
 }
+
 

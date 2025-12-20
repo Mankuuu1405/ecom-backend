@@ -62,8 +62,8 @@ public class ProductServiceImpl implements ProductService {
     private String productFrontUrl;
 
     // ======================================================================
-    // SELLER: ADD PRODUCT
-    // ======================================================================
+// SELLER: ADD PRODUCT (Updated - No bestSeller/newArrival control)
+// ======================================================================
     @Override
     @Transactional
     public BaseRs addProduct(ProductRq rq) {
@@ -102,9 +102,18 @@ public class ProductServiceImpl implements ProductService {
             bo.setPrice(rq.getPrice());
             bo.setStock(rq.getStock());
             bo.setBrand(rq.getBrand());
-            bo.setBestSeller(rq.isBestSeller());
-            bo.setNewArrival(rq.isNewArrival());
+
+            //  REMOVED: Sellers cannot set these flags
+            // bo.setBestSeller(rq.isBestSeller());
+            // bo.setNewArrival(rq.isNewArrival());
+
+            //  Only onSale is allowed
             bo.setOnSale(rq.isOnSale());
+
+            //  System automatically sets newArrival to true for new products
+            bo.setNewArrival(true);
+            bo.setBestSeller(false); // Admin will set this based on sales
+
             bo.setSpecificationsJson(rq.getSpecificationsJson());
 
             if (rq.getCategoryId() != null) {
@@ -131,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
                 bo.setCategoryName(category.getName());
             }
 
-            // ===== IMAGES + THUMBNAIL =====
+            // ===== IMAGES + THUMBNAIL WITH VALIDATION =====
             List<MultipartFile> images = rq.getImages();
             if (images == null || images.isEmpty()) {
                 return ResponseUtils.failure("NO_IMAGE", "Product must have at least one image");
@@ -146,16 +155,18 @@ public class ProductServiceImpl implements ProductService {
             for (MultipartFile file : images) {
                 if (file.isEmpty()) continue;
 
-                if (!List.of("image/jpeg", "image/png").contains(file.getContentType())) {
+                //  STRICT IMAGE VALIDATION
+                if (!List.of("image/jpeg", "image/png", "image/jpg").contains(file.getContentType())) {
                     return ResponseUtils.failure("INVALID_FILE_TYPE", "Only JPG and PNG allowed");
                 }
 
-                if (file.getSize() > 2 * 1024 * 1024) {
-                    return ResponseUtils.failure("FILE_TOO_LARGE", "Max 2MB allowed");
+                //  Max 5MB per image
+                if (file.getSize() > 5 * 1024 * 1024) {
+                    return ResponseUtils.failure("FILE_TOO_LARGE", "Max 5MB per image allowed");
                 }
 
-                InputStream processed =
-                        imageProcessingService.processProductImage(file);
+                //  Process image to 800x800 with padding
+                InputStream processed = imageProcessingService.processProductImage(file);
 
                 FileBO uploaded = fileService.uploadFile(
                         processed,
@@ -206,9 +217,10 @@ public class ProductServiceImpl implements ProductService {
 
 
 
+
     // ======================================================================
-    // SELLER: UPDATE PRODUCT
-    // ======================================================================
+    // SELLER: UPDATE PRODUCT (Updated - No bestSeller/newArrival control)
+// ======================================================================
     @Override
     @Transactional
     public BaseRs updateProduct(ProductRq rq) {
@@ -231,9 +243,6 @@ public class ProductServiceImpl implements ProductService {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized");
             }
 
-            // =================================================
-            // CHANGE TRACKER
-            // =================================================
             Map<String, String> changes = new LinkedHashMap<>();
 
             // =================================================
@@ -296,25 +305,10 @@ public class ProductServiceImpl implements ProductService {
                 stockChanged = true;
             }
 
-            // =================================================
-            // FLAGS (FIGMA FEATURES)
-            // =================================================
-
-            if (rq.isBestSeller() != product.isBestSeller()) {
-                changes.put("Best Seller",
-                        product.isBestSeller() + " → " + rq.isBestSeller());
-                product.setBestSeller(rq.isBestSeller());
-            }
-
-            if (rq.isNewArrival() != product.isNewArrival()) {
-                changes.put("New Arrival",
-                        product.isNewArrival() + " → " + rq.isNewArrival());
-                product.setNewArrival(rq.isNewArrival());
-            }
-
+            //  REMOVED: Sellers cannot modify these flags
+            // Only onSale is allowed to be modified by sellers
             if (rq.isOnSale() != product.isOnSale()) {
-                changes.put("On Sale",
-                        product.isOnSale() + " → " + rq.isOnSale());
+                changes.put("On Sale", product.isOnSale() + " → " + rq.isOnSale());
                 product.setOnSale(rq.isOnSale());
             }
 
@@ -346,8 +340,14 @@ public class ProductServiceImpl implements ProductService {
             }
 
             // =================================================
-            // SAVE
+            // SPECIFICATIONS
             // =================================================
+            if (Utils.isNotEmpty(rq.getSpecificationsJson())
+                    && !rq.getSpecificationsJson().equals(product.getSpecificationsJson())) {
+                changes.put("Specifications", "Updated");
+                product.setSpecificationsJson(rq.getSpecificationsJson());
+            }
+
             productRepo.save(product);
 
             // =================================================
@@ -720,18 +720,28 @@ public class ProductServiceImpl implements ProductService {
             if (limit <= 0) limit = 20;
             if (offset < 0) offset = 0;
 
-            Pageable pageable = PageRequest.of(offset / limit, limit);
-            Page<ProductBO> pageData = productRepo.findByActiveTrue(pageable);
+            int page = offset / limit;
+            Pageable pageable = PageRequest.of(page, limit);
+
+            Page<ProductBO> pageData =
+                    productRepo.findByActiveTrueOrderByCreatedAtDesc(pageable);
 
             return ResponseUtils.success(
-                    new ProductDataRsList("Products retrieved successfully",
-                            productMapper.toProductRsList(pageData.getContent())));  // ← CHANGED
+                    new ProductDataRsList(
+                            "Products retrieved successfully",
+                            productMapper.toProductRsList(pageData.getContent())
+                    )
+            );
 
         } catch (Exception e) {
             log.error("listProducts() failed", e);
-            return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, e.getMessage());
+            return ResponseUtils.failure(
+                    ErrorCodes.EC_INTERNAL_ERROR,
+                    e.getMessage()
+            );
         }
     }
+
 
     // ======================================================================
     // PUBLIC: CATEGORY PRODUCTS
@@ -785,14 +795,20 @@ public class ProductServiceImpl implements ProductService {
     // PUBLIC: HOMEPAGE PRODUCT LIST
     // ======================================================================
     @Override
-    public Page<ProductCardRs> getProducts(String category, int page, int size, String sort) throws Exception {
+    public Page<ProductCardRs> getProducts(String category, int page, int size, String sort) {
+
+        if (page < 0) page = 0;
+        if (size <= 0) size = 12;
+        if (size > 50) size = 50;
+
         Sort sortSpec;
-        try {
+
+        if (sort != null && sort.contains(",")) {
             String[] sortParts = sort.split(",");
-            sortSpec = sortParts[1].equalsIgnoreCase("asc")
+            sortSpec = "asc".equalsIgnoreCase(sortParts[1])
                     ? Sort.by(sortParts[0]).ascending()
                     : Sort.by(sortParts[0]).descending();
-        } catch (Exception e) {
+        } else {
             sortSpec = Sort.by("createdAt").descending();
         }
 
@@ -800,11 +816,12 @@ public class ProductServiceImpl implements ProductService {
 
         Page<ProductBO> pageData =
                 (category == null || category.isBlank())
-                        ? productRepo.findByActiveTrue(pageable)
+                        ? productRepo.findByActiveTrueOrderByCreatedAtDesc(pageable)
                         : productRepo.findByActiveTrueAndCategoryNameIgnoreCase(category, pageable);
 
-        return pageData.map(productMapper::toCardRs);  // ← CHANGED
+        return pageData.map(productMapper::toCardRs);
     }
+
 
     // ======================================================================
     // PUBLIC: HOMEPAGE SEARCH PRODUCTS

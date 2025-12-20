@@ -212,11 +212,11 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public BaseRs retrieveOrder(Long orderId) throws Exception {
-        log.debug("Executing retrieveOrder() for ID: {}", orderId);
+    public BaseRs retrieveOrder(String orderId) throws Exception {
+        log.debug("Executing retrieveOrder() for orderId: {}", orderId);
 
         try {
-            return orderRepo.findById(orderId)
+            return orderRepo.findByOrderId(orderId)
                     .map(order -> {
                         OrderRs orderRs = orderMapper.mapToOrderRs(order);
                         return ResponseUtils.success(
@@ -232,6 +232,7 @@ public class OrderServiceImpl implements OrderService {
             return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 //    @Override

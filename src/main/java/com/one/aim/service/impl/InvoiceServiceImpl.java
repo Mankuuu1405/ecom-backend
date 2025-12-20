@@ -11,6 +11,7 @@ import java.util.Optional;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.one.aim.bo.*;
 import com.one.aim.repo.InvoiceRepo;
+import com.one.aim.service.AdminSettingService;
 import com.one.aim.service.FileService;
 import com.one.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,15 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final OrderRepo orderRepo;
     private final FileService fileService;
     private final ResourceLoader resourceLoader;
+    private final AdminSettingService adminSettingService;
+
+
 
     @Value("${invoice.template.path}")
     private String templatePath;
 
     private static final DateTimeFormatter DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter.ofPattern("dd MMM yyyy");
 
     // ==============================================================  SAFE HELPERS
     private String safe(String s) {
@@ -49,28 +53,52 @@ public class InvoiceServiceImpl implements InvoiceService {
     private UserBO safeUser(UserBO u) { return u == null ? new UserBO() : u; }
     private AddressBO safeAddress(AddressBO a) { return a == null ? new AddressBO() : a; }
 
-    // ==============================================================  CUSTOMER SECTIONS (FULL & MASKED)
+    private String sanitize(String category) {
+        return Optional.ofNullable(category)
+                .orElse("")
+                .toLowerCase()
+                .replace(" ", "_")
+                .replaceAll("[^a-z0-9_]", "");
+    }
+
+    // ==============================================================  HSN CODE MAPPING
+    private String getHsnCode(String category) {
+        Map<String, String> hsnMap = Map.of(
+                "electronics", "8517",
+                "fashion", "6203",
+                "grocery", "1006",
+                "home_garden", "9403",
+                "sports_outdoors", "9506",
+                "toys_games", "9503",
+                "health_beauty", "3304"
+        );
+        return hsnMap.getOrDefault(sanitize(category), "9999");
+    }
+
+    // ==============================================================  CUSTOMER SECTIONS
     private String buildFullCustomerSection(UserBO user, AddressBO addr) {
         user = safeUser(user);
         addr = safeAddress(addr);
 
         return """
-            <table class="details-table">
-              <tr><td>
-                <strong>Customer Details</strong><br>
-                %s<br>
-                %s, %s<br>
-                %s - %s<br>
-                %s<br>
-                Phone: %s
-              </td></tr>
-            </table>
+            <div class="info-box">
+                <h3>Bill To</h3>
+                <p><strong>%s</strong></p>
+                <p>%s</p>
+                <p>%s, %s - %s</p>
+                <p>%s</p>
+                <p><strong>Phone:</strong> %s</p>
+                <p><strong>Email:</strong> %s</p>
+            </div>
         """.formatted(
                 safe(user.getFullName()),
-                safe(addr.getStreet()), safe(addr.getCity()),
-                safe(addr.getState()), safe(addr.getZip()),
+                safe(addr.getStreet()),
+                safe(addr.getCity()),
+                safe(addr.getState()),
+                safe(addr.getZip()),
                 safe(addr.getCountry()),
-                safe(addr.getPhone())
+                safe(addr.getPhone()),
+                safe(user.getEmail())
         );
     }
 
@@ -78,14 +106,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         addr = safeAddress(addr);
 
         return """
-            <table class="details-table">
-              <tr><td>
-                <strong>Customer Details</strong><br>
-                Customer<br>
-                %s - %s<br>
-                Phone: %s
-              </td></tr>
-            </table>
+            <div class="info-box">
+                <h3>Bill To</h3>
+                <p><strong>Customer</strong></p>
+                <p>%s - %s</p>
+                <p><strong>Phone:</strong> %s</p>
+            </div>
         """.formatted(
                 safe(addr.getCity()),
                 safe(addr.getZip()),
@@ -93,10 +119,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         );
     }
 
-    // ==============================================================  SELLER BLOCK (SAFE)
+    // ==============================================================  SELLER BLOCK
     private String buildMultiSellerSection(OrderBO order) {
         if (order == null || order.getOrderItems() == null)
-            return "<p><strong>Seller Details:</strong> Not Available</p>";
+            return "<div class='info-box'><h3>Seller Details</h3><p>Not Available</p></div>";
 
         String role = AuthUtils.getLoggedUserRole();
 
@@ -109,28 +135,79 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         if (sellers.isEmpty())
-            return "<p><strong>Seller Details:</strong> Not Available</p>";
+            return "<div class='info-box'><h3>Seller Details</h3><p>Not Available</p></div>";
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<table class='details-table'><tr><td>");
-        sb.append("<strong>Seller Details</strong><br>");
+        sb.append("<div class='info-box'><h3>Sold By</h3>");
 
         for (SellerBO s : sellers.values()) {
-            String gst = safe(s.getGst());
-            String email = safe(s.getEmail());
-            String phone = safe(s.getPhoneNo());
+            sb.append("<p><strong>").append(safe(s.getFullName())).append("</strong></p>");
+            sb.append("<p>GST: ").append(safe(s.getGst())).append("</p>");
+            sb.append("<p>Email: ").append(safe(s.getEmail())).append("</p>");
 
             if ("ADMIN".equalsIgnoreCase(role)) {
-                sb.append("<br>%s<br>GST: %s<br>Email: %s<br>Phone: %s<br>"
-                        .formatted(safe(s.getFullName()), gst, email, phone));
-            } else {
-                sb.append("<br>%s<br>GST: %s<br>Email: %s<br>"
-                        .formatted(safe(s.getFullName()), gst, email));
+                sb.append("<p>Phone: ").append(safe(s.getPhoneNo())).append("</p>");
             }
+            sb.append("<br>");
         }
 
-        sb.append("</td></tr></table>");
+        sb.append("</div>");
         return sb.toString();
+    }
+
+    // ==============================================================  BUILD TAX BREAKDOWN
+    private String buildTaxBreakdown(OrderBO order) {
+        Map<String, TaxSummary> categoryTaxes = new LinkedHashMap<>();
+
+        for (OrderItemBO item : order.getOrderItems()) {
+            String category = sanitize(item.getProductCategory());
+            double taxPercent = getTaxPercent(category);
+
+            long itemTotal = item.getTotalPrice();
+            long itemTax = Math.round(itemTotal * taxPercent / 100);
+
+            categoryTaxes.computeIfAbsent(category, k -> new TaxSummary())
+                    .addItem(itemTotal, itemTax, taxPercent);
+        }
+
+        if (categoryTaxes.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div class='tax-breakdown'>");
+        sb.append("<h4>Tax Breakdown (Category-wise)</h4>");
+
+        for (Map.Entry<String, TaxSummary> entry : categoryTaxes.entrySet()) {
+            TaxSummary summary = entry.getValue();
+            sb.append("<div class='tax-breakdown-item'>");
+            sb.append("<span>").append(entry.getKey().replace("_", " ").toUpperCase())
+                    .append(" (").append(String.format("%.2f", summary.taxPercent)).append("% GST)</span>");
+            sb.append("<span>₹ ").append(summary.totalTax).append("</span>");
+            sb.append("</div>");
+        }
+
+        sb.append("</div>");
+        return sb.toString();
+    }
+
+    // Tax Summary Helper Class
+    private static class TaxSummary {
+        long totalAmount = 0;
+        long totalTax = 0;
+        double taxPercent = 0;
+
+        void addItem(long amount, long tax, double percent) {
+            this.totalAmount += amount;
+            this.totalTax += tax;
+            this.taxPercent = percent; // Last one wins (should be same for category)
+        }
+    }
+
+    // ==============================================================  CALCULATE CATEGORY TAX
+    private double getTaxPercent(String category) {
+        return adminSettingService.getDoubleValue(
+                "tax_" + category,
+                adminSettingService.getDoubleValue("default_tax_percent", 0)
+        );
     }
 
     // ==============================================================  USER/ADMIN FULL HTML
@@ -144,31 +221,97 @@ public class InvoiceServiceImpl implements InvoiceService {
         UserBO user = safeUser(order.getUser());
         AddressBO addr = safeAddress(order.getShippingAddress());
 
+        // Build order items with category-based tax
         long subTotal = 0;
+        long totalTax = 0;
         StringBuilder rows = new StringBuilder();
         int index = 1;
 
         for (OrderItemBO item : order.getOrderItems()) {
-            long lineTotal = item.getTotalPrice();
-            subTotal += lineTotal;
+            String category = sanitize(item.getProductCategory());
+            double taxPercent = getTaxPercent(category);
+
+            long itemSubtotal = item.getUnitPrice() * item.getQuantity();
+            long itemTax = Math.round(itemSubtotal * taxPercent / 100);
+            long itemTotal = itemSubtotal + itemTax;
+
+            subTotal += itemSubtotal;
+            totalTax += itemTax;
 
             rows.append("""
                 <tr>
                   <td>%d</td>
+                  <td>
+                    <div class="item-name">%s</div>
+                    <div class="item-category">%s</div>
+                  </td>
                   <td>%s</td>
+                  <td>₹ %d</td>
                   <td>%d</td>
-                  <td>%d</td>
-                  <td>%d</td>
+                  <td>
+                    %.2f%%<br>
+                    <span class="tax-info">₹ %d</span>
+                  </td>
+                  <td>₹ %d</td>
                 </tr>
-            """.formatted(index++,
+            """.formatted(
+                    index++,
                     safe(item.getProductName()),
+                    safe(item.getProductCategory()),
+                    getHsnCode(item.getProductCategory()),
                     item.getUnitPrice(),
                     item.getQuantity(),
-                    lineTotal));
+                    taxPercent,
+                    itemTax,
+                    itemTotal
+            ));
         }
 
-        long tax = subTotal * 18 / 100;
-        long total = subTotal + tax;
+        // Payment method details
+        String paymentDetails = "";
+        String paymentMethod = order.getPaymentMethod();
+        String paymentStatus = order.getPaymentStatus();
+        String paymentStatusClass = getPaymentStatusClass(paymentStatus);
+
+        if ("COD".equalsIgnoreCase(paymentMethod)) {
+            paymentDetails = "<p><strong>Note:</strong> Payment will be collected at the time of delivery.</p>";
+        } else if ("PAID".equalsIgnoreCase(paymentStatus)) {
+            paymentDetails = "<p><strong>Transaction ID:</strong> " + safe(order.getPaymentId()) + "</p>";
+            paymentDetails += "<p><strong>Payment Date:</strong> " +
+                    (order.getPaymentTime() != null ? order.getPaymentTime().format(DATE_FORMAT) : "N/A") + "</p>";
+        }
+
+        // Tax rows for summary
+        String taxRows = "<div class='summary-row tax'>" +
+                "<span class='summary-label'>Total GST (Incl. All Categories)</span>" +
+                "<span class='summary-value'>₹ " + totalTax + "</span>" +
+                "</div>";
+
+        // Delivery charge
+        long deliveryCharge = order.getDeliveryCharge() != null ? order.getDeliveryCharge() : 0;
+        String deliveryChargeStr = deliveryCharge == 0 ? "FREE" : "₹ " + deliveryCharge;
+
+        // Discount
+        String discountSection = "";
+        long discount = order.getDiscountAmount() != null ? order.getDiscountAmount() : 0;
+        if (discount > 0) {
+            discountSection = "<div class='summary-row discount'>" +
+                    "<span class='summary-label'>Discount Applied</span>" +
+                    "<span class='summary-value'>- ₹ " + discount + "</span>" +
+                    "</div>";
+        }
+
+        // Payment charge
+        String paymentChargeSection = "";
+        long paymentCharge = order.getPaymentCharge() != null ? order.getPaymentCharge() : 0;
+        if (paymentCharge > 0) {
+            paymentChargeSection = "<div class='summary-row payment-charge'>" +
+                    "<span class='summary-label'>Payment Processing Fee</span>" +
+                    "<span class='summary-value'>₹ " + paymentCharge + "</span>" +
+                    "</div>";
+        }
+
+        long grandTotal = subTotal + totalTax + deliveryCharge + paymentCharge - discount;
 
         return html
                 .replace("@@invoiceNo@@", safe(order.getInvoiceno()))
@@ -177,11 +320,18 @@ public class InvoiceServiceImpl implements InvoiceService {
                         "" : order.getOrderTime().format(DATE_FORMAT))
                 .replace("@@customerSection@@", buildFullCustomerSection(user, addr))
                 .replace("@@sellerSection@@", buildMultiSellerSection(order))
+                .replace("@@paymentMethod@@", safe(paymentMethod))
+                .replace("@@paymentStatus@@", safe(paymentStatus))
+                .replace("@@paymentStatusClass@@", paymentStatusClass)
+                .replace("@@paymentDetails@@", paymentDetails)
                 .replace("@@orderItems@@", rows.toString())
+                .replace("@@taxBreakdown@@", buildTaxBreakdown(order))
                 .replace("@@subTotal@@", String.valueOf(subTotal))
-                .replace("@@taxPercent@@", "18")
-                .replace("@@taxAmount@@", String.valueOf(tax))
-                .replace("@@totalAmount@@", String.valueOf(total));
+                .replace("@@taxRows@@", taxRows)
+                .replace("@@deliveryCharge@@", deliveryChargeStr)
+                .replace("@@discountSection@@", discountSection)
+                .replace("@@paymentChargeSection@@", paymentChargeSection)
+                .replace("@@totalAmount@@", String.valueOf(grandTotal));
     }
 
     // ==============================================================  SELLER HTML (FILTERED)
@@ -203,46 +353,92 @@ public class InvoiceServiceImpl implements InvoiceService {
         AddressBO addr = safeAddress(order.getShippingAddress());
 
         long subTotal = 0;
+        long totalTax = 0;
         StringBuilder rows = new StringBuilder();
         int index = 1;
 
         for (OrderItemBO item : sellerItems) {
-            long lineTotal = item.getTotalPrice();
-            subTotal += lineTotal;
+            String category = sanitize(item.getProductCategory());
+            double taxPercent = getTaxPercent(category);
+
+            long itemSubtotal = item.getUnitPrice() * item.getQuantity();
+            long itemTax = Math.round(itemSubtotal * taxPercent / 100);
+            long itemTotal = itemSubtotal + itemTax;
+
+            subTotal += itemSubtotal;
+            totalTax += itemTax;
 
             rows.append("""
                 <tr>
                   <td>%d</td>
+                  <td>
+                    <div class="item-name">%s</div>
+                    <div class="item-category">%s</div>
+                  </td>
                   <td>%s</td>
+                  <td>₹ %d</td>
                   <td>%d</td>
-                  <td>%d</td>
-                  <td>%d</td>
+                  <td>
+                    %.2f%%<br>
+                    <span class="tax-info">₹ %d</span>
+                  </td>
+                  <td>₹ %d</td>
                 </tr>
-            """.formatted(index++,
+            """.formatted(
+                    index++,
                     safe(item.getProductName()),
+                    safe(item.getProductCategory()),
+                    getHsnCode(item.getProductCategory()),
                     item.getUnitPrice(),
                     item.getQuantity(),
-                    lineTotal));
+                    taxPercent,
+                    itemTax,
+                    itemTotal
+            ));
         }
 
-        long tax = subTotal * 18 / 100;
-        long total = subTotal + tax;
+        String taxRows = "<div class='summary-row tax'>" +
+                "<span class='summary-label'>Total GST</span>" +
+                "<span class='summary-value'>₹ " + totalTax + "</span>" +
+                "</div>";
+
+        long deliveryCharge = order.getDeliveryCharge() != null ? order.getDeliveryCharge() : 0;
+        String deliveryChargeStr = deliveryCharge == 0 ? "FREE" : "₹ " + deliveryCharge;
+
+        long grandTotal = subTotal + totalTax + deliveryCharge;
 
         return html
+                .replace("@@logoPath@@", "file:" + getLogoPath())
                 .replace("@@invoiceNo@@", safe(order.getInvoiceno()))
                 .replace("@@orderId@@", safe(order.getOrderId()))
                 .replace("@@orderDate@@", order.getOrderTime() == null ?
                         "" : order.getOrderTime().format(DATE_FORMAT))
                 .replace("@@customerSection@@", buildMaskedCustomerSection(addr))
-                .replace("@@sellerSection@@", "") //  No other sellers shown here
+                .replace("@@sellerSection@@", "")
+                .replace("@@paymentMethod@@", safe(order.getPaymentMethod()))
+                .replace("@@paymentStatus@@", safe(order.getPaymentStatus()))
+                .replace("@@paymentStatusClass@@", getPaymentStatusClass(order.getPaymentStatus()))
+                .replace("@@paymentDetails@@", "")
                 .replace("@@orderItems@@", rows.toString())
+                .replace("@@taxBreakdown@@", buildTaxBreakdown(order))
                 .replace("@@subTotal@@", String.valueOf(subTotal))
-                .replace("@@taxPercent@@", "18")
-                .replace("@@taxAmount@@", String.valueOf(tax))
-                .replace("@@totalAmount@@", String.valueOf(total));
+                .replace("@@taxRows@@", taxRows)
+                .replace("@@deliveryCharge@@", deliveryChargeStr)
+                .replace("@@discountSection@@", "")
+                .replace("@@paymentChargeSection@@", "")
+                .replace("@@totalAmount@@", String.valueOf(grandTotal));
     }
 
-    // ==============================================================  USER/ADMIN MASTER PDF
+    private String getPaymentStatusClass(String status) {
+        if (status == null) return "pending";
+
+        String s = status.toLowerCase();
+        if (s.contains("paid") || s.contains("success")) return "paid";
+        if (s.contains("cod")) return "cod";
+        return "pending";
+    }
+
+    // ==============================================================  PDF GENERATION
     @Override
     public byte[] downloadInvoicePdf(String orderId) throws Exception {
 
@@ -253,7 +449,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                 String.valueOf(invoice.getInvoiceFileId()));
     }
 
-    // ==============================================================  SELLER LIVE PDF
     @Override
     public byte[] downloadSellerInvoicePdf(String orderId, Long sellerDbId) throws Exception {
 
@@ -265,7 +460,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         return out.toByteArray();
     }
 
-    // ==============================================================  USER → SAVE MASTER PDF
     @Override
     public InvoiceBO generateInvoice(String orderId) throws Exception {
 
@@ -295,20 +489,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceRepo.save(invoice);
     }
 
-    // ==============================================================  GET SINGLE
     @Override
     public InvoiceBO getInvoiceByOrderId(String orderId) {
         return invoiceRepo.findByOrder_OrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
-    // ==============================================================  TEMPLATE LOADER
-    private String loadTemplate() throws Exception {
-        Resource resource = resourceLoader.getResource("classpath:" + templatePath);
-        return Files.readString(resource.getFile().toPath());
-    }
-
-    // ==============================================================  LISTING APIS
     @Override
     public List<InvoiceBO> getAllInvoicesForAdmin() {
         return invoiceRepo.findAll();
@@ -326,11 +512,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public byte[] downloadAdminInvoice(String orderId) throws Exception {
-
-        String html = downloadInvoiceHtml(orderId); // same base template
+        String html = downloadInvoiceHtml(orderId);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         HtmlConverter.convertToPdf(html, out);
         return out.toByteArray();
+    }
+
+    private String loadTemplate() throws Exception {
+        Resource resource = resourceLoader.getResource("classpath:" + templatePath);
+        return Files.readString(resource.getFile().toPath());
+    }
+
+    private String getLogoPath() throws Exception {
+        Resource resource =
+                resourceLoader.getResource("classpath:static/image/logo.jpg");
+        return resource.getFile().getAbsolutePath();
     }
 
 }
