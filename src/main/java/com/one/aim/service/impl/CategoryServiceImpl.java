@@ -291,5 +291,14 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.toRs(bo);
     }
 
+    @Override
+    public Long getIdBySlug(String slug) {
+        return categoryRepo
+                .findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("Category not found"))
+                .getId();
+    }
+
+
 
 }

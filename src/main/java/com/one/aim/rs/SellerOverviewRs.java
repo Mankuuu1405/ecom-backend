@@ -7,27 +7,30 @@ import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Builder
 public class SellerOverviewRs {
 
+    private String currency;
     private Stats stats;
     private List<RecentOrderVm> recentOrders;
     private List<TopProductVm> topProducts;
 
-    @Data
+    @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class Stats {
-        private Double totalRevenue;
-        private Long totalOrders;
-        private Integer totalProducts;
-        private Double averageRating;
+        private double totalRevenue;
+        private long totalOrders;
+        private double averageOrderValue;
+
+        private Double revenueGrowthPercent;
+        private Double orderGrowthPercent;
+
+
+        private int totalProducts;
     }
 }
+
 
 
 

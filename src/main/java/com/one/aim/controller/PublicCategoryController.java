@@ -3,6 +3,7 @@ package com.one.aim.controller;
 import com.one.aim.rs.CategoryCardRs;
 import com.one.aim.rs.ProductCardRs;
 import com.one.aim.service.CategoryService;
+import com.one.aim.service.ProductBrowseService;
 import com.one.aim.service.ProductService;
 import com.one.vm.core.BaseDataRs;
 import com.one.vm.core.BaseRs;
@@ -21,16 +22,16 @@ import java.util.List;
 public class PublicCategoryController {
 
     private final CategoryService categoryService;
-    private final ProductService productService;
+    private final ProductBrowseService productBrowseService;
 
     // ---------------------------------------------------------
-    // 1. LIST ACTIVE CATEGORIES (PAGINATED)
+    // LIST ACTIVE CATEGORIES (PAGINATED)
     // ---------------------------------------------------------
     @GetMapping
     public ResponseEntity<?> getCategories(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ) throws Exception {
+    ) {
 
         log.debug("REST [GET /api/public/category]");
 
@@ -39,10 +40,10 @@ public class PublicCategoryController {
     }
 
     // ---------------------------------------------------------
-    // 2. BROWSE ALL CATEGORIES (NO PAGINATION, for Figma "Browse")
+    // BROWSE ALL CATEGORIES (NO PAGINATION)
     // ---------------------------------------------------------
     @GetMapping("/browse")
-    public ResponseEntity<?> browseCategories() throws Exception {
+    public ResponseEntity<?> browseCategories() {
 
         log.debug("REST [GET /api/public/category/browse]");
 
@@ -51,8 +52,8 @@ public class PublicCategoryController {
     }
 
     // ---------------------------------------------------------
-// CATEGORY DETAILS (PUBLIC)
-// ---------------------------------------------------------
+    // CATEGORY DETAILS
+    // ---------------------------------------------------------
     @GetMapping("/{slug}")
     public ResponseEntity<CategoryCardRs> getCategoryDetails(
             @PathVariable String slug
@@ -61,24 +62,49 @@ public class PublicCategoryController {
     }
 
     // ---------------------------------------------------------
-// PRODUCTS UNDER CATEGORY (PUBLIC)
+// PRODUCTS UNDER CATEGORY (UNIFIED SEARCH)
 // ---------------------------------------------------------
     @GetMapping("/{slug}/products")
     public ResponseEntity<Page<ProductCardRs>> getProductsByCategory(
             @PathVariable String slug,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) List<String> brands,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort
-    ) throws Exception {
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        log.debug("REST [GET /api/public/category/{}/products]", slug);
+
+        // slug → categoryId (internal)
+        Long categoryId = categoryService.getIdBySlug(slug);
+
         return ResponseEntity.ok(
-                productService.getProducts(slug, page, size, sort)
+                productBrowseService.search(
+                        q,
+                        List.of(categoryId),   // always LIST
+                        gender,
+                        brands,                // always LIST
+                        minPrice,
+                        maxPrice,
+                        rating,
+                        sort,
+                        page,
+                        size
+                )
         );
     }
 
 
+
+
     // ---------------------------------------------------------
-// 5. POPULAR CATEGORIES
-// ---------------------------------------------------------
+    // POPULAR CATEGORIES
+    // ---------------------------------------------------------
     @GetMapping("/popular")
     public ResponseEntity<?> getPopularCategories() {
 
@@ -87,7 +113,4 @@ public class PublicCategoryController {
         List<CategoryCardRs> data = categoryService.getPopularCategories();
         return ResponseEntity.ok(data);
     }
-
 }
-
-

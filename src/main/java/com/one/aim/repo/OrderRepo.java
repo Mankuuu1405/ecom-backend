@@ -300,6 +300,50 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
             @Param("end") LocalDateTime end
     );
 
+    @Query("""
+    SELECT o.orderId, u.fullName, o.createdAt, o.orderStatus, o.totalAmount
+    FROM OrderBO o
+    JOIN o.user u
+    WHERE o.id IN (
+        SELECT DISTINCT oi.order.id
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+    )
+    ORDER BY o.createdAt DESC
+""")
+    Page<Object[]> findRecentOrders(
+            @Param("sellerId") Long sellerId,
+            Pageable pageable
+    );
+
+
+
+    @Query("""
+    SELECT COALESCE(SUM(oi.totalPrice), 0)
+    FROM OrderItemBO oi
+    WHERE oi.sellerId = :sellerId
+      AND oi.createdAt BETWEEN :start AND :end
+""")
+    Double getRevenueBetween(
+            @Param("sellerId") Long sellerId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+
+    @Query("""
+    SELECT COUNT(DISTINCT oi.order.id)
+    FROM OrderItemBO oi
+    WHERE oi.sellerId = :sellerId
+      AND oi.createdAt BETWEEN :start AND :end
+""")
+    Long getOrdersBetween(
+            @Param("sellerId") Long sellerId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
+
 
 
 }

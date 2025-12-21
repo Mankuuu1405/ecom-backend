@@ -36,6 +36,6 @@ public interface CategoryService {
 
     CategoryRs updateCategoryImage(Long id, MultipartFile file) throws Exception;
 
-
+    Long getIdBySlug(String slug);
 
 }
