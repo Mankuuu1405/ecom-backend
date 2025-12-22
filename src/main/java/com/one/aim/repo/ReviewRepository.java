@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewBO, Long> {
 
+    Page<ReviewBO> findByProduct_Slug(String slug, Pageable pageable);
     List<ReviewBO> findByProduct_Id(Long productId);
     Page<ReviewBO> findByProduct_Id(Long productId, Pageable pageable);
     Page<ReviewBO> findByUser_Id(Long userId, Pageable pageable);

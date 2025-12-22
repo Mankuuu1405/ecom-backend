@@ -4,8 +4,10 @@ import com.one.aim.rq.ProductRq;
 import com.one.aim.rs.ProductCardRs;
 import com.one.aim.rs.ProductDetailsRs;
 import com.one.aim.rs.ProductRs;
+import com.one.aim.rs.ReviewRs;
 import com.one.vm.core.BaseRs;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -59,5 +61,11 @@ public interface ProductService {
 
 
     ProductRs getProductDetailsForSeller(Long productId) throws Exception;
+
+    BaseRs reorderProductImages(Long productId, List<Long> imageIds);
+
+    Page<ReviewRs> getProductReviewsBySlug(String slug, Pageable pageable);
+
+
 
 }

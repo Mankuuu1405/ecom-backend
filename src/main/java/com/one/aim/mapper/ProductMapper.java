@@ -29,7 +29,7 @@ public class ProductMapper {
     // ================================================
     public ProductCardRs toCardRs(ProductBO bo) {
         if (bo == null) return null;
-        bo.ensureThumbnail();
+
 
         ProductCardRs rs = new ProductCardRs();
 
@@ -42,11 +42,10 @@ public class ProductMapper {
         rs.setCategoryId(bo.getCategoryId());
 
         // Main Image
-        if (bo.getThumbnailFileId() != null) {
-            rs.setImage(urlUtils.publicFile(bo.getThumbnailFileId()));
-        } else if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
+        if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
             rs.setImage(urlUtils.publicFile(bo.getImageFileIds().get(0)));
         }
+
 
 
         // Stock Status
@@ -71,8 +70,8 @@ public class ProductMapper {
     }
 
     // ================================================
-    // PRODUCT DETAILS (For Product Detail Page)
-    // ================================================
+// PRODUCT DETAILS (For Product Detail Page)
+// ================================================
     public ProductDetailsRs toDetails(ProductBO product) {
 
         ProductDetailsRs rs = new ProductDetailsRs();
@@ -90,35 +89,30 @@ public class ProductMapper {
         rs.setLowStock(product.isLowStock());
         rs.setInStock(product.getStock() != null && product.getStock() > 0);
 
-        // Images
-        List<Long> imageIds = new ArrayList<>();
+        // =====================
+        // IMAGES (ORDER AS STORED IN DB)
+        // =====================
+        List<Long> imageFileIds =
+                product.getImageFileIds() != null
+                        ? product.getImageFileIds()
+                        : Collections.emptyList();
 
-        if (product.getThumbnailFileId() != null) {
-            imageIds.add(product.getThumbnailFileId());
-        }
-
-        if (product.getImageFileIds() != null) {
-            for (Long id : product.getImageFileIds()) {
-                if (!id.equals(product.getThumbnailFileId())) {
-                    imageIds.add(id);
-                }
-            }
-        }
-
-        List<String> imageUrls = imageIds.stream()
+        List<String> imageUrls = imageFileIds.stream()
                 .map(urlUtils::publicFile)
                 .toList();
 
         rs.setImages(imageUrls);
-        rs.setThumbnail(
-                product.getThumbnailFileId() != null
-                        ? urlUtils.publicFile(product.getThumbnailFileId())
-                        : null
-        );
 
+        // FIRST IMAGE = THUMBNAIL
+        if (!imageUrls.isEmpty()) {
+            rs.setThumbnail(imageUrls.get(0));
+        }
 
-        // Product specifications
+        // =====================
+        // PRODUCT SPECIFICATIONS
+        // =====================
         Map<String, String> details = new LinkedHashMap<>();
+
         if (product.getMaterial() != null) details.put("Material", product.getMaterial());
         if (product.getSole() != null) details.put("Sole", product.getSole());
         if (product.getClosure() != null) details.put("Closure", product.getClosure());
@@ -139,37 +133,27 @@ public class ProductMapper {
                 log.error("Error parsing specifications JSON", e);
             }
         }
+
         rs.setDetails(details);
 
-        // Rating summary
-        rs.setAverageRating(
-                product.getReviewCount() != null && product.getReviewCount() > 0
-                        ? product.getAverageRating()
-                        : null
-        );
-
-        rs.setReviewCount(
-                product.getReviewCount() != null ? product.getReviewCount() : 0L
-        );
 
 
-        // Rating distribution (placeholder for now)
-        rs.setRatingDistribution(Collections.emptyList());
+        //  NO RATINGS HERE
 
         return rs;
     }
 
 
+
+
     // ================================================
-    // PRODUCT RS (For Seller Dashboard / Admin)
-    // ================================================
+// PRODUCT RS (For Seller Dashboard / Admin)
+// ================================================
     public ProductRs toProductRs(ProductBO bo) {
         if (bo == null) {
             log.warn("ProductBO is NULL");
             return null;
         }
-
-        bo.ensureThumbnail();
 
         ProductRs rs = new ProductRs();
 
@@ -199,35 +183,23 @@ public class ProductMapper {
         rs.setReviewCount(bo.getReviewCount());
 
         // =====================
-        // IMAGES (THUMBNAIL FIRST)
+        // IMAGES (ORDER AS STORED IN DB)
         // =====================
-        List<Long> orderedImageIds = new ArrayList<>();
+        List<Long> imageFileIds =
+                bo.getImageFileIds() != null ? bo.getImageFileIds() : Collections.emptyList();
 
-        if (bo.getThumbnailFileId() != null) {
-            orderedImageIds.add(bo.getThumbnailFileId());
-        }
-
-        if (bo.getImageFileIds() != null) {
-            for (Long id : bo.getImageFileIds()) {
-                if (!id.equals(bo.getThumbnailFileId())) {
-                    orderedImageIds.add(id);
-                }
-            }
-        }
-
-        List<String> imageUrls = orderedImageIds.stream()
+        List<String> imageUrls = imageFileIds.stream()
                 .map(urlUtils::publicFile)
-                .collect(Collectors.toList());
+                .toList();
 
         rs.setImages(imageUrls);
 
-        rs.setThumbnail(
-                bo.getThumbnailFileId() != null
-                        ? urlUtils.publicFile(bo.getThumbnailFileId())
-                        : null
-        );
-
-        rs.setImage(rs.getThumbnail());
+        // FIRST IMAGE = THUMBNAIL
+        if (!imageFileIds.isEmpty()) {
+            rs.setThumbnail(imageUrls.get(0));
+            rs.setImage(imageUrls.get(0));               // main image
+            rs.setThumbnailFileId(imageFileIds.get(0)); // for seller edit UI
+        }
 
         rs.setInStock(bo.getStock() != null && bo.getStock() > 0);
         rs.setCreatedAt(bo.getCreatedAt());
@@ -237,22 +209,36 @@ public class ProductMapper {
     }
 
 
+
     // ================================================
     // REVIEW MAPPER
     // ================================================
-    private ReviewRs toReviewRs(ReviewBO review) {
+    public ReviewRs toReviewRs(ReviewBO review) {
         ReviewRs rs = new ReviewRs();
+
         rs.setId(review.getId());
         rs.setUserName(review.getUser().getFullName());
-        rs.setUserAvatar(null); // Set if you have user avatar
-        rs.setDate(review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         rs.setRating(review.getRating());
         rs.setComment(review.getComment());
         rs.setLikes(review.getLikes());
         rs.setDislikes(review.getDislikes());
         rs.setVerifiedPurchase(review.isVerified());
+        rs.setDate(
+                review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        );
+
+        //  USER AVATAR
+        if (review.getUser().getImageFileId() != null) {
+            rs.setUserAvatar(
+                    urlUtils.publicFile(review.getUser().getImageFileId())
+            );
+        } else {
+            rs.setUserAvatar(null); // frontend fallback
+        }
+
         return rs;
     }
+
 
     // ================================================
     // RATING DISTRIBUTION

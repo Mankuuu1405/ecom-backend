@@ -27,20 +27,16 @@ public class ProductDetailsRs {
     private boolean lowStock;
     private Boolean inStock;
 
-    // =====================
-    // IMAGES
-    // =====================
-    private List<String> images;   // images[0] is ALWAYS thumbnail
-    private String thumbnail;      // Explicit thumbnail
-    private Long thumbnailFileId;  // Optional, future-safe
+    /* IMAGES */
+    private List<String> images;
+    private String thumbnail;
 
-    // Product specifications / attributes
+    /* DETAILS */
     private Map<String, String> details;
 
-    // Rating summary (AGGREGATE, not reviews)
-    private Double averageRating;
-    private Long reviewCount;
+    /*  FLATTENED RATING SUMMARY */
+    private Double averageRating;              // 3.0
+    private Long reviewCount;                  // 1
     private List<RatingDistributionRs> ratingDistribution;
 }
-
 

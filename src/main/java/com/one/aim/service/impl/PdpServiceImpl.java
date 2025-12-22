@@ -35,125 +35,78 @@ public class PdpServiceImpl implements PdpService {
     @Override
     public PdpRs getPdpBySlug(String slug) throws Exception {
 
-        ProductDetailsRs product =
-                productService.getProductDetails(slug);
-
-        Page<ReviewRs> reviews =
-                reviewService.getReviewsByProductSlug(slug, 0, 10);
-
-    /* ======================================================
-       ⭐ RATING SUMMARY (IMPORTANT FIX)
-    ====================================================== */
-
+        ProductDetailsRs product = productService.getProductDetails(slug);
         Long productId = product.getId();
 
-        // Average rating
-        Double avgRating =
-                reviewRepo.getAverageRatingByProductId(productId);
+    /* ===========================
+       RATING SUMMARY
+    ============================ */
 
-        // Total reviews
-        Long reviewCount =
-                reviewRepo.getReviewCountByProductId(productId);
+        Double avgRating = reviewRepo.getAverageRatingByProductId(productId);
+        Long reviewCount = reviewRepo.getReviewCountByProductId(productId);
 
-        // Rating distribution (1–5)
         List<Object[]> rawDistribution =
                 reviewRepo.getRatingDistributionByProductId(productId);
 
-        // Initialize all stars with 0
         Map<Integer, Long> ratingMap = new LinkedHashMap<>();
-        for (int i = 5; i >= 1; i--) {
-            ratingMap.put(i, 0L);
-        }
+        for (int i = 5; i >= 1; i--) ratingMap.put(i, 0L);
 
-        // Fill actual counts
         for (Object[] row : rawDistribution) {
-            Integer rating = (Integer) row[0];
-            Long count = (Long) row[1];
-            ratingMap.put(rating, count);
+            ratingMap.put((Integer) row[0], (Long) row[1]);
         }
 
-        Long totalReviews = reviewCount != null ? reviewCount : 0L;
+        long total = reviewCount != null ? reviewCount : 0L;
 
         List<RatingDistributionRs> distribution =
                 ratingMap.entrySet().stream()
-                        .map(e -> {
-                            int stars = e.getKey();
-                            long count = e.getValue();
-
-                            int percentage =
-                                    totalReviews == 0
-                                            ? 0
-                                            : (int) Math.round((count * 100.0) / totalReviews);
-
-                            return new RatingDistributionRs(
-                                    stars,
-                                    (int) count,
-                                    percentage
-                            );
-                        })
+                        .map(e -> new RatingDistributionRs(
+                                e.getKey(),
+                                e.getValue().intValue(),
+                                total == 0 ? 0 : (int) Math.round(e.getValue() * 100.0 / total)
+                        ))
                         .toList();
 
-
-        // Set into product
         product.setAverageRating(avgRating != null ? avgRating : 0.0);
-        product.setReviewCount(reviewCount != null ? reviewCount : 0);
+        product.setReviewCount(total);
         product.setRatingDistribution(distribution);
 
-    /* ======================================================
+    /* ===========================
        RECOMMENDATIONS (UNCHANGED)
-    ====================================================== */
-
-        List<ProductCardRs> peopleAlsoBought =
-                recommendationService.getPeopleAlsoBought(
-                        product.getId(),
-                        product.getCategoryName(),
-                        6
-                );
-
-        List<ProductCardRs> frequentlyBoughtTogether =
-                recommendationService.getFrequentlyBoughtTogether(
-                        product.getId(),
-                        4
-                );
-
-        List<ProductCardRs> similarProducts =
-                productRepo
-                        .findByActiveTrueAndCategoryNameIgnoreCaseAndIdNot(
-                                product.getCategoryName(),
-                                product.getId(),
-                                PageRequest.of(0, 10)
-                        )
-                        .getContent()
-                        .stream()
-                        .map(productMapper::toCardRs)
-                        .toList();
-
-        Set<Long> alreadyShown =
-                Stream.concat(
-                                peopleAlsoBought.stream(),
-                                frequentlyBoughtTogether.stream()
-                        )
-                        .map(ProductCardRs::getDocId)
-                        .map(Long::valueOf)
-                        .collect(Collectors.toSet());
-
-        similarProducts =
-                similarProducts.stream()
-                        .filter(p -> !alreadyShown.contains(Long.valueOf(p.getDocId())))
-                        .limit(6)
-                        .toList();
+    ============================ */
 
         RecommendationBlockRs recos =
                 RecommendationBlockRs.builder()
-                        .peopleAlsoBought(peopleAlsoBought)
-                        .frequentlyBoughtTogether(frequentlyBoughtTogether)
-                        .similarProducts(similarProducts)
+                        .peopleAlsoBought(
+                                recommendationService.getPeopleAlsoBought(
+                                        productId,
+                                        product.getCategoryName(),
+                                        6
+                                )
+                        )
+                        .frequentlyBoughtTogether(
+                                recommendationService.getFrequentlyBoughtTogether(
+                                        productId,
+                                        4
+                                )
+                        )
+                        .similarProducts(
+                                productRepo
+                                        .findByActiveTrueAndCategoryNameIgnoreCaseAndIdNot(
+                                                product.getCategoryName(),
+                                                productId,
+                                                PageRequest.of(0, 10)
+                                        )
+                                        .stream()
+                                        .map(productMapper::toCardRs)
+                                        .limit(6)
+                                        .toList()
+                        )
                         .build();
 
         return PdpRs.builder()
                 .product(product)
-                .reviews(reviews)
                 .recommendations(recos)
                 .build();
     }
+
 }

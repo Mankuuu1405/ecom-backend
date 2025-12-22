@@ -126,6 +126,20 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    // ===========================
+    // REORDER IMAGES
+    // ===========================
+    @PreAuthorize("hasAuthority('SELLER')")
+    @PutMapping("/{productId}/images/reorder")
+    public ResponseEntity<BaseRs> reorderImages(
+            @PathVariable Long productId,
+            @RequestBody List<Long> imageIds) {
+
+        return ResponseEntity.ok(
+                productService.reorderProductImages(productId, imageIds)
+        );
+    }
+
 
 
 }
