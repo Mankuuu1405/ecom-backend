@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 2025-12-24 00:09:27.847 [HikariPool-1 housekeeper] WARN  c.z.h.p.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49s353ms684µs).
 2025-12-24 00:10:03.854 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
 2025-12-24 00:10:03.854 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/public/category/browse
@@ -24409,3 +24410,352 @@ java.io.FileNotFoundException: File not found
 2025-12-24 21:14:56.991 [http-nio-8989-exec-8] DEBUG org.hibernate.SQL - select count(pb1_0.id) from product pb1_0 where pb1_0.active and upper(pb1_0.category_name)=upper(?)
 2025-12-24 21:15:49.688 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-12-24 21:15:49.700 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+=======
+2025-12-23 00:06:09.008 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2025-12-23 00:06:09.113 [RMI TCP Connection(35)-127.0.0.1] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2025-12-23 00:06:09.300 [RMI TCP Connection(35)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-12-23 00:06:09.320 [RMI TCP Connection(35)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-12-23 18:42:48.817 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 8376 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2025-12-23 18:42:48.823 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2025-12-23 18:43:00.497 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2025-12-23 18:43:00.530 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-12-23 18:43:00.535 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-12-23 18:43:02.818 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2025-12-23 18:43:10.353 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2025-12-23 18:43:11.809 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4325a63c
+2025-12-23 18:43:11.819 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-23 18:43:37.376 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-23 18:43:37.382 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-23 18:43:43.518 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-23 18:43:43.567 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 18:43:43.567 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2025-12-23 18:43:43.568 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 18:43:43.569 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2025-12-23 18:43:43.570 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 18:43:43.570 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2025-12-23 18:43:43.570 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 18:43:43.570 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2025-12-23 18:43:43.571 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 18:43:43.571 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2025-12-23 18:43:44.995 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2025-12-23 18:43:45.097 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 57.748 seconds (process running for 60.601)
+2025-12-23 18:47:41.790 [http-nio-8989-exec-3] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-23 18:47:42.439 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/public/home
+2025-12-23 18:47:42.439 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 18:47:42.792 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 18:47:42.792 [http-nio-8989-exec-1] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 18:47:42.801 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/public/home
+2025-12-23 18:47:45.153 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/public/home
+2025-12-23 18:47:45.156 [http-nio-8989-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 18:47:45.159 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/public/home
+2025-12-23 18:47:45.445 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 18:47:45.448 [http-nio-8989-exec-6] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 18:51:13.542 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2025-12-23 18:51:13.660 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 18:51:13.701 [http-nio-8989-exec-8] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 18:51:13.706 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 18:51:15.317 [http-nio-8989-exec-8] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2025-12-23 18:51:16.673 [http-nio-8989-exec-9] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 18:51:16.756 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 18:51:17.133 [http-nio-8989-exec-10] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 18:51:17.141 [http-nio-8989-exec-10] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 18:51:29.774 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2025-12-23 18:51:29.777 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2025-12-23 18:51:29.790 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2025-12-23 18:51:29.803 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2025-12-23 18:51:29.863 [http-nio-8989-exec-6] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 18:51:29.874 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2025-12-23 18:51:29.876 [http-nio-8989-exec-1] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 18:51:29.881 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2025-12-23 18:51:44.788 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 18:51:44.825 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 18:51:44.964 [http-nio-8989-exec-5] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 18:51:44.971 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 18:51:45.008 [http-nio-8989-exec-5] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 18:51:45.089 [http-nio-8989-exec-5] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 18:51:45.090 [http-nio-8989-exec-5] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 18:58:28.030 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 18:58:28.121 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 18:58:28.509 [http-nio-8989-exec-3] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 18:58:28.522 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 19:06:09.064 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 19:06:09.202 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 19:06:10.094 [http-nio-8989-exec-1] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:06:10.109 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 19:06:10.243 [http-nio-8989-exec-1] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 19:06:10.277 [http-nio-8989-exec-1] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 19:06:10.278 [http-nio-8989-exec-1] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 19:06:19.414 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 19:06:19.444 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 19:06:19.647 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 19:06:19.857 [http-nio-8989-exec-4] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:06:19.858 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 19:06:19.906 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 19:06:19.907 [http-nio-8989-exec-4] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 19:06:19.917 [http-nio-8989-exec-4] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 19:06:19.917 [http-nio-8989-exec-4] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 19:06:19.981 [http-nio-8989-exec-5] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:06:20.026 [http-nio-8989-exec-5] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 19:15:37.124 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 19:15:37.271 [http-nio-8989-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 19:15:37.275 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 19:15:38.692 [http-nio-8989-exec-2] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2025-12-23 19:16:21.383 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 19:16:21.456 [http-nio-8989-exec-6] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:16:21.460 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 19:16:21.469 [http-nio-8989-exec-6] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 19:16:21.484 [http-nio-8989-exec-6] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 19:16:21.484 [http-nio-8989-exec-6] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 19:19:45.607 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/seller/all
+2025-12-23 19:19:46.092 [http-nio-8989-exec-8] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:19:46.096 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/seller/all
+2025-12-23 19:19:46.209 [http-nio-8989-exec-8] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.SellerController.retrieveSellers() throws java.lang.Exception; target is of class [com.one.aim.controller.SellerController]
+2025-12-23 19:19:46.304 [http-nio-8989-exec-8] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.SellerController.retrieveSellers() throws java.lang.Exception; target is of class [com.one.aim.controller.SellerController]
+2025-12-23 19:19:46.309 [http-nio-8989-exec-8] DEBUG c.o.a.c.SellerController - Executing [GET /api/seller/all]
+2025-12-23 19:31:52.904 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/orders/all
+2025-12-23 19:31:53.663 [http-nio-8989-exec-5] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:31:53.669 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/orders/all
+2025-12-23 19:31:54.295 [http-nio-8989-exec-5] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.OrderController.getAllOrders(int,int,java.lang.String,java.lang.String,java.lang.String) throws java.lang.Exception; target is of class [com.one.aim.controller.OrderController]
+2025-12-23 19:31:54.339 [http-nio-8989-exec-5] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.OrderController.getAllOrders(int,int,java.lang.String,java.lang.String,java.lang.String) throws java.lang.Exception; target is of class [com.one.aim.controller.OrderController]
+2025-12-23 19:53:08.579 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/public/home
+2025-12-23 19:53:08.579 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 19:53:08.685 [http-nio-8989-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 19:53:08.685 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 19:53:08.689 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/public/home
+2025-12-23 19:53:49.229 [http-nio-8989-exec-7] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2025-12-23 19:53:49.398 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 19:53:49.443 [http-nio-8989-exec-8] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 19:53:49.457 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 19:53:50.951 [http-nio-8989-exec-8] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Failed to find user ''
+2025-12-23 19:54:07.182 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2025-12-23 19:54:07.231 [RMI TCP Connection(73)-127.0.0.1] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2025-12-23 19:54:07.733 [RMI TCP Connection(73)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-12-23 19:54:07.788 [RMI TCP Connection(73)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-12-23 19:54:26.503 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 15392 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2025-12-23 19:54:26.508 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2025-12-23 19:54:36.293 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2025-12-23 19:54:36.297 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-12-23 19:54:36.299 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-12-23 19:54:36.535 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2025-12-23 19:54:38.249 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2025-12-23 19:54:39.205 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6631e6c6
+2025-12-23 19:54:39.210 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-23 19:54:52.536 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-23 19:54:52.538 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-23 19:54:56.326 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-23 19:54:56.360 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 19:54:56.360 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2025-12-23 19:54:56.361 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 19:54:56.361 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2025-12-23 19:54:56.362 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 19:54:56.362 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2025-12-23 19:54:56.362 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 19:54:56.362 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2025-12-23 19:54:56.362 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 19:54:56.363 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2025-12-23 19:54:58.062 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2025-12-23 19:54:58.159 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 33.355 seconds (process running for 36.98)
+2025-12-23 19:55:32.534 [http-nio-8989-exec-1] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-23 19:55:32.586 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2025-12-23 19:55:32.655 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 19:55:32.669 [http-nio-8989-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 19:55:32.673 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 19:55:33.049 [http-nio-8989-exec-2] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2025-12-23 19:55:33.707 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 19:55:33.717 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 19:55:33.860 [http-nio-8989-exec-4] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:55:33.870 [http-nio-8989-exec-4] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 19:55:45.399 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2025-12-23 19:55:45.416 [http-nio-8989-exec-7] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2025-12-23 19:55:45.434 [http-nio-8989-exec-9] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2025-12-23 19:55:45.436 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2025-12-23 19:55:45.456 [http-nio-8989-exec-9] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:55:45.468 [http-nio-8989-exec-9] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2025-12-23 19:55:45.471 [http-nio-8989-exec-8] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:55:45.476 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2025-12-23 19:59:36.245 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 19:59:36.365 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 19:59:36.884 [http-nio-8989-exec-3] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 19:59:36.902 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 20:03:37.178 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 20:03:37.178 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 20:03:37.318 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 20:03:37.428 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 20:03:38.079 [http-nio-8989-exec-6] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:03:38.079 [http-nio-8989-exec-8] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:03:38.098 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 20:03:38.105 [http-nio-8989-exec-6] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 20:03:38.376 [http-nio-8989-exec-8] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:03:39.299 [http-nio-8989-exec-8] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:03:39.304 [http-nio-8989-exec-8] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 20:08:06.005 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 20:08:06.005 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 20:08:06.187 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 20:08:06.191 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 20:08:06.804 [http-nio-8989-exec-3] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:08:06.804 [http-nio-8989-exec-4] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:08:06.820 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 20:08:06.842 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 20:08:06.923 [http-nio-8989-exec-4] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:08:06.942 [http-nio-8989-exec-4] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:08:06.944 [http-nio-8989-exec-4] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 20:24:13.235 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:13.534 [Thread-5] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:14.405 [Thread-5] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-12-23 20:24:14.516 [Thread-5] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-12-23 20:24:17.900 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 15392 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2025-12-23 20:24:17.903 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2025-12-23 20:24:25.344 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:25.345 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-12-23 20:24:25.345 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-12-23 20:24:25.622 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2025-12-23 20:24:26.170 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-2 - Starting...
+2025-12-23 20:24:26.209 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@456b0bc7
+2025-12-23 20:24:26.210 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-2 - Start completed.
+2025-12-23 20:24:30.342 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-23 20:24:30.344 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-23 20:24:33.782 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-23 20:24:33.813 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:33.813 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2025-12-23 20:24:33.815 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:33.815 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2025-12-23 20:24:33.815 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:33.815 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2025-12-23 20:24:33.815 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:33.815 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2025-12-23 20:24:33.815 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:33.815 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2025-12-23 20:24:34.341 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:34.370 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 17.417 seconds (process running for 1813.191)
+2025-12-23 20:24:36.508 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:36.525 [Thread-7] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:36.537 [Thread-7] INFO  c.z.h.HikariDataSource - HikariPool-2 - Shutdown initiated...
+2025-12-23 20:24:36.551 [Thread-7] INFO  c.z.h.HikariDataSource - HikariPool-2 - Shutdown completed.
+2025-12-23 20:24:36.790 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 15392 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2025-12-23 20:24:36.791 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2025-12-23 20:24:38.457 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:38.457 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-12-23 20:24:38.458 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-12-23 20:24:38.604 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2025-12-23 20:24:38.812 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-3 - Starting...
+2025-12-23 20:24:38.838 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1aec0556
+2025-12-23 20:24:38.839 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-3 - Start completed.
+2025-12-23 20:24:41.682 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-23 20:24:41.683 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-23 20:24:44.650 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-23 20:24:44.685 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:44.686 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2025-12-23 20:24:44.686 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:44.686 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2025-12-23 20:24:44.687 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:44.687 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2025-12-23 20:24:44.687 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:44.687 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2025-12-23 20:24:44.687 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:24:44.687 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2025-12-23 20:24:45.198 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:24:45.218 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 8.524 seconds (process running for 1824.039)
+2025-12-23 20:25:11.412 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:25:11.453 [Thread-11] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:25:11.505 [Thread-11] INFO  c.z.h.HikariDataSource - HikariPool-3 - Shutdown initiated...
+2025-12-23 20:25:11.546 [Thread-11] INFO  c.z.h.HikariDataSource - HikariPool-3 - Shutdown completed.
+2025-12-23 20:25:13.402 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 15392 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2025-12-23 20:25:13.406 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2025-12-23 20:25:15.724 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:25:15.725 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-12-23 20:25:15.725 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-12-23 20:25:15.905 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2025-12-23 20:25:16.211 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-4 - Starting...
+2025-12-23 20:25:16.252 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-4 - Added connection com.mysql.cj.jdbc.ConnectionImpl@251b18ee
+2025-12-23 20:25:16.253 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-4 - Start completed.
+2025-12-23 20:25:19.309 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-23 20:25:19.311 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-23 20:25:22.293 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-23 20:25:22.319 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:25:22.319 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2025-12-23 20:25:22.319 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:25:22.319 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2025-12-23 20:25:22.319 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:25:22.320 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2025-12-23 20:25:22.320 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:25:22.320 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2025-12-23 20:25:22.320 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:25:22.320 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2025-12-23 20:25:22.752 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:25:22.783 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 10.406 seconds (process running for 1861.604)
+2025-12-23 20:26:34.173 [http-nio-8989-exec-2] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-23 20:26:34.413 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 20:26:34.593 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 20:26:36.490 [http-nio-8989-exec-1] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:26:36.522 [http-nio-8989-exec-1] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 20:26:37.215 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2025-12-23 20:26:37.336 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 20:26:37.345 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 20:26:37.348 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 20:26:37.885 [http-nio-8989-exec-3] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Failed to find user ''
+2025-12-23 20:27:08.484 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2025-12-23 20:27:08.612 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 20:27:08.615 [http-nio-8989-exec-6] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 20:27:08.631 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 20:27:08.681 [http-nio-8989-exec-6] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Failed to find user ''
+2025-12-23 20:27:15.600 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:27:15.625 [RMI TCP Connection(37)-127.0.0.1] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:27:15.695 [RMI TCP Connection(37)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-4 - Shutdown initiated...
+2025-12-23 20:27:15.733 [RMI TCP Connection(37)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-4 - Shutdown completed.
+2025-12-23 20:36:11.940 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 14632 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2025-12-23 20:36:11.944 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2025-12-23 20:36:18.326 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:36:18.330 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2025-12-23 20:36:18.331 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-12-23 20:36:18.536 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2025-12-23 20:36:19.850 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2025-12-23 20:36:20.693 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@b8f23fd
+2025-12-23 20:36:20.699 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-23 20:36:33.877 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-12-23 20:36:33.889 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-12-23 20:36:38.097 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2025-12-23 20:36:38.137 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:36:38.147 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2025-12-23 20:36:38.151 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:36:38.152 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2025-12-23 20:36:38.158 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:36:38.168 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2025-12-23 20:36:38.169 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:36:38.176 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2025-12-23 20:36:38.183 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-12-23 20:36:38.187 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2025-12-23 20:36:39.729 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2025-12-23 20:36:39.818 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 29.253 seconds (process running for 31.799)
+2025-12-23 20:37:14.227 [http-nio-8989-exec-1] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-23 20:37:14.463 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2025-12-23 20:37:14.606 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2025-12-23 20:37:14.645 [http-nio-8989-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2025-12-23 20:37:14.653 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2025-12-23 20:37:15.552 [http-nio-8989-exec-2] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2025-12-23 20:37:16.516 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/cart/my
+2025-12-23 20:37:16.659 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/cart/my
+2025-12-23 20:37:17.207 [http-nio-8989-exec-3] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:37:17.221 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AccessDeniedHandlerImpl - Responding with 403 status code
+2025-12-23 20:37:22.613 [http-nio-8989-exec-9] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2025-12-23 20:37:22.614 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2025-12-23 20:37:22.785 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2025-12-23 20:37:22.825 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2025-12-23 20:37:23.079 [http-nio-8989-exec-5] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:37:23.076 [http-nio-8989-exec-6] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:37:23.099 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2025-12-23 20:37:23.100 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2025-12-23 20:37:29.111 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 20:37:29.115 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/user/all
+2025-12-23 20:37:29.139 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 20:37:29.160 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/user/all
+2025-12-23 20:37:29.191 [http-nio-8989-exec-2] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:37:29.210 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 20:37:29.221 [http-nio-8989-exec-8] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2025-12-23 20:37:29.222 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/user/all
+2025-12-23 20:37:29.236 [http-nio-8989-exec-8] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:37:29.235 [http-nio-8989-exec-2] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:37:29.465 [http-nio-8989-exec-2] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:37:29.465 [http-nio-8989-exec-8] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.UserController.getAllUsers() throws java.lang.Exception; target is of class [com.one.aim.controller.UserController]
+2025-12-23 20:37:29.467 [http-nio-8989-exec-2] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+2025-12-23 20:37:29.467 [http-nio-8989-exec-8] DEBUG c.o.a.c.UserController - Executing [GET /api/user/all]
+>>>>>>> e678b28082d8a54868fc985fe80436e7c5ce2e84
