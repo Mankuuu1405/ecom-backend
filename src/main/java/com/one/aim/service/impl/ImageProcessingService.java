@@ -1,5 +1,7 @@
 package com.one.aim.service.impl;
 
+import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,8 @@ public class ImageProcessingService {
     private static final int MIN_DIMENSION = 400;         // Minimum width/height
     private static final int MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final String[] ALLOWED_FORMATS = {"jpg", "jpeg", "png"};
+    private static final int CATEGORY_SIZE = 600;
+
 
     /**
      * Process product image WITHOUT padding
@@ -187,5 +191,32 @@ public class ImageProcessingService {
                     MIN_DIMENSION, MIN_DIMENSION, dim.width, dim.height
             ));
         }
+    }
+
+    public MultipartFile processCategoryImage(MultipartFile file) throws IOException {
+
+        BufferedImage original = ImageIO.read(file.getInputStream());
+        if (original == null) {
+            throw new IOException("Invalid image file");
+        }
+
+        BufferedImage processed =
+                Thumbnails.of(original)
+                        .size(CATEGORY_SIZE, CATEGORY_SIZE)
+                        .outputQuality(0.85)
+                        .asBufferedImage();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(processed, "jpg", baos);
+
+        log.info("✅ Category image processed: {} → {}x{}",
+                file.getOriginalFilename(), CATEGORY_SIZE, CATEGORY_SIZE);
+
+        return new MockMultipartFile(
+                "file",
+                file.getOriginalFilename(),
+                "image/jpeg",
+                baos.toByteArray()
+        );
     }
 }

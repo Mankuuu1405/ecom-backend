@@ -1,14 +1,19 @@
 package com.one.aim.controller;
 
+import com.one.aim.rq.CustomReportRq;
 import com.one.aim.service.AdminAnalyticsService;
 import com.one.vm.core.BaseRs;
 import com.one.vm.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Slf4j
 @RestController
@@ -18,68 +23,115 @@ public class AdminAnalyticsController {
 
     private final AdminAnalyticsService adminAnalyticsService;
 
-    // ------------------------------------------------------------
-    // ADMIN DASHBOARD
-    // ------------------------------------------------------------
+    // ================= DASHBOARD (UNCHANGED) =================
     @GetMapping("/dashboard")
     @PreAuthorize("hasAuthority('ADMIN')")
     public BaseRs getDashboard() {
-        try {
-            return adminAnalyticsService.getDashboard();
-        } catch (Exception ex) {
-            log.error("Error fetching admin dashboard: {}", ex.getMessage(), ex);
-            return ResponseUtils.failure("EC_ANALYTICS_ERROR", "Failed to load admin dashboard.");
-        }
+        return ResponseUtils.success(adminAnalyticsService.getDashboard());
     }
 
-    // ------------------------------------------------------------
-    // ADMIN ANALYTICS OVERVIEW
-    // ------------------------------------------------------------
+    // ================= OVERVIEW (DATE RANGE) =================
     @GetMapping("/overview")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public BaseRs getOverview() {
-        return ResponseUtils.success(adminAnalyticsService.getOverview());
+    public BaseRs getOverview(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+        return ResponseUtils.success(
+                adminAnalyticsService.getOverview(startDate, endDate)
+        );
     }
 
-    // ------------------------------------------------------------
-    // SALES PERFORMANCE CHART
-    // ------------------------------------------------------------
+    // ================= SALES CHART =================
     @GetMapping("/charts/sales")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public BaseRs getSalesChart() {
-        return ResponseUtils.success(adminAnalyticsService.getSalesChart());
+    public BaseRs getSalesChart(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+        return ResponseUtils.success(
+                adminAnalyticsService.getSalesChart(startDate, endDate)
+        );
     }
 
-    // ------------------------------------------------------------
-    // USER ACTIVITY CHART
-    // ------------------------------------------------------------
+    // ================= USER ACTIVITY CHART =================
     @GetMapping("/charts/user-activity")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public BaseRs getUserActivityChart() {
-        return ResponseUtils.success(adminAnalyticsService.getUserActivityChart());
+    public BaseRs getUserActivityChart(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+        return ResponseUtils.success(
+                adminAnalyticsService.getUserActivityChart(startDate, endDate)
+        );
     }
 
-    // ------------------------------------------------------------
-    // SALES PERFORMANCE TABLE
-    // ------------------------------------------------------------
+    // ================= SALES TABLE (PAGINATED) =================
     @GetMapping("/reports/sales-performance")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public BaseRs getSalesPerformanceReport() {
-        return ResponseUtils.success(adminAnalyticsService.getSalesPerformanceReport());
+    public BaseRs getSalesPerformanceReport(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseUtils.success(
+                adminAnalyticsService.getSalesPerformanceReport(
+                        startDate, endDate, page, size
+                )
+        );
     }
 
-    // USER ACTIVITY TABLE
+    // ================= USER ACTIVITY TABLE (PAGINATED) =================
     @GetMapping("/reports/user-activity")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public BaseRs getUserActivityReport() {
-        return ResponseUtils.success(adminAnalyticsService.getUserActivityReport());
+    public BaseRs getUserActivityReport(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseUtils.success(
+                adminAnalyticsService.getUserActivityReport(
+                        startDate, endDate, page, size
+                )
+        );
     }
 
-    //  MARKETING EFFECTIVENESS TABLE
-    @GetMapping("/reports/marketing-effectiveness")
+    // ------------------------------------------------------------
+// CUSTOM REPORT GENERATOR
+// ------------------------------------------------------------
+    @PostMapping("/reports/custom/export")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public BaseRs getMarketingEffectivenessReport() {
-        return ResponseUtils.success(adminAnalyticsService.getMarketingEffectivenessReport());
+    public ResponseEntity<byte[]> exportCustomReport(
+            @RequestBody CustomReportRq rq
+    ) {
+        byte[] file = adminAnalyticsService.exportCustomReport(rq);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=custom-report.csv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(file);
     }
+
+
+    @GetMapping("/reports/custom")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public BaseRs getCustomReport(
+            @RequestParam String type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseUtils.success(
+                adminAnalyticsService.getCustomReport(
+                        type, startDate, endDate, page, size
+                )
+        );
+    }
+
+
 
 }

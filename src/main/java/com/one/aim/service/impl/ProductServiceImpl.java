@@ -63,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     private String productFrontUrl;
 
     // ======================================================================
-// SELLER: ADD PRODUCT (Updated - No bestSeller/newArrival control)
+// SELLER: ADD PRODUCT (WITH ENHANCED NOTIFICATION)
 // ======================================================================
     @Override
     @Transactional
@@ -105,11 +105,9 @@ public class ProductServiceImpl implements ProductService {
             bo.setPrice(rq.getPrice());
             bo.setStock(rq.getStock());
             bo.setBrand(rq.getBrand());
-
             bo.setOnSale(rq.isOnSale());
             bo.setNewArrival(true);
             bo.setBestSeller(false);
-
             bo.setSpecificationsJson(rq.getSpecificationsJson());
 
             // ---------- CATEGORY ----------
@@ -175,26 +173,27 @@ public class ProductServiceImpl implements ProductService {
                 return ResponseUtils.failure("NO_IMAGE", "At least one valid image required");
             }
 
-            // ---------- THUMBNAIL (NO REORDER) ----------
-            Long thumbnailFileId = imageFileIds.get(0); // first image is primary
+            // ---------- THUMBNAIL ----------
+            Long thumbnailFileId = imageFileIds.get(0);
             bo.setImageFileIds(imageFileIds);
             bo.setThumbnailFileId(thumbnailFileId);
 
             productRepo.save(bo);
 
-            // ---------- ACTIVITY + NOTIFICATION ----------
+            // ---------- ACTIVITY LOG ----------
             userActivityService.log(
                     sellerId,
                     "PRODUCT_CREATED",
                     "Created product: " + bo.getName()
             );
 
+            // ---------- ENHANCED NOTIFICATION TO ADMINS ----------
             notificationService.notifyAdmins(
                     "PRODUCT_ADDED",
                     "New Product Added",
-                    bo.getName() + " added successfully!",
-                    null,
-                    bo,
+                    "", // Description will be built in service
+                    seller,    // Seller info
+                    bo,        // Product info
                     null,
                     "/admin/products/" + bo.getSlug()
             );
@@ -212,12 +211,8 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-
-
-
-
     // ======================================================================
-    // SELLER: UPDATE PRODUCT (Updated - No bestSeller/newArrival control)
+// SELLER: UPDATE PRODUCT (WITH CHANGE TRACKING)
 // ======================================================================
     @Override
     @Transactional
@@ -256,7 +251,7 @@ public class ProductServiceImpl implements ProductService {
                     (rq.getImages() == null || rq.getImages().isEmpty())) {
 
                 if (product.isActive() != rq.getActive()) {
-                    changes.put("Active", product.isActive() + " → " + rq.getActive());
+                    changes.put("Status", product.isActive() ? "Active → Inactive" : "Inactive → Active");
                     product.setActive(rq.getActive());
                 }
 
@@ -275,7 +270,7 @@ public class ProductServiceImpl implements ProductService {
             }
 
             // =================================================
-            // BASIC FIELDS
+            // TRACK ALL CHANGES
             // =================================================
             if (Utils.isNotEmpty(rq.getName()) && !rq.getName().equals(product.getName())) {
                 changes.put("Name", product.getName() + " → " + rq.getName());
@@ -291,7 +286,7 @@ public class ProductServiceImpl implements ProductService {
 
             if (rq.getPrice() != null && rq.getPrice() > 0
                     && !rq.getPrice().equals(product.getPrice())) {
-                changes.put("Price", product.getPrice() + " → " + rq.getPrice());
+                changes.put("Price", "₹" + product.getPrice() + " → ₹" + rq.getPrice());
                 product.setPrice(rq.getPrice());
             }
 
@@ -304,12 +299,12 @@ public class ProductServiceImpl implements ProductService {
             }
 
             if (rq.isOnSale() != product.isOnSale()) {
-                changes.put("On Sale", product.isOnSale() + " → " + rq.isOnSale());
+                changes.put("Sale Status", product.isOnSale() ? "On Sale → Regular" : "Regular → On Sale");
                 product.setOnSale(rq.isOnSale());
             }
 
             // =================================================
-            // CATEGORY
+            // CATEGORY CHANGES
             // =================================================
             if (rq.getCategoryId() != null &&
                     !rq.getCategoryId().equals(product.getCategoryId())) {
@@ -317,25 +312,18 @@ public class ProductServiceImpl implements ProductService {
                 CategoryBO category = categoryRepo.findById(rq.getCategoryId())
                         .orElseThrow(() -> new RuntimeException("Category not found"));
 
-                changes.put("Category",
-                        product.getCategoryName() + " → " + category.getName());
-
+                changes.put("Category", product.getCategoryName() + " → " + category.getName());
                 product.setCategoryId(category.getId());
                 product.setCategoryName(category.getName());
 
             } else if (Utils.isNotEmpty(rq.getCustomCategoryName())
                     && !rq.getCustomCategoryName().equals(product.getCategoryName())) {
 
-                changes.put("Category",
-                        product.getCategoryName() + " → " + rq.getCustomCategoryName());
-
+                changes.put("Category", product.getCategoryName() + " → " + rq.getCustomCategoryName());
                 product.setCategoryId(null);
                 product.setCategoryName(rq.getCustomCategoryName());
             }
 
-            // =================================================
-            // SPECIFICATIONS
-            // =================================================
             if (Utils.isNotEmpty(rq.getSpecificationsJson())
                     && !rq.getSpecificationsJson().equals(product.getSpecificationsJson())) {
                 changes.put("Specifications", "Updated");
@@ -343,11 +331,10 @@ public class ProductServiceImpl implements ProductService {
             }
 
             // =================================================
-            // IMAGES (REPLACE ALL)
+            // IMAGE CHANGES
             // =================================================
             List<MultipartFile> images = rq.getImages();
             if (images != null && !images.isEmpty()) {
-
                 if (images.size() > 5) {
                     return ResponseUtils.failure("TOO_MANY_IMAGES", "Maximum 5 images allowed");
                 }
@@ -382,9 +369,8 @@ public class ProductServiceImpl implements ProductService {
                 }
 
                 product.setImageFileIds(newImageIds);
-                product.setThumbnailFileId(newImageIds.get(0)); // FIRST IMAGE = PRIMARY
-
-                changes.put("Images", "Updated");
+                product.setThumbnailFileId(newImageIds.get(0));
+                changes.put("Images", "Updated (" + newImageIds.size() + " images)");
             }
 
             productRepo.save(product);
@@ -405,6 +391,9 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
 
+            // =================================================
+            // SEND NOTIFICATION WITH CHANGES
+            // =================================================
             sendProductUpdateNotification(product, changes);
 
             return ResponseUtils.success(
@@ -417,8 +406,6 @@ public class ProductServiceImpl implements ProductService {
             return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_ERROR, e.getMessage());
         }
     }
-
-
 
 
     // ======================================================================
@@ -1074,22 +1061,20 @@ public class ProductServiceImpl implements ProductService {
         return seller;
     }
 
+    // ======================================================================
+// HELPER: SEND PRODUCT UPDATE NOTIFICATION
+// ======================================================================
     private void sendProductUpdateNotification(ProductBO product, Map<String, String> changes) {
-
-        String changeSummary = changes.isEmpty()
-                ? "No significant fields changed"
-                : changes.entrySet().stream()
-                .map(e -> "• " + e.getKey() + ": " + e.getValue())
-                .collect(Collectors.joining("\n"));
+        if (changes.isEmpty()) return;
 
         notificationService.notifyAdmins(
                 "PRODUCT_UPDATED",
                 "Product Updated",
-                product.getName() + "\n\nChanges:\n" + changeSummary,
-                null,
+                "", // Changes will be formatted in service
+                product.getSeller(),
                 product,
                 null,
-                "/admin/products/" + product.getId()
+                "/admin/products/" + product.getSlug()
         );
     }
 

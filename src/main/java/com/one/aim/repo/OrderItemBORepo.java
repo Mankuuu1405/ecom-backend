@@ -2,6 +2,7 @@ package com.one.aim.repo;
 
 import com.one.aim.bo.OrderItemBO;
 import com.one.vm.analytics.TopProductVm;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -452,6 +453,44 @@ AND (:category IS NULL OR oi.productCategory = :category)
     Long getUniqueCustomersBySellerWithCategory(
             Long sellerId, LocalDateTime start, LocalDateTime end, String category
     );
+
+
+    @Query("""
+    SELECT 
+        oi.productName,
+        oi.productCategory,
+        oi.sellerId,
+        SUM(oi.totalPrice)
+    FROM OrderItemBO oi
+    WHERE oi.createdAt BETWEEN :start AND :end
+    GROUP BY oi.productName, oi.productCategory, oi.sellerId
+""")
+    Page<Object[]> getSalesTable(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT 
+        oi.productName,
+        SUM(oi.totalPrice),
+        COUNT(DISTINCT oi.order.id),
+        COUNT(DISTINCT oi.order.user.id)
+    FROM OrderItemBO oi
+    WHERE oi.createdAt BETWEEN :start AND :end
+      AND (:category IS NULL OR oi.productCategory = :category)
+      AND (:sellerId IS NULL OR oi.sellerId = :sellerId)
+    GROUP BY oi.productName
+""")
+    Page<Object[]> getCustomReport(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("category") String category,
+            @Param("sellerId") Long sellerId,
+            Pageable pageable
+    );
+
 
 
 }

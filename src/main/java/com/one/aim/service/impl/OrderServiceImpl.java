@@ -291,6 +291,24 @@ public class OrderServiceImpl implements OrderService {
                     "userName", o.getUser().getFullName(),
                     "email", o.getUser().getEmail()
             ));
+            String sellerEmail = o.getOrderItems().stream()
+                    .map(oi -> sellerRepo.findById(oi.getSellerId())
+                            .map(SellerBO::getEmail)
+                            .orElse("N/A"))
+                    .findFirst()
+                    .orElse("N/A");
+            String sellerName = o.getOrderItems().stream()
+                    .map(oi -> sellerRepo.findById(oi.getSellerId())
+                            .map(s -> s.getFullName())  // or getSellerName() depending on field
+                            .orElse("N/A"))
+                    .findFirst()
+                    .orElse("N/A");
+
+            m.put("seller", Map.of(
+                    "sellerName",sellerName ,
+                    "email", sellerEmail
+            ));
+
             return m;
         }).toList();
 

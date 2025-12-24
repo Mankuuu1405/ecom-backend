@@ -38,49 +38,110 @@ public class SellerAnalyticsServiceImpl implements SellerAnalyticsService {
 
         Long sellerId = getSellerId();
 
-        LocalDateTime end = to != null ? to : LocalDateTime.now();
-        LocalDateTime start = from != null ? from : end.minusDays(30);
+        // --------------------
+        // DATE RANGES
+        // --------------------
+        LocalDateTime end = (to != null) ? to : LocalDateTime.now();
+        LocalDateTime start = (from != null) ? from : end.minusDays(30);
+
+        LocalDateTime prevEnd = start;
+        LocalDateTime prevStart = start.minusDays(30);
 
         // --------------------
-        // SUMMARY CARDS
+        // CURRENT PERIOD (NULL SAFE)
         // --------------------
-        Double totalSales =
+        double totalSales = safeDouble(
                 orderItemRepo.getTotalSalesBySeller(
                         sellerId, start, end, category
-                );
+                )
+        );
 
-        Long totalOrders =
+        long totalOrders = safeLong(
                 orderItemRepo.getTotalOrdersBySellerWithCategory(
                         sellerId, start, end, category
-                );
+                )
+        );
 
         double avgOrderValue =
-                (totalOrders == null || totalOrders == 0)
-                        ? 0
-                        : totalSales / totalOrders;
+                totalOrders == 0 ? 0 : totalSales / totalOrders;
 
-        Long customerAcquisition =
+        long customerAcquisition = safeLong(
                 orderItemRepo.getUniqueCustomersBySellerWithCategory(
                         sellerId, start, end, category
-                );
+                )
+        );
 
-        Integer retentionPercent =
+        int retentionPercent = safeInt(
                 orderItemRepo.getCustomerRetentionPercent(
                         sellerId, start, end
-                );
+                )
+        );
 
+        // --------------------
+        // PREVIOUS PERIOD (NULL SAFE)
+        // --------------------
+        double prevTotalSales = safeDouble(
+                orderItemRepo.getTotalSalesBySeller(
+                        sellerId, prevStart, prevEnd, category
+                )
+        );
+
+        long prevTotalOrders = safeLong(
+                orderItemRepo.getTotalOrdersBySellerWithCategory(
+                        sellerId, prevStart, prevEnd, category
+                )
+        );
+
+        double prevAvgOrderValue =
+                prevTotalOrders == 0 ? 0 : prevTotalSales / prevTotalOrders;
+
+        long prevCustomerAcquisition = safeLong(
+                orderItemRepo.getUniqueCustomersBySellerWithCategory(
+                        sellerId, prevStart, prevEnd, category
+                )
+        );
+
+        int prevRetentionPercent = safeInt(
+                orderItemRepo.getCustomerRetentionPercent(
+                        sellerId, prevStart, prevEnd
+                )
+        );
+
+        // --------------------
+        // GROWTH CALCULATIONS (SAFE)
+        // --------------------
+        double totalSalesGrowthPercent =
+                calculateGrowth(totalSales, prevTotalSales);
+
+        double avgOrderValueGrowthPercent =
+                calculateGrowth(avgOrderValue, prevAvgOrderValue);
+
+        double customerAcquisitionGrowthPercent =
+                calculateGrowth(customerAcquisition, prevCustomerAcquisition);
+
+        double retentionGrowthPercent =
+                calculateGrowth(retentionPercent, prevRetentionPercent);
+
+        // --------------------
+        // SUMMARY
+        // --------------------
         AnalyticsSummaryVm summary =
                 new AnalyticsSummaryVm(
-                        totalSales == null ? 0 : totalSales,
+                        totalSales,
                         BigDecimal.valueOf(avgOrderValue)
                                 .setScale(2, RoundingMode.HALF_UP)
                                 .doubleValue(),
-                        customerAcquisition == null ? 0 : customerAcquisition,
-                        retentionPercent // ✅ keep null if no previous data
+                        customerAcquisition,
+                        retentionPercent,
+
+                        totalSalesGrowthPercent,
+                        avgOrderValueGrowthPercent,
+                        customerAcquisitionGrowthPercent,
+                        retentionGrowthPercent
                 );
 
         // --------------------
-        // SALES TREND (NO CATEGORY)
+        // SALES TREND
         // --------------------
         List<SalesTrendVm> salesTrend =
                 orderItemRepo.getSellerDailySales(sellerId, start, end, category)
@@ -91,18 +152,16 @@ public class SellerAnalyticsServiceImpl implements SellerAnalyticsService {
                         ))
                         .toList();
 
-
-
         // --------------------
-        // PRODUCT PERFORMANCE (NO CATEGORY HERE)
+        // PRODUCT PERFORMANCE
         // --------------------
         List<TopProductChartVm> products =
                 orderItemRepo.findTopSellingBySeller(
-                        sellerId,
-                        start,
-                        end,
-                        category,
-                        PageRequest.of(0, 5)
+                                sellerId,
+                                start,
+                                end,
+                                category,
+                                PageRequest.of(0, 5)
                         )
                         .stream()
                         .map(r -> new TopProductChartVm(
@@ -112,7 +171,7 @@ public class SellerAnalyticsServiceImpl implements SellerAnalyticsService {
                         .toList();
 
         // --------------------
-        // ORDER STATUS PIE (NO CATEGORY)
+        // ORDER STATUS
         // --------------------
         List<OrderStatusVm> status =
                 orderItemRepo.getSellerOrderStatusSummary(
@@ -126,7 +185,7 @@ public class SellerAnalyticsServiceImpl implements SellerAnalyticsService {
                         .toList();
 
         // --------------------
-        // CUSTOMER ACTIVITY (NO CATEGORY)
+        // CUSTOMER ACTIVITY
         // --------------------
         List<DailyOrderCountVm> activity =
                 orderItemRepo.getSellerDailyOrderCount(
@@ -149,8 +208,25 @@ public class SellerAnalyticsServiceImpl implements SellerAnalyticsService {
     }
 
     // --------------------
-    // CACHE KEY HELPER
+    // UTIL METHODS
     // --------------------
+    private double calculateGrowth(double current, double previous) {
+        if (previous <= 0) return 0.0;
+        return ((current - previous) / previous) * 100;
+    }
+
+    private double safeDouble(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
+    private long safeLong(Long value) {
+        return value == null ? 0L : value;
+    }
+
+    private int safeInt(Integer value) {
+        return value == null ? 0 : value;
+    }
+
     public Long getSellerId() {
         return AuthUtils.findLoggedInUser().getDocId();
     }

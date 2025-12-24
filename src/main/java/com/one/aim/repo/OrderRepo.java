@@ -276,11 +276,12 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     List<Object[]> getTopProducts(@Param("sellerId") Long sellerId);
 
     @Query("""
-    SELECT SUM(oi.totalPrice)
+    SELECT COALESCE(SUM(oi.totalPrice), 0)
     FROM OrderItemBO oi
     WHERE oi.sellerId = :sellerId
 """)
     Long getTotalRevenueBySeller(@Param("sellerId") Long sellerId);
+
 
     @Query("""
     SELECT COUNT(DISTINCT oi.order.id)

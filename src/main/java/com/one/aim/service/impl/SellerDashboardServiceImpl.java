@@ -44,13 +44,16 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
 
         // ---------- TOTAL ----------
         double totalRevenue =
-                orderRepo.getTotalRevenueBySeller(sellerId);
+                safeDouble(orderRepo.getTotalRevenueBySeller(sellerId));
 
         long totalOrders =
-                orderRepo.getSellerOrderCount(sellerId);
+                safeLong(orderRepo.getSellerOrderCount(sellerId));
+
 
         int totalProducts =
-                Math.toIntExact(productRepo.countProductsBySeller(sellerId));
+                Math.toIntExact(
+                        safeLong(productRepo.countProductsBySeller(sellerId))
+                );
 
         double avgOrderValueRaw =
                 totalOrders == 0 ? 0 : totalRevenue / totalOrders;
@@ -67,38 +70,44 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
 
         // ---------- REVENUE ----------
         double revenueLast30 =
-                orderRepo.getRevenueBetween(sellerId, last30Start, now);
+                safeDouble(orderRepo.getRevenueBetween(sellerId, last30Start, now));
 
         double revenuePrev30 =
-                orderRepo.getRevenueBetween(sellerId, prev30Start, last30Start);
+                safeDouble(orderRepo.getRevenueBetween(sellerId, prev30Start, last30Start));
 
         // ---------- ORDERS ----------
         long ordersLast30 =
-                orderRepo.getOrdersBetween(sellerId, last30Start, now);
+                safeLong(orderRepo.getOrdersBetween(sellerId, last30Start, now));
 
         long ordersPrev30 =
-                orderRepo.getOrdersBetween(sellerId, prev30Start, last30Start);
+                safeLong(orderRepo.getOrdersBetween(sellerId, prev30Start, last30Start));
+
+        double avgOrderValuePrev =
+                ordersPrev30 == 0 ? 0 : revenuePrev30 / ordersPrev30;
+
+        double avgOrderValueGrowth =
+                calculateGrowth(averageOrderValue, avgOrderValuePrev);
+
 
         // ---------- GROWTH ----------
-        Double revenueGrowth =
+        double revenueGrowth =
                 calculateGrowth(revenueLast30, revenuePrev30);
 
-        Double orderGrowth =
+        double orderGrowth =
                 calculateGrowth(ordersLast30, ordersPrev30);
 
-        // ---------- RECENT ORDERS (LIMIT 5) ----------
+        // ---------- RECENT ORDERS ----------
         List<RecentOrderVm> recentOrders =
                 orderRepo.findRecentOrders(sellerId, PageRequest.of(0, 5))
                         .getContent()
                         .stream()
                         .map(r -> new RecentOrderVm(
-                                        r[0].toString(),
-                                        r[1].toString(),
-                                        ((LocalDateTime) r[2]).withNano(0),
-                                        mapStatus(r[3].toString()),
-                                        ((Number) r[4]).doubleValue()
-                                )
-                        )
+                                r[0].toString(),
+                                r[1].toString(),
+                                ((LocalDateTime) r[2]).withNano(0),
+                                mapStatus(r[3].toString()),
+                                ((Number) r[4]).doubleValue()
+                        ))
                         .toList();
 
         // ---------- TOP PRODUCTS ----------
@@ -115,23 +124,30 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
                 new SellerOverviewRs(
                         "INR",
                         new SellerOverviewRs.Stats(
-                                totalRevenue,
-                                totalOrders,
-                                averageOrderValue,
-                                revenueGrowth,
-                                orderGrowth,
-                                totalProducts
+                                totalRevenue,                 // double
+                                totalOrders,                  // long
+                                averageOrderValue,            // double
+
+                                revenueGrowth,                // Double
+                                orderGrowth,                  // Double
+
+                                avgOrderValueGrowth,           // double
+
+                                totalProducts                 // int
                         ),
                         recentOrders,
                         topProducts
                 );
 
+
         return success("Seller dashboard fetched successfully", overview);
     }
 
-    private Double calculateGrowth(double current, double previous) {
+    // ---------- UTIL METHODS ----------
+
+    private double calculateGrowth(double current, double previous) {
         if (previous == 0) {
-            return null; // UI shows NEW / —
+            return 0.0; // NEVER return null
         }
         return ((current - previous) / previous) * 100;
     }
@@ -151,4 +167,18 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
         rs.setData(new BaseDataRs(msg, data));
         return rs;
     }
+
+    private long safeLong(Long value) {
+        return value == null ? 0L : value;
+    }
+
+    private double safeDouble(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
+    private double safeDouble(Long value) {
+        return value == null ? 0.0 : value.doubleValue();
+    }
+
 }
+

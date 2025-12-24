@@ -29,13 +29,14 @@ public class NotificationMapper {
         dto.put("createdAt", status.getCreatedAt());
         dto.put("isRead", status.getIsRead());
 
-
-        // ========= IMAGE PUBLIC URL =========
-        if (event.getImageFileId() != null) {
-            String url = fileService.getPublicFileUrl(event.getImageFileId());
-            dto.put("imageUrl", url);
+        // ========= IMAGE SECTION UPDATED (ONLY VALID URL, SKIP IF NULL/INVALID) =========
+        Long fileId = event.getImageFileId();
+        if (fileId != null) {
+            String fetched = fileService.getPublicFileUrl(fileId);
+            if (fetched != null && !fetched.isEmpty() && !fetched.contains("null")) {
+                dto.put("imageUrl", fetched);
+            }
         }
-
 
         // ================= WHO TRIGGERED =================
         if (event.getTriggeredByUser() != null) {
@@ -47,30 +48,28 @@ public class NotificationMapper {
         // ================= ORDER DATA =================
         var order = event.getOrder();
         if (order != null) {
-
             dto.put("orderId", order.getId());
             dto.put("totalAmount", order.getTotalAmount());
 
             var items = order.getOrderItems();
             if (items != null && !items.isEmpty()) {
                 var firstItem = items.get(0);
-
-                // Product
                 var product = firstItem.getProduct();
                 if (product != null) {
                     dto.put("productId", product.getId());
                     dto.put("productName", product.getName());
 
-                    if (product.getImageFileIds() != null &&
-                            !product.getImageFileIds().isEmpty()) {
-                        Long imgId = product.getImageFileIds().get(0);
-                        dto.put("productImageUrl", fileService.getPublicFileUrl(imgId));
+                    if (product.getImageFileIds() != null && !product.getImageFileIds().isEmpty()) {
+                        Long pImg = product.getImageFileIds().get(0);
+                        String pUrl = fileService.getPublicFileUrl(pImg);
+                        if (pUrl != null && !pUrl.contains("null")) {
+                            dto.put("productImageUrl", pUrl);
+                        }
                     }
 
-                    // Seller
                     var seller = product.getSeller();
                     if (seller != null) {
-                        dto.put("sellerId", seller.getSellerId()); // UNIQUE STRING ID
+                        dto.put("sellerId", seller.getSellerId());
                         dto.put("sellerName", seller.getFullName());
                         dto.put("sellerEmail", seller.getEmail());
                     }
@@ -84,10 +83,12 @@ public class NotificationMapper {
             dto.put("productId", productEvent.getId());
             dto.put("productName", productEvent.getName());
 
-            if (productEvent.getImageFileIds() != null &&
-                    !productEvent.getImageFileIds().isEmpty()) {
-                Long imgId = productEvent.getImageFileIds().get(0);
-                dto.put("productImageUrl", fileService.getPublicFileUrl(imgId));
+            if (productEvent.getImageFileIds() != null && !productEvent.getImageFileIds().isEmpty()) {
+                Long pImg = productEvent.getImageFileIds().get(0);
+                String pUrl = fileService.getPublicFileUrl(pImg);
+                if (pUrl != null && !pUrl.contains("null")) {
+                    dto.put("productImageUrl", pUrl);
+                }
             }
 
             var seller = productEvent.getSeller();
@@ -108,7 +109,6 @@ public class NotificationMapper {
 
         return dto;
     }
-
 
     private static String formatTimestamp(LocalDateTime createdAt) {
         Duration diff = Duration.between(createdAt, LocalDateTime.now());

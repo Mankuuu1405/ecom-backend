@@ -36,6 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final ProductRepo productRepo;
     private final FileService fileService;
     private final CategoryMapper categoryMapper;
+    private final ImageProcessingService imageProcessingService;
 
     @Override
     @Transactional
@@ -60,8 +61,14 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new RuntimeException("Only JPG or PNG allowed");
             }
 
-            FileBO uploaded = fileService.uploadAndReturnFile(image);
+            MultipartFile processedImage =
+                    imageProcessingService.processCategoryImage(image);
+
+            FileBO uploaded =
+                    fileService.uploadAndReturnFile(processedImage);
+
             bo.setImageFileId(uploaded.getId());
+
         }
 
         CategoryBO saved = categoryRepo.save(bo);
@@ -283,8 +290,14 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         // Upload new image
-        FileBO uploaded = fileService.uploadAndReturnFile(file);
+        MultipartFile processed =
+                imageProcessingService.processCategoryImage(file);
+
+        FileBO uploaded =
+                fileService.uploadAndReturnFile(processed);
+
         bo.setImageFileId(uploaded.getId());
+
 
         categoryRepo.save(bo);
 

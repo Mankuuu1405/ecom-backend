@@ -26,6 +26,7 @@ public class SellerOverviewRs {
         private Double revenueGrowthPercent;
         private Double orderGrowthPercent;
 
+        private double averageOrderValueGrowthPercent;
 
         private int totalProducts;
     }
