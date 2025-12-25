@@ -11,6 +11,7 @@ import com.one.aim.repo.InvoiceRepo;
 import com.one.aim.rq.LoginRq;
 import com.one.aim.rq.SaleAnnouncementRq;
 import com.one.aim.rs.AdminInvoiceRs;
+import com.one.aim.rs.CombinedUserRs;
 import com.one.aim.rs.InvoiceRs;
 import com.one.aim.service.*;
 import com.one.utils.AuthUtils;
@@ -46,6 +47,7 @@ public class AdminController {
     private final InvoiceService invoiceService;
     private final ProductService productService;
     private final NotificationService notificationService;
+    private final CombinedUserService combinedUserService;
 
     // ============================================================
     // CREATE ADMIN (REGISTER)
@@ -178,4 +180,10 @@ public class AdminController {
         return ResponseEntity.ok("Broadcast sent to all users & sellers");
     }
 
+    @GetMapping("/users/all")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<CombinedUserRs>> getAllUsersAndSellers() {
+        List<CombinedUserRs> list = combinedUserService.getAllUsersAndSellers();
+        return ResponseEntity.ok(list);
+    }
 }
