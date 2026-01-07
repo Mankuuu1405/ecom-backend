@@ -32,8 +32,6 @@ import com.one.vm.utils.ResponseUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
-
-
 @Slf4j
 @Service("fileService")
 public class FileServiceImpl implements FileService {
@@ -82,7 +80,8 @@ public class FileServiceImpl implements FileService {
 			log.error("FileBO IS NULL");
 			throw new FileNotFoundException(ErrorCodes.EC_FILE_NOT_FOUND);
 		}
-		String finalPath = FileHelper.prepareChunksDir(fileBO.getPath());
+		//String finalPath = FileHelper.prepareChunksDir(fileBO.getPath());
+		String finalPath = FileHelper.getChunksDir(fileBO.getPath());
 		File folder = new File(finalPath);
 		if (folder == null || !folder.exists()) {
 			log.error("Folder does not exist - " + finalPath);
@@ -365,7 +364,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String getPublicFileUrl(Long fileId) {
-        return "http://localhost:8989/aimdev/api/files/public/" + fileId + "/view";
+        return "/aimdev/api/files/public/" + fileId + "/view";
     }
 
     @Override

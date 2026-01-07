@@ -68,6 +68,9 @@ public class OrderBO {
     // ALWAYS "PAID" (payment-first architecture)
     private String paymentStatus;
 
+    private String paymentId;
+    private LocalDateTime paymentTime;
+
     private String razorpayPaymentId;
     private String razorpaySignature;
     private String razorpayOrderId;

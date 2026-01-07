@@ -5,10 +5,16 @@ import com.one.aim.rs.SellerOverviewRs;
 import com.one.aim.rs.SellerProductRowRs;
 import com.one.aim.rs.SellerSalesTrendRs;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SellerAnalyticsService {
-    SellerAnalyticsRs getAnalytics();
+    SellerAnalyticsRs getAnalytics(
+            LocalDateTime from,
+            LocalDateTime to,
+            String category
+    );
+
 }
 
 

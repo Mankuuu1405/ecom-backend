@@ -33,6 +33,8 @@ public class HomePageServiceImpl implements HomePageService {
     private final OrderItemBORepo orderItemBoRepo;
     private final CategoryMapper categoryMapper;
     private final UrlUtils urlUtils;
+    private final ReviewRepository reviewRepo;
+    private final BlogRepo blogRepo;
 
     @Override
     public HomePageRs getHomePage(int limit) {
@@ -47,13 +49,7 @@ public class HomePageServiceImpl implements HomePageService {
         trending.forEach(p -> shownProductIds.add(Long.valueOf(p.getDocId())));
 
         if (!trending.isEmpty()) {
-            sections.add(
-                    HomeSectionRs.products(
-                            "Trending Now",
-                            trending,
-                            "/products?sort=trending"
-                    )
-            );
+            sections.add(HomeSectionRs.products("Trending Now", getTrendingProducts(limit), "/products?sort=trending"));
         }
 
         // =========================
@@ -66,24 +62,57 @@ public class HomePageServiceImpl implements HomePageService {
                         .toList();
 
         if (!newArrivals.isEmpty()) {
+            sections.add(HomeSectionRs.products("New Arrivals", getNewArrivals(limit), "/products?sort=new"));
+        }
+
+        // =========================
+// HOT PICKS (FEATURED)
+// =========================
+        List<ProductCardRs> hotPicks = getHotPicks(limit);
+
+        if (!hotPicks.isEmpty()) {
+            sections.add(HomeSectionRs.products("Hot Picks", getHotPicks(limit), "/products?filter=featured"));
+        }
+
+        List<ReviewCardRs> reviews = getTopReviews(3);
+
+        if (!reviews.isEmpty()) {
             sections.add(
-                    HomeSectionRs.products(
-                            "New Arrivals",
-                            newArrivals,
-                            "/products?sort=new"
+                    HomeSectionRs.reviews("Customer Reviews", reviews)
+            );
+        }
+
+
+        // =========================
+// BLOGS
+// =========================
+        List<BlogCardRs> blogs = getBlogs(3);
+
+        if (!blogs.isEmpty()) {
+            sections.add(
+                    HomeSectionRs.blogs(
+                            "From Our Blog",
+                            blogs
                     )
             );
         }
+
+
 
         // =========================
         // TOP SERVICES
         // =========================
         List<ServiceCardRs> services = serviceModuleService.getTopServices(4);
+
         if (!services.isEmpty()) {
             sections.add(
-                    HomeSectionRs.services("Top Services", services)
+                    HomeSectionRs.services(
+                            "Top Services",
+                            services
+                    )
             );
         }
+
 
         // =========================
         // CATEGORIES
@@ -111,20 +140,14 @@ public class HomePageServiceImpl implements HomePageService {
 
         LocalDateTime start = LocalDateTime.now().minusDays(30);
 
-        List<Long> productIds =
-                orderItemBoRepo.findTopSelling(
-                                start,
-                                LocalDateTime.now(),
-                                PageRequest.of(0, limit)
-                        ).stream()
-                        .map(r -> ((Number) r[0]).longValue())
-                        .distinct()
-                        .toList();
+        Pageable pageable = PageRequest.of(0, limit);
 
-        if (productIds.isEmpty()) return Collections.emptyList();
-
-        return productRepo.findAllById(productIds).stream()
-                .filter(ProductBO::isActive)
+        return productRepo.findTrendingProducts(
+                        start,
+                        LocalDateTime.now(),
+                        pageable
+                )
+                .stream()
                 .map(productMapper::toCardRs)
                 .toList();
     }
@@ -134,14 +157,16 @@ public class HomePageServiceImpl implements HomePageService {
     // ======================================================
     private List<ProductCardRs> getNewArrivals(int limit) {
 
-        Pageable pageable =
-                PageRequest.of(0, limit, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(0, limit);
 
-        return productRepo.findByActiveTrue(pageable)
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+
+        return productRepo.findHomeNewArrivals(cutoff, pageable)
                 .stream()
                 .map(productMapper::toCardRs)
                 .toList();
     }
+
 
     // ======================================================
     // FEATURED CATEGORIES
@@ -150,12 +175,7 @@ public class HomePageServiceImpl implements HomePageService {
 
         Pageable pageable = PageRequest.of(0, limit);
 
-        Map<Long, Long> countMap = productRepo.countProductsGrouped()
-                .stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
+        Map<Long, Long> countMap = productRepo.countProductsGroupedByCategoryAsMap();
 
         return categoryRepo.findTopActiveCategories(pageable)
                 .stream()
@@ -187,6 +207,43 @@ public class HomePageServiceImpl implements HomePageService {
                 ))
                 .toList();
     }
+
+    private List<ProductCardRs> getHotPicks(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return productRepo
+                .findByActiveTrueAndFeaturedTrueOrderByUpdatedAtDesc(pageable)
+                .stream()
+                .map(productMapper::toCardRs)
+                .toList();
+    }
+
+
+    private List<ReviewCardRs> getTopReviews(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return reviewRepo.findTopReviews(pageable)
+                .stream()
+                .map(r -> new ReviewCardRs(
+                        r.getUser().getFullName(),
+                        r.getRating(),
+                        r.getComment()
+                ))
+                .toList();
+    }
+
+
+    private List<BlogCardRs> getBlogs(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return blogRepo.findByActiveTrueOrderByCreatedAtDesc(pageable)
+                .stream()
+                .map(b -> new BlogCardRs(
+                        b.getTitle(),
+                        b.getSlug(),
+                        urlUtils.publicFile(b.getImageFileId())
+                ))
+                .toList();
+    }
+
+
 
 }
 

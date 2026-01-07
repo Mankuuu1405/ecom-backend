@@ -25,15 +25,31 @@ public class WishlistMapper {
             firstImageUrl = "/api/files/public/" + imageId + "/view";
         }
 
+        boolean available =
+                product.isActive()
+                        && product.getStock() != null
+                        && product.getStock() > 0;
+
+        String message = null;
+        if (!product.isActive()) {
+            message = "This product is no longer available";
+        } else if (product.getStock() == null || product.getStock() <= 0) {
+            message = "This product is out of stock";
+        }
+
         return WishlistRs.builder()
                 .productId(product.getId())
                 .productName(product.getName())
+                .slug(product.getSlug())
                 .price(product.getPrice())
                 .inStock(product.getStock() != null && product.getStock() > 0)
                 .lowStock(product.isLowStock())
+                .available(available)
+                .message(message)
                 .productImageUrl(firstImageUrl)
                 .categoryName(product.getCategoryName())
                 .build();
+
     }
 
 

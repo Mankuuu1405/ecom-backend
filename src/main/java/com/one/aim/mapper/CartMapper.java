@@ -59,14 +59,21 @@ public class CartMapper {
             // ===============================
             // ACTIVE / INACTIVE LOGIC (NEW)
             // ===============================
-            boolean available = product.isActive();
+            boolean available =
+                    product.isActive()
+                            && product.getStock() != null
+                            && product.getStock() > 0;
+
             rs.setAvailable(available);
 
-            if (!available) {
+            if (!product.isActive()) {
                 rs.setMessage("This product is no longer available");
+            } else if (product.getStock() == null || product.getStock() <= 0) {
+                rs.setMessage("This product is out of stock");
             } else {
                 rs.setMessage(null);
             }
+
         }
 
         return rs;

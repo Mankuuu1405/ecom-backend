@@ -35,6 +35,7 @@ import com.one.utils.EncryptionUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 @EnableMethodSecurity(prePostEnabled = true)
 @Configuration
@@ -132,7 +133,6 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/files/public/**",
-                                "/api/files/private/**",
                                 "/api/public/pdp/**"
                         ).permitAll()
 
@@ -195,13 +195,12 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/seller/me",
                                 "/api/seller/carts",
-                                "/api/seller/product/**",
                                 "/api/seller/download/**",
                                 "/api/seller/all/invoices",
                                 "/api/seller/analytics/**"
                         ).hasAuthority("SELLER")
 
-                        .requestMatchers("/api/admin/category/active")
+                        .requestMatchers("/api/admin/category/active","/api/seller/product/**")
                         .hasAnyAuthority("ADMIN", "SELLER")
 
                         // ======================================
@@ -210,6 +209,8 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/admin/**"
                         ).hasAuthority("ADMIN")
+
+                        .requestMatchers("/api/files/private/**").authenticated()
 
                         .anyRequest().authenticated()
                 );
@@ -226,14 +227,13 @@ public class WebSecurityConfig {
 
         config.setAllowCredentials(true);
 
-        // Allow Vercel frontend
-        config.addAllowedOriginPattern("https://*.vercel.app");
-
-        // Allow NGROK dynamic URLs
-        config.addAllowedOriginPattern("https://*.ngrok-free.dev");
 
         // Allow localhost (for local testing)
-        config.addAllowedOriginPattern("http://localhost:*");
+        config.setAllowedOriginPatterns(List.of(
+    "http://localhost:*",
+    "http://3.111.217.88:3000"
+));
+ 
 
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");

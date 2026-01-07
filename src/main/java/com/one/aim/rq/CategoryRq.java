@@ -17,5 +17,8 @@ public class CategoryRq {
     @Size(max = 100, message = "Category must be under 100 characters")
     private String name;
 
+    private boolean popular;
+
+
     private boolean active = true;
 }

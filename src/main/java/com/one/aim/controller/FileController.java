@@ -11,6 +11,7 @@ import com.one.security.jwt.JwtUtils;
 import com.one.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -163,12 +164,48 @@ public class FileController {
     @GetMapping("/files/private/{id}/view")
     public ResponseEntity<byte[]> viewPrivateFile(@PathVariable String id) throws Exception {
 
-        FileBO file = fileService.getFile(id);
-        byte[] content = fileService.getContentFromGridFS(id);
+        Long viewerId = AuthUtils.getLoggedUserId();
+        String role = AuthUtils.getLoggedUserRole();
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(file.getContenttype()))
-                .body(content);
+        if (viewerId == null || role == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        FileBO file = fileService.getFile(id);
+
+        // ADMIN → full access
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(file.getContenttype()))
+                    .body(fileService.getContentFromGridFS(id));
+        }
+
+        // USER → only own profile image
+        if ("USER".equalsIgnoreCase(role)) {
+            UserBO user = userRepo.findById(viewerId).orElse(null);
+
+            if (user != null && id.equals(String.valueOf(user.getImageFileId()))) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(file.getContenttype()))
+                        .body(fileService.getContentFromGridFS(id));
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // SELLER → only own profile image
+        if ("SELLER".equalsIgnoreCase(role)) {
+            SellerBO seller = sellerRepo.findById(viewerId).orElse(null);
+
+            if (seller != null && id.equals(String.valueOf(seller.getImageFileId()))) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(file.getContenttype()))
+                        .body(fileService.getContentFromGridFS(id));
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
+
 
 }

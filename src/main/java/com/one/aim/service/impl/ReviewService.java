@@ -53,7 +53,7 @@ public class ReviewService {
         ProductBO product = productRepo.findById(rq.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        //  CHECK IF USER BOUGHT PRODUCT
+        // CHECK PURCHASE
         boolean hasPurchased =
                 orderRepo.hasUserPurchasedProduct(user.getId(), product.getId());
 
@@ -64,21 +64,27 @@ public class ReviewService {
             );
         }
 
+        // UPSERT REVIEW (ADD OR UPDATE)
+        ReviewBO review =
+                reviewRepo.findByUser_IdAndProduct_Id(user.getId(), product.getId())
+                        .orElseGet(() -> {
+                            ReviewBO r = new ReviewBO();
+                            r.setUser(user);
+                            r.setProduct(product);
+                            r.setVerified(true);
+                            return r;
+                        });
 
 
-        ReviewBO review = new ReviewBO();
-        review.setUser(user);
-        review.setProduct(product);
         review.setRating(rq.getRating());
         review.setComment(rq.getComment());
-
-        //  IMPORTANT
-        review.setVerified(true);
 
         reviewRepo.save(review);
 
         productRatingService.updateProductRating(product.getId());
     }
+
+
 
 
     // ======================================================

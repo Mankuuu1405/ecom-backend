@@ -206,10 +206,8 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     // ==========================================================
     // ADMIN DASHBOARD
     // ==========================================================
-    @Query("""
-        SELECT SUM(o.totalAmount)
-        FROM OrderBO o
-    """)
+    // In OrderItemBORepo
+    @Query("SELECT SUM(oi.totalPrice) FROM OrderItemBO oi")
     Long getTotalRevenue();
 
 
@@ -276,11 +274,12 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     List<Object[]> getTopProducts(@Param("sellerId") Long sellerId);
 
     @Query("""
-    SELECT SUM(oi.totalPrice)
+    SELECT COALESCE(SUM(oi.totalPrice), 0)
     FROM OrderItemBO oi
     WHERE oi.sellerId = :sellerId
 """)
     Long getTotalRevenueBySeller(@Param("sellerId") Long sellerId);
+
 
     @Query("""
     SELECT COUNT(DISTINCT oi.order.id)
@@ -290,15 +289,59 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     Long getSellerOrderCount(@Param("sellerId") Long sellerId);
 
 
+    // In OrderItemBORepo (better source since it uses delivered purchase activity)
     @Query("""
     SELECT COUNT(DISTINCT oi.order.user.id)
     FROM OrderItemBO oi
-    WHERE oi.createdAt BETWEEN :start AND :end
+    WHERE oi.createdAt >= :start AND oi.createdAt < :end
 """)
-    Long getActiveUsers(
+    Long getActiveUsers(@Param("start") LocalDateTime start,
+                        @Param("end") LocalDateTime end);
+
+
+    @Query("""
+    SELECT o.orderId, u.fullName, o.createdAt, o.orderStatus, o.totalAmount
+    FROM OrderBO o
+    JOIN o.user u
+    WHERE o.id IN (
+        SELECT DISTINCT oi.order.id
+        FROM OrderItemBO oi
+        WHERE oi.sellerId = :sellerId
+    )
+    ORDER BY o.createdAt DESC
+""")
+    Page<Object[]> findRecentOrders(
+            @Param("sellerId") Long sellerId,
+            Pageable pageable
+    );
+
+
+
+    @Query("""
+    SELECT COALESCE(SUM(oi.totalPrice), 0)
+    FROM OrderItemBO oi
+    WHERE oi.sellerId = :sellerId
+      AND oi.createdAt BETWEEN :start AND :end
+""")
+    Double getRevenueBetween(
+            @Param("sellerId") Long sellerId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+
+    @Query("""
+    SELECT COUNT(DISTINCT oi.order.id)
+    FROM OrderItemBO oi
+    WHERE oi.sellerId = :sellerId
+      AND oi.createdAt BETWEEN :start AND :end
+""")
+    Long getOrdersBetween(
+            @Param("sellerId") Long sellerId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
+
 
 
 

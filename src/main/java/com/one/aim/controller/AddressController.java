@@ -13,6 +13,8 @@ import com.one.vm.utils.ResponseUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/address")
 @Slf4j
@@ -58,34 +60,28 @@ public class AddressController {
     // GET ALL ADDRESSES OF LOGGED-IN USER
     // =========================================================
     @GetMapping
-    public ResponseEntity<?> getAllAddresses() {
+    public ResponseEntity<?> getAllAddresses() throws Exception {
 
-        try {
-            if (log.isDebugEnabled()) log.debug("GET /api/address");
+        var result = addressService.getAllAddressesOfLoggedUser();
 
-            return ResponseEntity.ok(addressService.getAllAddressesOfLoggedUser());
-
-        } catch (Exception e) {
-            log.error("Error fetching address list", e);
-            return ResponseEntity.internalServerError()
-                    .body(ResponseUtils.failure("Internal server error"));
+        // If service returns ResponseUtils.success(...)
+        if (result instanceof Map<?, ?> map && map.containsKey("data")) {
+            return ResponseEntity.ok(map.get("data"));
         }
+
+        return ResponseEntity.ok(result);
     }
+
 
 
     // =========================================================
     // SET DEFAULT ADDRESS
     // =========================================================
-    @PutMapping("/default/{addressId}")
-    public ResponseEntity<?> setDefaultAddress(@PathVariable Long addressId) throws Exception {
-
-        if (log.isDebugEnabled()) {
-            log.debug("PUT /api/address/default/{}", addressId);
-        }
-
-        return ResponseEntity.ok(addressService.setDefaultAddress(addressId));
+    @PutMapping("/{addressId}/make-default")
+    public ResponseEntity<BaseRs> makeDefault(@PathVariable Long addressId) throws Exception {
+        BaseRs rs = addressService.setDefaultAddress(addressId);
+        return ResponseEntity.ok(rs);
     }
-
 
     // =========================================================
     // UPDATE ADDRESS

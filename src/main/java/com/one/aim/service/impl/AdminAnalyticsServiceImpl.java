@@ -4,255 +4,445 @@ import com.one.aim.bo.SellerBO;
 import com.one.aim.bo.UserActivityBO;
 import com.one.aim.mapper.AdminAnalyticsMapper;
 import com.one.aim.repo.*;
+import com.one.aim.rq.CustomReportRq;
 import com.one.aim.rs.*;
 import com.one.aim.service.AdminAnalyticsService;
 import com.one.vm.core.BaseRs;
 import com.one.vm.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class AdminAnalyticsServiceImpl implements AdminAnalyticsService {
 
     private final OrderItemBORepo orderItemRepo;
     private final OrderRepo orderRepo;
     private final UserRepo userRepo;
-    private final SellerRepo sellerRepo;
     private final UserActivityRepo userActivityRepo;
-    private final MarketingConversionRepo marketingConversionRepo;
+    private final SellerRepo sellerRepo;
     private final AdminAnalyticsMapper mapper;
+    private final MarketingConversionRepo marketingConversionRepo;
 
-    // ============================== DASHBOARD ==============================
+    // ================= UTIL =================
+    private LocalDateTime startOf(LocalDate date) {
+        return date.atStartOfDay();
+    }
+
+    private LocalDateTime endOf(LocalDate date) {
+        return date.atTime(23, 59, 59);
+    }
+
+    private LocalDateTime[] resolveRange(LocalDate start, LocalDate end) {
+        if (start == null || end == null) {
+            LocalDateTime now = LocalDateTime.now();
+            return new LocalDateTime[]{now.minusDays(30), now};
+        }
+        return new LocalDateTime[]{startOf(start), endOf(end)};
+    }
+
     @Override
-    public BaseRs getDashboard() {
-        SummaryCardsRs summary = getSummaryCards();
-        SalesPerformanceRs salesPerformance = getSalesPerformance();
-        UserActivityRs userActivity = getUserActivity();
-        List<SalesTableRowRs> salesTable = getSalesTable();
+    public AdminAnalyticsRs getDashboard() {
 
-        return ResponseUtils.success(
-                mapper.toAdminAnalyticsResponse(summary, salesPerformance, userActivity, salesTable)
+        // DEFAULT RANGE = last 30 days
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+
+        // DEFAULT PAGINATION
+        int page = 0;
+        int size = 5;
+
+        SummaryCardsRs summary =
+                getOverview(startDate, endDate);
+
+        SalesPerformanceRs salesPerformance =
+                getSalesChart(startDate, endDate);
+
+        UserActivityRs userActivity =
+                getUserActivityChart(startDate, endDate);
+
+        Page<SalesTableRowRs> salesPage =
+                getSalesPerformanceReport(startDate, endDate, page, size);
+
+        return mapper.toAdminAnalyticsResponse(
+                summary,
+                salesPerformance,
+                userActivity,
+                salesPage.getContent()
         );
     }
 
-    // ============================== SUMMARY ==============================
+
+
+    // ================= OVERVIEW =================
     @Override
-    public SummaryCardsRs getSummaryCards() {
+    public SummaryCardsRs getOverview(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime[] range = resolveRange(startDate, endDate);
+        LocalDateTime start = range[0];
+        LocalDateTime end = range[1];
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = now.minusDays(30);
+        Long revenue = orderItemRepo.getTotalRevenue(start, end);
+        Long orders = orderRepo.getOrderVolume(start, end);
+        Long users = userRepo.countNewUsers(start, end);
 
-        // previous window = 30–60 days ago
-        LocalDateTime prevStart = now.minusDays(60);
-        LocalDateTime prevEnd = now.minusDays(30);
+        // ✅ FIX: Calculate sales trend for SAME DURATION in previous period
+        long days = ChronoUnit.DAYS.between(start, end);
+        LocalDateTime prevStart = start.minusDays(days + 1); // +1 to avoid overlap
+        LocalDateTime prevEnd = start.minusSeconds(1); // End just before current period
 
-        // ================================
-        // 1. Revenue + Trend %
-        // ================================
-        Long currRevenue = orderItemRepo.getTotalRevenue(start, now);
         Long prevRevenue = orderItemRepo.getTotalRevenue(prevStart, prevEnd);
+        int salesTrend = calculatePercentChange(prevRevenue, revenue);
 
-        currRevenue = currRevenue == null ? 0L : currRevenue;
-        prevRevenue = prevRevenue == null ? 0L : prevRevenue;
-
-        int salesTrend = calculatePercentChange(currRevenue, prevRevenue);
-
-        // ================================
-        // 2. New Users
-        // ================================
-        Long newUsers = userRepo.countNewUsers(start, now);
-        newUsers = newUsers == null ? 0L : newUsers;
-
-        // ================================
-        // 3. Order Volume
-        // ================================
-        Long orderVolume = orderRepo.getOrderVolume(start, now);
-        orderVolume = orderVolume == null ? 0L : orderVolume;
-
-        // ================================
-        // 4. Top Selling Product
-        // ================================
-        List<Object[]> top = orderItemRepo.getTopSellingProduct(start, now);
-
+        // ✅ FIX: Get ACTUAL top selling product by name
+        List<Object[]> topList = orderItemRepo.getTopSellingProduct(start, end);
+        Object[] top1 = topList.isEmpty() ? null : topList.get(0);
         String topProduct = "N/A";
-        if (top != null && !top.isEmpty()) {
-            Object[] row = top.get(0);
 
-            if (row != null && row.length > 0 && row[0] != null) {
-                topProduct = row[0].toString();
-            }
+        if (topList != null && !topList.isEmpty() && topList.get(0) != null) {
+            Object[] row = topList.get(0);
+            // Assuming row[0] is product name and row[1] is quantity/revenue
+            topProduct = row[0] != null ? row[0].toString() : "N/A";
         }
 
-        // ================================
-        // FINAL RESPONSE
-        // ================================
         return mapper.toSummaryCards(
-                currRevenue,
+                revenue == null ? 0 : revenue,
                 salesTrend,
-                newUsers,
-                orderVolume,
+                users == null ? 0 : users,
+                orders == null ? 0 : orders,
                 topProduct
         );
     }
 
-
-    // ============================== SALES PERFORMANCE ==============================
+    // ================= SALES CHART WITH % CHANGE =================
     @Override
-    public SalesPerformanceRs getSalesPerformance() {
+    public SalesPerformanceRs getSalesChart(LocalDate startDate, LocalDate endDate) {
+        var r = resolveRange(startDate, endDate);
+        LocalDateTime start = r[0];
+        LocalDateTime end = r[1];
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = now.minusDays(30);
+        // Current period total
+        Long currentTotal = orderItemRepo.getTotalRevenue(start, end);
 
-        Long totalSales = orderItemRepo.getTotalRevenue(start, now);
-        Long prev = orderItemRepo.getTotalRevenue(now.minusDays(60), now.minusDays(30));
-        int percentChange = calculatePercentChange(totalSales, prev);
+        // Previous period (same duration, shifted back)
+        long days = ChronoUnit.DAYS.between(start, end);
+        LocalDateTime prevStart = start.minusDays(days);
+        LocalDateTime prevEnd = start;
+        Long previousTotal = orderItemRepo.getTotalRevenue(prevStart, prevEnd);
 
-        List<WeeklyRevenueRs> weekly = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            LocalDateTime wStart = now.minusDays(30 - (i * 7));
-            LocalDateTime wEnd = wStart.plusDays(7);
+        // Calculate percentage change
+        int percentChange = calculatePercentChange(previousTotal, currentTotal);
 
-            weekly.add(
-                    mapper.toWeeklyRevenue("Week " + (i + 1),
-                            orderItemRepo.getRevenueBetween(wStart, wEnd))
-            );
+        // Map weekly data
+        List<WeeklyRevenueRs> weekly = generateWeeklyRevenue(start, end)
+                .stream()
+                .map(w -> WeeklyRevenueRs.builder()
+                        .weekLabel(w.getLabel())
+                        .revenue(w.getValue())
+                        .build())
+                .toList();
+
+        return SalesPerformanceRs.builder()
+                .totalSalesLast30Days(currentTotal == null ? 0 : currentTotal)
+                .percentChange(percentChange)
+                .weeklyRevenue(weekly)
+                .build();
+    }
+
+    // ================= USER ACTIVITY CHART WITH % CHANGE =================
+    @Override
+    public UserActivityRs getUserActivityChart(LocalDate startDate, LocalDate endDate) {
+        var r = resolveRange(startDate, endDate);
+        LocalDateTime start = r[0];
+        LocalDateTime end = r[1];
+
+        // Current period active users
+        Long currentActive = orderRepo.getActiveUsers(start, end);
+
+        // Previous period (same duration, shifted back)
+        long days = ChronoUnit.DAYS.between(start, end);
+        LocalDateTime prevStart = start.minusDays(days);
+        LocalDateTime prevEnd = start;
+        Long previousActive = orderRepo.getActiveUsers(prevStart, prevEnd);
+
+        // Calculate percentage change
+        int percentChange = calculatePercentChange(previousActive, currentActive);
+
+        // Map weekly data
+        List<WeeklyUserActivityRs> weekly = generateWeeklyActivity(start, end)
+                .stream()
+                .map(w -> WeeklyUserActivityRs.builder()
+                        .weekLabel(w.getLabel())
+                        .userCount(w.getValue())
+                        .build())
+                .toList();
+
+        return UserActivityRs.builder()
+                .totalActiveUsers(currentActive == null ? 0 : currentActive)
+                .percentChange(percentChange)
+                .weeklyActivity(weekly)
+                .build();
+    }
+
+    // ================= HELPER: Calculate % Change =================
+    private int calculatePercentChange(Long previous, Long current) {
+        if (previous == null || previous == 0) {
+            return current != null && current > 0 ? 100 : 0;
+        }
+        if (current == null) {
+            return -100;
         }
 
-        return mapper.toSalesPerformance(totalSales, percentChange, weekly);
-    }
-
-    // ============================== USER ACTIVITY CHART ==============================
-    @Override
-    public UserActivityRs getUserActivity() {
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = now.minusDays(30);
-
-        Long totalActiveUsers = orderRepo.getActiveUsers(start, now);
-        Long prev = orderRepo.getActiveUsers(now.minusDays(60), now.minusDays(30));
-
-        int percentChange = calculatePercentChange(totalActiveUsers, prev);
-
-        List<WeeklyUserActivityRs> weekly = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            LocalDateTime wStart = now.minusDays(30 - (i * 7));
-            LocalDateTime wEnd = wStart.plusDays(7);
-
-            weekly.add(
-                    mapper.toWeeklyUserActivity("Week " + (i + 1),
-                            orderRepo.getActiveUsers(wStart, wEnd))
-            );
-        }
-
-        return mapper.toUserActivity(totalActiveUsers, percentChange, weekly);
-    }
-
-    // ============================== SALES TABLE ==============================
-    @Override
-    public List<SalesTableRowRs> getSalesTable() {
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = now.minusDays(30);
-
-        List<Object[]> rows = orderItemRepo.getSalesTable(start, now);
-        List<SalesTableRowRs> result = new ArrayList<>();
-
-        for (Object[] row : rows) {
-            Long sellerId = ((Number) row[2]).longValue();
-            SellerBO seller = sellerRepo.findById(sellerId).orElse(null);
-            result.add(mapper.toSalesTableRow(row, seller));
-        }
-
-        return result;
-    }
-
-    @Override
-    public SummaryCardsRs getOverview() {
-        // Overview Tab = Summary Cards
-        return getSummaryCards();
-    }
-
-    @Override
-    public SalesPerformanceRs getSalesChart() {
-        // Sales Chart Tab = Sales Performance Chart
-        return getSalesPerformance();
-    }
-
-    @Override
-    public List<SalesTableRowRs> getSalesPerformanceReport() {
-        // Sales Performance Table
-        return getSalesTable();
-    }
-
-    @Override
-    public UserActivityRs getUserActivityChart() {
-        // User Activity Chart
-        return getUserActivity();
-    }
-
-
-    // ============================== USER ACTIVITY REPORT (TABLE) ==============================
-    @Override
-    public List<UserActivityRowRs> getUserActivityReport() {
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = now.minusDays(30);
-
-        List<UserActivityBO> logs = userActivityRepo.findByCreatedAtBetween(start, now);
-        List<UserActivityRowRs> rows = new ArrayList<>();
-
-        for (UserActivityBO log : logs) {
-            rows.add(mapper.toUserActivityRow(log)); // NEW FIXED METHOD
-        }
-
-        return rows;
-    }
-
-    // ============================== MARKETING REPORT ==============================
-    @Override
-    public List<MarketingEffectivenessRowRs> getMarketingEffectivenessReport() {
-
-        List<Object[]> rows = marketingConversionRepo.getCampaignAggregates();
-        Long totalOrders = orderRepo.count();
-
-        List<MarketingEffectivenessRowRs> result = new ArrayList<>();
-
-        for (Object[] row : rows) {
-            Long campaignId = ((Number) row[0]).longValue();
-            String name = (String) row[1];
-            Long orders = row[2] != null ? ((Number) row[2]).longValue() : 0L;
-            Long revenue = row[3] != null ? ((Number) row[3]).longValue() : 0L;
-
-            double rate = totalOrders > 0 ? (orders * 100.0) / totalOrders : 0.0;
-            String sample = findSampleCouponCodeForCampaign(campaignId);
-
-            result.add(mapper.toMarketingEffectivenessRow(name, orders, revenue, rate, sample));
-        }
-
-        return result;
-    }
-
-    private String findSampleCouponCodeForCampaign(Long id) {
-        return marketingConversionRepo.findAll().stream()
-                .filter(c -> c.getCampaign() != null &&
-                        c.getCampaign().getId().equals(id) &&
-                        c.getCoupon() != null)
-                .map(c -> c.getCoupon().getCode())
-                .findFirst()
-                .orElse(null);
-    }
-
-    // ============================== PERCENT CHANGE ==============================
-    private int calculatePercentChange(Long current, Long previous) {
-        if (previous == null || previous == 0) return 0;
         double change = ((double) (current - previous) / previous) * 100;
         return (int) Math.round(change);
     }
+
+
+    // ================= SALES TABLE =================
+    @Override
+    public Page<SalesTableRowRs> getSalesPerformanceReport(
+            LocalDate startDate,
+            LocalDate endDate,
+            int page,
+            int size
+    ) {
+        LocalDateTime[] range = resolveRange(startDate, endDate);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Object[]> rows =
+                orderItemRepo.getSalesTable(range[0], range[1], pageable);
+
+        return rows.map(row -> {
+            Long sellerId = ((Number) row[2]).longValue();
+            return mapper.toSalesTableRow(
+                    row,
+                    sellerRepo.findById(sellerId).orElse(null)
+            );
+        });
+    }
+
+    // ================= USER ACTIVITY TABLE =================
+    @Override
+    public Page<UserActivityRowRs> getUserActivityReport(
+            LocalDate startDate,
+            LocalDate endDate,
+            int page,
+            int size
+    ) {
+        LocalDateTime[] range = resolveRange(startDate, endDate);
+        Pageable pageable = PageRequest.of(page, size);
+
+        return userActivityRepo
+                .findByCreatedAtBetween(range[0], range[1], pageable)
+                .map(mapper::toUserActivityRow);
+    }
+
+    @Override
+    public Page<CustomReportRowRs> generateCustomReport(CustomReportRq rq) {
+
+        LocalDateTime[] range = resolveRange(
+                rq.getStartDate(),
+                rq.getEndDate()
+        );
+
+        Pageable pageable = PageRequest.of(
+                rq.getPage(),
+                rq.getSize()
+        );
+
+        Page<Object[]> rows = orderItemRepo.getCustomReport(
+                range[0],
+                range[1],
+                rq.getCategory(),
+                rq.getSellerId(),
+                pageable
+        );
+
+        return rows.map(row -> CustomReportRowRs.builder()
+                .label((String) row[0])
+                .revenue(rq.isRevenue() ? ((Number) row[1]).longValue() : null)
+                .orders(rq.isOrders() ? ((Number) row[2]).longValue() : null)
+                .users(rq.isUsers() ? ((Number) row[3]).longValue() : null)
+                .build()
+        );
+    }
+
+    @Override
+    public Page<?> getCustomReport(
+            String type,
+            LocalDate startDate,
+            LocalDate endDate,
+            int page,
+            int size
+    ) {
+        LocalDateTime[] range = resolveRange(startDate, endDate);
+        Pageable pageable = PageRequest.of(page, size);
+
+        return switch (type.toLowerCase()) {
+
+            case "sales" ->
+                    getSalesPerformanceReport(startDate, endDate, page, size);
+
+            case "user" ->
+                    getUserActivityReport(startDate, endDate, page, size);
+
+            case "marketing" ->
+                    marketingConversionRepo
+                            .getCampaignAggregates(range[0], range[1], pageable)
+                            .map(row -> mapper.toMarketingEffectivenessRow(
+                                    (String) row[0],
+                                    ((Number) row[1]).longValue(),
+                                    ((Number) row[2]).longValue(),
+                                    ((Number) row[3]).doubleValue(),
+                                    (String) row[4]
+                            ));
+
+            default ->
+                    throw new IllegalArgumentException("Invalid report type");
+        };
+    }
+
+
+    @Override
+    public byte[] exportCustomReport(CustomReportRq rq) {
+
+        Page<CustomReportRowRs> page =
+                generateCustomReport(rq);
+
+        StringBuilder csv = new StringBuilder();
+
+        // Header
+        csv.append("Label,Revenue,Orders,Users\n");
+
+        for (CustomReportRowRs row : page.getContent()) {
+            csv.append(row.getLabel()).append(",");
+            csv.append(row.getRevenue() != null ? row.getRevenue() : "").append(",");
+            csv.append(row.getOrders() != null ? row.getOrders() : "").append(",");
+            csv.append(row.getUsers() != null ? row.getUsers() : "").append("\n");
+        }
+
+        return csv.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    // ================= HELPER: Generate Weekly Data Points =================
+    private List<WeeklyDataPoint> generateWeeklyRevenue(LocalDateTime start, LocalDateTime end) {
+        List<WeeklyDataPoint> weeklyData = new ArrayList<>();
+
+        long totalDays = ChronoUnit.DAYS.between(start, end);
+
+        // ✅ Determine appropriate grouping
+        int weeks;
+        int daysPerWeek;
+
+        if (totalDays <= 7) {
+            // Show daily data for ranges <= 1 week
+            weeks = (int) totalDays;
+            daysPerWeek = 1;
+        } else if (totalDays <= 30) {
+            // Show weekly data for ranges <= 1 month
+            weeks = (int) Math.ceil(totalDays / 7.0);
+            daysPerWeek = 7;
+        } else {
+            // Show bi-weekly or monthly for longer ranges
+            weeks = (int) Math.ceil(totalDays / 14.0);
+            daysPerWeek = 14;
+        }
+
+        LocalDateTime currentStart = start;
+
+        for (int i = 0; i < weeks; i++) {
+            LocalDateTime periodEnd = currentStart.plusDays(daysPerWeek);
+            if (periodEnd.isAfter(end)) {
+                periodEnd = end;
+            }
+
+            // ✅ Get revenue for this period
+            Long revenue = orderItemRepo.getTotalRevenue(currentStart, periodEnd);
+
+            // ✅ Better labels
+            String label;
+            if (daysPerWeek == 1) {
+                label = currentStart.format(DateTimeFormatter.ofPattern("MMM dd"));
+            } else if (daysPerWeek == 7) {
+                label = String.format("Week %d", i + 1);
+            } else {
+                label = String.format("Period %d", i + 1);
+            }
+
+            weeklyData.add(new WeeklyDataPoint(label, revenue != null ? revenue : 0L));
+
+            currentStart = periodEnd;
+            if (!currentStart.isBefore(end)) break;
+        }
+
+        return weeklyData;
+    }
+
+    // ✅ Apply same logic to generateWeeklyActivity
+    private List<WeeklyDataPoint> generateWeeklyActivity(LocalDateTime start, LocalDateTime end) {
+        List<WeeklyDataPoint> weeklyData = new ArrayList<>();
+
+        long totalDays = ChronoUnit.DAYS.between(start, end);
+
+        int weeks;
+        int daysPerWeek;
+
+        if (totalDays <= 7) {
+            weeks = (int) totalDays;
+            daysPerWeek = 1;
+        } else if (totalDays <= 30) {
+            weeks = (int) Math.ceil(totalDays / 7.0);
+            daysPerWeek = 7;
+        } else {
+            weeks = (int) Math.ceil(totalDays / 14.0);
+            daysPerWeek = 14;
+        }
+
+        LocalDateTime currentStart = start;
+
+        for (int i = 0; i < weeks; i++) {
+            LocalDateTime periodEnd = currentStart.plusDays(daysPerWeek);
+            if (periodEnd.isAfter(end)) {
+                periodEnd = end;
+            }
+
+            // ✅ Count active users (who logged in)
+            Long activeUsers = userActivityRepo.getWeeklyActiveUsersByType(currentStart, periodEnd)
+                    .stream()
+                    .mapToLong(r -> ((Number) r[1]).longValue())
+                    .sum();
+
+
+
+            String label;
+            if (daysPerWeek == 1) {
+                label = currentStart.format(DateTimeFormatter.ofPattern("MMM dd"));
+            } else if (daysPerWeek == 7) {
+                label = String.format("Week %d", i + 1);
+            } else {
+                label = String.format("Period %d", i + 1);
+            }
+
+            weeklyData.add(new WeeklyDataPoint(label, activeUsers != null ? activeUsers : 0L));
+
+            currentStart = periodEnd;
+            if (!currentStart.isBefore(end)) break;
+        }
+
+        return weeklyData;
+    }
+
 }

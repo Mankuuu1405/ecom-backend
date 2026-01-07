@@ -16,5 +16,7 @@ public interface ServiceRepo extends JpaRepository<ServiceBO, Long> {
 
     @Query("SELECT s FROM ServiceBO s WHERE s.active = true ORDER BY s.createdAt DESC")
     List<ServiceBO> findActiveServices(Pageable pageable);
+
+    boolean existsBySlug(String slug);
 }
 

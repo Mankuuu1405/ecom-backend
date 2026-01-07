@@ -16,6 +16,7 @@ public class CategoryRs {
     private String slug;
     private boolean active;
     private String imageUrl;
+    private boolean popular;
     private Double taxPercent;
     private Double deliveryCharge;
     private Integer returnPolicyDays;

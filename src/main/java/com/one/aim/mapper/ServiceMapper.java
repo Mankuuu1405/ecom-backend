@@ -2,29 +2,34 @@ package com.one.aim.mapper;
 
 import com.one.aim.bo.ServiceBO;
 import com.one.aim.rs.ServiceCardRs;
+import com.one.utils.UrlUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class ServiceMapper {
 
-    public static ServiceCardRs toCard(ServiceBO bo) {
+    private final UrlUtils urlUtils;
+
+    public ServiceCardRs toCard(ServiceBO bo) {
         ServiceCardRs rs = new ServiceCardRs();
 
         rs.setId(bo.getId());
-        rs.setTitle(bo.getTitle());  // Map title → name
+        rs.setTitle(bo.getTitle());
         rs.setDescription(bo.getDescription());
-        rs.setStartingPrice(bo.getStartingPrice());  // Map startingPrice → price
+        rs.setStartingPrice(bo.getStartingPrice());
+        rs.setSlug(bo.getSlug());
 
-        // Generate image URL
-        if (bo.getImageFileId() != null) {
-            rs.setImage("/api/files/public/" + bo.getImageFileId() + "/view");
-        } else {
-            rs.setImage("/assets/default-service.jpg");
-        }
 
-        // Set default/placeholder values for missing fields
-//        rs.setRating(0.0);  // Default rating or calculate from reviews
-//        rs.setProvider("Platform");  // Default provider or get from related entity
+        rs.setImage(
+                bo.getImageFileId() != null
+                        ? urlUtils.publicFile(bo.getImageFileId())
+                        : urlUtils.defaultImage()
+        );
 
         return rs;
     }
+
 }
 

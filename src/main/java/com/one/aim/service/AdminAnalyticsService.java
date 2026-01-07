@@ -1,32 +1,50 @@
 package com.one.aim.service;
 
+import com.one.aim.rq.CustomReportRq;
 import com.one.aim.rs.*;
 import com.one.vm.core.BaseRs;
+import org.springframework.data.domain.Page;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AdminAnalyticsService {
 
-    // Main Dashboard (full pack)
-    BaseRs getDashboard();
+    // Existing (unchanged)
+    AdminAnalyticsRs getDashboard();
 
-    // ---- Summary, Charts, Tables (Dashboard internal parts)
-    SummaryCardsRs getSummaryCards();
-    SalesPerformanceRs getSalesPerformance();
-    UserActivityRs getUserActivity();
-    List<SalesTableRowRs> getSalesTable();
+    // New enhanced APIs
+    SummaryCardsRs getOverview(LocalDate startDate, LocalDate endDate);
 
-    // ---- Overview Tab
-    SummaryCardsRs getOverview();
+    SalesPerformanceRs getSalesChart(LocalDate startDate, LocalDate endDate);
 
-    // ---- Sales Performance Tab
-    SalesPerformanceRs getSalesChart();
-    List<SalesTableRowRs> getSalesPerformanceReport();
+    UserActivityRs getUserActivityChart(LocalDate startDate, LocalDate endDate);
 
-    // ---- User Activity Tab
-    UserActivityRs getUserActivityChart();
-    List<UserActivityRowRs> getUserActivityReport();
+    Page<SalesTableRowRs> getSalesPerformanceReport(
+            LocalDate startDate,
+            LocalDate endDate,
+            int page,
+            int size
+    );
 
-    // ---- Marketing Effectiveness Tab
-    List<MarketingEffectivenessRowRs> getMarketingEffectivenessReport();
+    Page<UserActivityRowRs> getUserActivityReport(
+            LocalDate startDate,
+            LocalDate endDate,
+            int page,
+            int size
+    );
+
+    Page<CustomReportRowRs> generateCustomReport(CustomReportRq rq);
+
+    Page<?> getCustomReport(
+            String type,
+            LocalDate startDate,
+            LocalDate endDate,
+            int page,
+            int size
+    );
+
+    byte[] exportCustomReport(CustomReportRq rq);
+
 }
+

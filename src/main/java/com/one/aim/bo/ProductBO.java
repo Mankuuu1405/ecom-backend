@@ -54,12 +54,15 @@ public class ProductBO {
     @Column(name = "image_file_id")
     private List<Long> imageFileIds = new ArrayList<>();
 
+    private Long thumbnailFileId;
+
+
     //  Optional category text
     private String categoryName;
 
     private Long categoryId;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "featured")
     private boolean featured = false;
 
 
@@ -84,12 +87,10 @@ public class ProductBO {
     @Column(columnDefinition = "TEXT")
     private String specificationsJson;
 
-    // Remove hardcoded values, calculate from reviews
-//    @Transient
-//    private Double averageRating;
-//
-//    @Transient
-//    private Long reviewCount;
+    private boolean bestSeller;
+    private boolean newArrival;
+    private boolean onSale;
+
 
     @Transient
     private Integer soldItem = 0;
@@ -115,5 +116,20 @@ public class ProductBO {
     public void updateLowStock() {
         this.lowStock = (this.stock != null && this.stock <= 5);
     }
+
+    public void ensureThumbnail() {
+        if (this.thumbnailFileId == null
+                && this.imageFileIds != null
+                && !this.imageFileIds.isEmpty()) {
+
+            this.thumbnailFileId = this.imageFileIds.get(0);
+        }
+    }
+
+    @PreUpdate
+    private void ensureThumbnailBeforeSave() {
+        ensureThumbnail();
+    }
+
 
 }

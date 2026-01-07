@@ -85,4 +85,7 @@ public interface NotificationService {
     void markAllAsRead(Long userId);
 
     void hideNotification(Long statusId, Long userId);
+
+
+
 }

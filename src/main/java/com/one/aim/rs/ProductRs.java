@@ -25,8 +25,15 @@ public class ProductRs implements Serializable {
     private String brand;
     private String categoryName;
     private Long categoryId;
-    private String image;              // Primary image
-    private List<String> images;       // All images
+
+    // =====================
+    // IMAGES
+    // =====================
+    private String image;              // ALWAYS same as thumbnail
+    private String thumbnail;          // Explicit thumbnail
+    private Long thumbnailFileId;      // For seller edit UI
+    private List<String> images;       // Thumbnail is always images[0]
+
     private boolean inStock;
     private boolean active;
     private boolean featured;
@@ -46,6 +53,4 @@ public class ProductRs implements Serializable {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }
-

@@ -9,25 +9,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<ReviewBO, Long> {
 
-    // =========================
-    // BASIC REVIEW FETCHING
-    // =========================
-
+    Page<ReviewBO> findByProduct_Slug(String slug, Pageable pageable);
     List<ReviewBO> findByProduct_Id(Long productId);
-
     Page<ReviewBO> findByProduct_Id(Long productId, Pageable pageable);
-
     Page<ReviewBO> findByUser_Id(Long userId, Pageable pageable);
 
     boolean existsByUser_IdAndProduct_Id(Long userId, Long productId);
-
-    // =========================
-    // RATING AGGREGATES
-    // =========================
+    Optional<ReviewBO> findByUser_IdAndProduct_Id(Long userId, Long productId);
 
     @Query("SELECT AVG(r.rating) FROM ReviewBO r WHERE r.product.id = :productId")
     Double getAverageRatingByProductId(@Param("productId") Long productId);
@@ -35,6 +28,13 @@ public interface ReviewRepository extends JpaRepository<ReviewBO, Long> {
     @Query("SELECT COUNT(r) FROM ReviewBO r WHERE r.product.id = :productId")
     Long getReviewCountByProductId(@Param("productId") Long productId);
 
+    @Query("""
+   SELECT r FROM ReviewBO r
+   JOIN FETCH r.user
+   WHERE r.rating >= 4
+   ORDER BY r.createdAt DESC
+""")
+    Page<ReviewBO> findTopReviews(Pageable pageable);
 
     @Query("""
 SELECT r.rating, COUNT(r)
@@ -44,4 +44,6 @@ GROUP BY r.rating
 """)
     List<Object[]> getRatingDistributionByProductId(@Param("productId") Long productId);
 
+
 }
+

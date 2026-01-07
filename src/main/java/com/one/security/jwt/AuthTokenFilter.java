@@ -118,11 +118,31 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     // ===========================================================
     //  Extract Token from Authorization Header
     // ===========================================================
+//    private String getTokenFromRequest(HttpServletRequest request) {
+//        String bearerToken = request.getHeader("Authorization");
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+//            return bearerToken.substring(7);
+//        }
+//        return null;
+//    }
+
     private String getTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+
+        // 1️ Try Authorization header (normal API calls)
+        String bearer = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
         }
+
+        // 2️ Try query param (for <img>, <video>, etc.)
+        String tokenParam = request.getParameter("token");
+
+        if (StringUtils.hasText(tokenParam)) {
+            return tokenParam;
+        }
+
         return null;
     }
+
 }

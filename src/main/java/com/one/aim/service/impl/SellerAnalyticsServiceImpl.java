@@ -4,15 +4,17 @@ import com.one.aim.repo.OrderItemBORepo;
 import com.one.aim.rs.*;
 import com.one.aim.service.SellerAnalyticsService;
 import com.one.utils.AuthUtils;
-import com.one.vm.analytics.DailyOrderCountVm;
-import com.one.vm.analytics.OrderStatusVm;
-import com.one.vm.analytics.SalesTrendVm;
-import com.one.vm.analytics.TopProductChartVm;
+import com.one.vm.analytics.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,77 +26,208 @@ public class SellerAnalyticsServiceImpl implements SellerAnalyticsService {
     private final OrderItemBORepo orderItemRepo;
 
     @Override
-    public SellerAnalyticsRs getAnalytics() {
-        Long sellerId = AuthUtils.findLoggedInUser().getDocId();
+    @Cacheable(
+            value = "sellerAnalytics",
+            key = "#root.target.getSellerId() + ':' + #from + ':' + #to + ':' + #category"
+    )
+    public SellerAnalyticsRs getAnalytics(
+            LocalDateTime from,
+            LocalDateTime to,
+            String category
+    ) {
 
-        // We'll use a 30-day window for charts (you can change)
-        LocalDateTime end = LocalDateTime.now();
-        LocalDateTime start = end.minusDays(30);
-
-        // --------------------
-        // A. Sales trend (daily sales)
-        // --------------------
-        List<Object[]> dailySalesRows = orderItemRepo.getSellerDailySales(sellerId, start, end);
-        List<SalesTrendVm> salesTrend = dailySalesRows.stream()
-                .map(r -> {
-                    // r[0] = java.sql.Date (or LocalDate depending on JPA), r[1] = Number
-                    String day = r[0] == null ? "" : r[0].toString();
-                    Double sales = r[1] == null ? 0.0 : ((Number) r[1]).doubleValue();
-                    return new SalesTrendVm(day, sales);
-                })
-                .toList();
+        Long sellerId = getSellerId();
 
         // --------------------
-        // B. Top selling products (last 30 days) — reusing existing repo method `findTopSelling`
-        //    your findTopSelling(start,end,pageable) returns productId, productName, qty
+        // DATE RANGES
         // --------------------
-        List<Object[]> topRows = orderItemRepo.findTopSellingBySeller(
-                sellerId, start, end, PageRequest.of(0, 5)
+        LocalDateTime end = (to != null) ? to : LocalDateTime.now();
+        LocalDateTime start = (from != null) ? from : end.minusDays(30);
+
+        LocalDateTime prevEnd = start;
+        LocalDateTime prevStart = start.minusDays(30);
+
+        // --------------------
+        // CURRENT PERIOD (NULL SAFE)
+        // --------------------
+        double totalSales = safeDouble(
+                orderItemRepo.getTotalSalesBySeller(
+                        sellerId, start, end, category
+                )
         );
 
-        List<TopProductChartVm> topProducts = topRows.stream()
-                .map(r -> {
-                    // r[0] = productId (Long), r[1] = productName, r[2] = qty
-                    String name = r.length > 1 && r[1] != null ? r[1].toString() : "Unknown";
-                    Long units = r.length > 2 && r[2] != null ? ((Number) r[2]).longValue() : 0L;
-                    return new TopProductChartVm(name, units);
-                })
-                .toList();
+        long totalOrders = safeLong(
+                orderItemRepo.getTotalOrdersBySellerWithCategory(
+                        sellerId, start, end, category
+                )
+        );
+
+        double avgOrderValue =
+                totalOrders == 0 ? 0 : totalSales / totalOrders;
+
+        long customerAcquisition = safeLong(
+                orderItemRepo.getUniqueCustomersBySellerWithCategory(
+                        sellerId, start, end, category
+                )
+        );
+
+        int retentionPercent = safeInt(
+                orderItemRepo.getCustomerRetentionPercent(
+                        sellerId, start, end
+                )
+        );
 
         // --------------------
-        // C. Order status breakdown (pie)
+        // PREVIOUS PERIOD (NULL SAFE)
         // --------------------
-        List<Object[]> statusRows = orderItemRepo.getSellerOrderStatusSummary(sellerId, start, end);
-        List<OrderStatusVm> orderStatus = statusRows.stream()
-                .map(r -> {
-                    String status = r[0] == null ? "UNKNOWN" : r[0].toString();
-                    Integer count = r[1] == null ? 0 : ((Number) r[1]).intValue();
-                    return new OrderStatusVm(status, count);
-                })
-                .toList();
+        double prevTotalSales = safeDouble(
+                orderItemRepo.getTotalSalesBySeller(
+                        sellerId, prevStart, prevEnd, category
+                )
+        );
+
+        long prevTotalOrders = safeLong(
+                orderItemRepo.getTotalOrdersBySellerWithCategory(
+                        sellerId, prevStart, prevEnd, category
+                )
+        );
+
+        double prevAvgOrderValue =
+                prevTotalOrders == 0 ? 0 : prevTotalSales / prevTotalOrders;
+
+        long prevCustomerAcquisition = safeLong(
+                orderItemRepo.getUniqueCustomersBySellerWithCategory(
+                        sellerId, prevStart, prevEnd, category
+                )
+        );
+
+        int prevRetentionPercent = safeInt(
+                orderItemRepo.getCustomerRetentionPercent(
+                        sellerId, prevStart, prevEnd
+                )
+        );
 
         // --------------------
-        // D. Recent orders activity (daily order count)
+        // GROWTH CALCULATIONS (SAFE)
         // --------------------
-        List<Object[]> dailyOrderRows = orderItemRepo.getSellerDailyOrderCount(sellerId, start, end);
-        List<DailyOrderCountVm> recentActivity = dailyOrderRows.stream()
-                .map(r -> {
-                    String date = r[0] == null ? "" : r[0].toString();
-                    Integer orders = r[1] == null ? 0 : ((Number) r[1]).intValue();
-                    return new DailyOrderCountVm(date, orders);
-                })
-                .toList();
+        double totalSalesGrowthPercent =
+                calculateGrowth(totalSales, prevTotalSales);
+
+        double avgOrderValueGrowthPercent =
+                calculateGrowth(avgOrderValue, prevAvgOrderValue);
+
+        double customerAcquisitionGrowthPercent =
+                calculateGrowth(customerAcquisition, prevCustomerAcquisition);
+
+        double retentionGrowthPercent =
+                calculateGrowth(retentionPercent, prevRetentionPercent);
 
         // --------------------
-        // Build and return
+        // SUMMARY
         // --------------------
+        AnalyticsSummaryVm summary =
+                new AnalyticsSummaryVm(
+                        totalSales,
+                        BigDecimal.valueOf(avgOrderValue)
+                                .setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue(),
+                        customerAcquisition,
+                        retentionPercent,
+
+                        totalSalesGrowthPercent,
+                        avgOrderValueGrowthPercent,
+                        customerAcquisitionGrowthPercent,
+                        retentionGrowthPercent
+                );
+
+        // --------------------
+        // SALES TREND
+        // --------------------
+        List<SalesTrendVm> salesTrend =
+                orderItemRepo.getSellerDailySales(sellerId, start, end, category)
+                        .stream()
+                        .map(r -> new SalesTrendVm(
+                                r[0].toString(),
+                                ((Number) r[1]).doubleValue()
+                        ))
+                        .toList();
+
+        // --------------------
+        // PRODUCT PERFORMANCE
+        // --------------------
+        List<TopProductChartVm> products =
+                orderItemRepo.findTopSellingBySeller(
+                                sellerId,
+                                start,
+                                end,
+                                category,
+                                PageRequest.of(0, 5)
+                        )
+                        .stream()
+                        .map(r -> new TopProductChartVm(
+                                r[1].toString(),
+                                ((Number) r[2]).longValue()
+                        ))
+                        .toList();
+
+        // --------------------
+        // ORDER STATUS
+        // --------------------
+        List<OrderStatusVm> status =
+                orderItemRepo.getSellerOrderStatusSummary(
+                                sellerId, start, end, category
+                        )
+                        .stream()
+                        .map(r -> new OrderStatusVm(
+                                r[0].toString(),
+                                ((Number) r[1]).intValue()
+                        ))
+                        .toList();
+
+        // --------------------
+        // CUSTOMER ACTIVITY
+        // --------------------
+        List<DailyOrderCountVm> activity =
+                orderItemRepo.getSellerDailyOrderCount(
+                                sellerId, start, end, category
+                        )
+                        .stream()
+                        .map(r -> new DailyOrderCountVm(
+                                r[0].toString(),
+                                ((Number) r[1]).intValue()
+                        ))
+                        .toList();
+
         return new SellerAnalyticsRs(
-                recentActivity,
-                orderStatus,
-                topProducts,
-                salesTrend
+                summary,
+                salesTrend,
+                products,
+                status,
+                activity
         );
     }
 
+    // --------------------
+    // UTIL METHODS
+    // --------------------
+    private double calculateGrowth(double current, double previous) {
+        if (previous <= 0) return 0.0;
+        return ((current - previous) / previous) * 100;
+    }
 
+    private double safeDouble(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
+    private long safeLong(Long value) {
+        return value == null ? 0L : value;
+    }
+
+    private int safeInt(Integer value) {
+        return value == null ? 0 : value;
+    }
+
+    public Long getSellerId() {
+        return AuthUtils.findLoggedInUser().getDocId();
+    }
 }

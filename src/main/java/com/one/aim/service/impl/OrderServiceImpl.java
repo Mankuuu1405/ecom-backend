@@ -1,6 +1,5 @@
 package com.one.aim.service.impl;
 
-import com.itextpdf.html2pdf.HtmlConverter;
 import com.one.aim.bo.*;
 import com.one.aim.constants.ErrorCodes;
 import com.one.aim.constants.MessageCodes;
@@ -9,17 +8,14 @@ import com.one.aim.mapper.OrderMapper;
 import com.one.aim.repo.*;
 import com.one.aim.rq.OrderRq;
 import com.one.aim.rs.OrderRs;
-import com.one.aim.rs.UserRs;
 import com.one.aim.rs.data.OrderDataRs;
 import com.one.aim.rs.data.OrderDataRsList;
 import com.one.aim.service.*;
 import com.one.utils.AuthUtils;
-import com.one.vm.core.BaseDataRs;
 import com.one.vm.core.BaseRs;
 import com.one.vm.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +23,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.compress.utils.ArchiveUtils.sanitize;
 
@@ -217,11 +213,11 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public BaseRs retrieveOrder(Long orderId) throws Exception {
-        log.debug("Executing retrieveOrder() for ID: {}", orderId);
+    public BaseRs retrieveOrder(String orderId) throws Exception {
+        log.debug("Executing retrieveOrder() for orderId: {}", orderId);
 
         try {
-            return orderRepo.findById(orderId)
+            return orderRepo.findByOrderId(orderId)
                     .map(order -> {
                         OrderRs orderRs = orderMapper.mapToOrderRs(order);
                         return ResponseUtils.success(
@@ -237,6 +233,7 @@ public class OrderServiceImpl implements OrderService {
             return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
 //    @Override
@@ -295,6 +292,24 @@ public class OrderServiceImpl implements OrderService {
                     "userName", o.getUser().getFullName(),
                     "email", o.getUser().getEmail()
             ));
+            String sellerEmail = o.getOrderItems().stream()
+                    .map(oi -> sellerRepo.findById(oi.getSellerId())
+                            .map(SellerBO::getEmail)
+                            .orElse("N/A"))
+                    .findFirst()
+                    .orElse("N/A");
+            String sellerName = o.getOrderItems().stream()
+                    .map(oi -> sellerRepo.findById(oi.getSellerId())
+                            .map(s -> s.getFullName())  // or getSellerName() depending on field
+                            .orElse("N/A"))
+                    .findFirst()
+                    .orElse("N/A");
+
+            m.put("seller", Map.of(
+                    "sellerName",sellerName ,
+                    "email", sellerEmail
+            ));
+
             return m;
         }).toList();
 
@@ -510,55 +525,154 @@ public class OrderServiceImpl implements OrderService {
 
 
     private void sendOrderNotifications(OrderBO order) {
-
         UserBO buyer = order.getUser();
-        OrderItemBO item = order.getOrderItems().get(0); // 1st product
-        ProductBO product = item.getProduct();
-        SellerBO seller = product.getSeller();
+        String orderNo = order.getOrderId(); // This is a String
 
-        Long productImageId = null;
-        if (product.getImageFileIds() != null && !product.getImageFileIds().isEmpty()) {
-            productImageId = product.getImageFileIds().get(0);
+        // Get all unique sellers from the order
+        Set<SellerBO> uniqueSellers = order.getOrderItems().stream()
+                .map(item -> item.getProduct().getSeller())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // --------------------------------------------------
+        // 1. NOTIFY BUYER (once)
+        // --------------------------------------------------
+        Long orderImageId = null;
+        if (!order.getOrderItems().isEmpty()) {
+            ProductBO firstProduct = order.getOrderItems().get(0).getProduct();
+            if (firstProduct.getImageFileIds() != null && !firstProduct.getImageFileIds().isEmpty()) {
+                orderImageId = firstProduct.getImageFileIds().get(0);
+            }
         }
 
-        String orderNo = order.getOrderId(); // <-- String ID
-        String orderRedirect = "/orders/" + orderNo;
-// USER → Order Confirmed
         notificationService.notifyUser(
                 buyer.getId(),
                 "ORDER_PLACED",
                 "Order Confirmed",
-                "Your order #" + order.getOrderId() + " has been placed successfully",
-                productImageId,
+                "Your order #" + orderNo + " has been placed successfully",
+                orderImageId,
                 order.getId(),
                 "/account/orders"
         );
 
+        // --------------------------------------------------
+        // 2. NOTIFY EACH SELLER (for their products only)
+        // --------------------------------------------------
+        for (SellerBO seller : uniqueSellers) {
+            List<OrderItemBO> sellerItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct().getSeller().equals(seller))
+                    .toList();
 
+            String productNames;
+            Long sellerImageId = null;
 
-        // SELLER → New Order Received
-        notificationService.notifyUser(
-                seller.getId(),
-                "NEW_ORDER",
-                "New Order for " + product.getName(),
-                "Order received for product: " + product.getName(),
-                productImageId,
-                null,
-                "/seller/orders/" + orderNo
-        );
+            if (sellerItems.size() == 1) {
+                OrderItemBO item = sellerItems.get(0);
+                ProductBO product = item.getProduct();
+                productNames = product.getName();
 
-        // ADMIN → Track new order
+                if (product.getImageFileIds() != null && !product.getImageFileIds().isEmpty()) {
+                    sellerImageId = product.getImageFileIds().get(0);
+                }
+            } else {
+                productNames = sellerItems.stream()
+                        .map(item -> item.getProduct().getName())
+                        .limit(3)
+                        .collect(Collectors.joining(", "));
+
+                if (sellerItems.size() > 3) {
+                    productNames += " and " + (sellerItems.size() - 3) + " more";
+                }
+
+                ProductBO firstProduct = sellerItems.get(0).getProduct();
+                if (firstProduct.getImageFileIds() != null && !firstProduct.getImageFileIds().isEmpty()) {
+                    sellerImageId = firstProduct.getImageFileIds().get(0);
+                }
+            }
+
+            long sellerTotal = sellerItems.stream()
+                    .mapToLong(OrderItemBO::getTotalPrice)
+                    .sum();
+
+            notificationService.notifyUser(
+                    seller.getId(),
+                    "NEW_ORDER",
+                    "New Order #" + orderNo,
+                    String.format("%d item(s) ordered: %s (₹%,d)",
+                            sellerItems.size(),
+                            productNames,
+                            sellerTotal),
+                    sellerImageId,
+                    null,
+                    "/seller/orders/" + orderNo
+            );
+        }
+
+        // --------------------------------------------------
+        // 3. NOTIFY ADMIN (with ALL sellers details)
+        // --------------------------------------------------
+        String adminMessage = buildAdminNotificationMessage(buyer, order, uniqueSellers);
+
         notificationService.notifyAdmins(
                 "ORDER_PLACED",
                 "New Order Placed",
-                order.getUser().getFullName() + " bought " + product.getName(),
-                null,                 // seller
-                product,              // product reference
-                order,                // full order data
-                "/admin/orders/" + order.getId()
+                adminMessage,
+                null,
+                order.getOrderItems().get(0).getProduct(),
+                order,
+                "/admin/orders/" + orderNo  // ✅ String orderNo
         );
+    }
 
+    // --------------------------------------------------
+// ✅ FIXED: Proper String Concatenation (NO formatting errors)
+// --------------------------------------------------
+    private String buildAdminNotificationMessage(UserBO buyer, OrderBO order, Set<SellerBO> sellers) {
+        StringBuilder message = new StringBuilder();
 
+        // Header with customer and order info
+        message.append("👤 Customer: ").append(buyer.getFullName())
+                .append(" (ID: ").append(buyer.getId())
+                .append(") 📋 Order ID: ").append(order.getOrderId()) // ✅ String - just append
+                .append(" 💰 Total Amount: ₹").append(String.format("%,d", order.getTotalAmount()))
+                .append(" 💳 Payment: ").append(order.getPaymentMethod())
+                .append(" 📦 Items: ").append(order.getOrderItems().size())
+                .append(" 🔖 Status: ").append(order.getOrderStatus())
+                .append("\n\n");
+
+        // ✅ Add each seller's details
+        int sellerIndex = 1;
+        for (SellerBO seller : sellers) {
+            List<OrderItemBO> sellerItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct().getSeller().equals(seller))
+                    .toList();
+
+            if (sellerItems.isEmpty()) continue;
+
+            OrderItemBO firstItem = sellerItems.get(0);
+            ProductBO product = firstItem.getProduct();
+
+            // Build product info
+            String productInfo = product.getName();
+            if (sellerItems.size() > 1) {
+                productInfo += " (+" + (sellerItems.size() - 1) + " more)";
+            }
+
+            // Add seller details
+            message.append("👤 Seller ").append(sellerIndex++).append(": ")
+//                    .append(seller.getStoreName() != null ? seller.getStoreName() : "Unknown Store")
+                    .append(" (SLR-").append(seller.getId()).append(")")
+                    .append("\n📦 Product: ").append(productInfo)
+                    .append(" (ID: ").append(product.getId()).append(")")
+                    .append("\n📧 ").append(seller.getEmail() != null ? seller.getEmail() : "N/A");
+
+            // Add spacing between sellers (but not after the last one)
+            if (sellerIndex <= sellers.size()) {
+                message.append("\n\n");
+            }
+        }
+
+        return message.toString();
     }
 
     @Override
@@ -738,7 +852,6 @@ public class OrderServiceImpl implements OrderService {
 
         return order;
     }
-
 
 
 }

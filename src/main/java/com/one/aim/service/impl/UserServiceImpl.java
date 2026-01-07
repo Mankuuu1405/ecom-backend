@@ -72,12 +72,18 @@ public class UserServiceImpl implements UserService {
             return ResponseUtils.failure("EMAIL_EXISTS", "Email already registered.");
         }
 
-        String phone = PhoneUtils.normalize(rq.getPhoneNo());
-        if (userRepo.existsByPhoneNo(phone) ||
-                sellerRepo.existsByPhoneNo(phone) ||
-                adminRepo.existsByPhoneNo(phone)) {
-            return ResponseUtils.failure("PHONE_EXISTS", "Phone number already exists.");
+        String phone = null;
+
+        if (Utils.isNotEmpty(rq.getPhoneNo())) {
+            phone = PhoneUtils.normalize(rq.getPhoneNo());
+
+            if (userRepo.existsByPhoneNo(phone) ||
+                    sellerRepo.existsByPhoneNo(phone) ||
+                    adminRepo.existsByPhoneNo(phone)) {
+                return ResponseUtils.failure("PHONE_EXISTS", "Phone number already exists.");
+            }
         }
+
 
         UserBO user = new UserBO();
         user.setFullName(rq.getFullName());
@@ -226,7 +232,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // -----------------------------
-        // PHONE NUMBER
+        // PHONE NUMBER (OPTIONAL)
         // -----------------------------
         if (Utils.isNotEmpty(rq.getPhoneNo())) {
 
@@ -258,7 +264,9 @@ public class UserServiceImpl implements UserService {
             if (user.getImageFileId() != null) {
                 try {
                     fileService.deleteFile(user.getImageFileId());
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                    // do nothing
+                }
 
                 user.setImageFileId(null);
                 updated = true;
@@ -266,25 +274,28 @@ public class UserServiceImpl implements UserService {
         }
 
         // -----------------------------
-        // UPLOAD IMAGE (REPLACE)
+        // UPLOAD / REPLACE IMAGE
         // -----------------------------
         if (rq.getImage() != null && !rq.getImage().isEmpty()) {
 
             try {
-                // delete old image
+                // delete old image if exists
                 if (user.getImageFileId() != null) {
-                    try { fileService.deleteFile(user.getImageFileId()); }
-                    catch (Exception ignore) {}
+                    try {
+                        fileService.deleteFile(user.getImageFileId());
+                    } catch (Exception ignore) {}
                 }
 
                 FileBO uploaded = fileService.uploadAndReturnFile(rq.getImage());
                 user.setImageFileId(uploaded.getId());
+                updated = true;
 
             } catch (Exception e) {
-                return ResponseUtils.failure("EC_INVALID_IMAGE", "Failed to upload image.");
+                return ResponseUtils.failure(
+                        "EC_INVALID_IMAGE",
+                        "Failed to upload image."
+                );
             }
-
-            updated = true;
         }
 
         // -----------------------------
@@ -303,7 +314,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // -----------------------------
-        // EMAIL CHANGE (with verification)
+        // EMAIL CHANGE (WITH VERIFICATION)
         // -----------------------------
         if (Utils.isNotEmpty(rq.getEmail()) &&
                 !rq.getEmail().equalsIgnoreCase(user.getEmail())) {
@@ -334,6 +345,7 @@ public class UserServiceImpl implements UserService {
 
         return ResponseUtils.failure("NO_CHANGES", "No valid fields provided.");
     }
+
 
 
 

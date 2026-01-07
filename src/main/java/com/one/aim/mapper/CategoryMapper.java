@@ -47,6 +47,7 @@ public class CategoryMapper {
         rs.setReturnPolicyDays(bo.getReturnPolicyDays());
         rs.setCreatedAt(bo.getCreatedAt());
         rs.setUpdatedAt(bo.getUpdatedAt());
+        rs.setPopular(bo.isPopular());
 
         if (bo.getImageFileId() != null) {
             rs.setImageUrl(urlUtils.publicFile(bo.getImageFileId()));
@@ -60,16 +61,25 @@ public class CategoryMapper {
                 .name(rq.getName())
                 .slug(SlugUtils.from(rq.getName()))
                 .active(rq.isActive())
+                .popular(rq.isPopular())
                 .build();
     }
 
+
     public void updateEntity(CategoryBO bo, CategoryRq rq) {
+
         if (rq.getName() != null && !rq.getName().isBlank()) {
             bo.setName(rq.getName());
             bo.setSlug(SlugUtils.from(rq.getName()));
         }
+
+        // update active only if explicitly provided
         bo.setActive(rq.isActive());
+
+        // update popular flag
+        bo.setPopular(rq.isPopular());
     }
+
 
     public CategoryCardRs toBrowseRs(CategoryBO bo, Long productCount) {
         CategoryCardRs rs = new CategoryCardRs();

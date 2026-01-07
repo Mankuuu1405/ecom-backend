@@ -1,6 +1,9 @@
 package com.one.aim.helper;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -62,30 +65,52 @@ public class FileHelper {
         }
     }
 
+//    public static String prepareChunksDir(String subDir) {
+//
+//        if (log.isDebugEnabled()) {
+//            log.debug("Executing prepareChunksDir(subDir) ->");
+//        }
+//
+//        try {
+//            String finalPath = appendSeparator(appendSeparator(UPLOAD_ROOT_DIR, subDir), DIR_CHUNKS);
+//
+//            File dir = new File(finalPath);
+//            if (!dir.exists()) {
+//                boolean created = dir.mkdirs();
+//                if (created) {
+//                    log.info("Created upload directory: {}", dir.getAbsolutePath());
+//                } else {
+//                    log.warn("Could not create upload directory: {}", dir.getAbsolutePath());
+//                }
+//            }
+//            return finalPath;
+//        } catch (Exception e) {
+//            log.error("Exception in prepareChunksDir(subDir) ->", e);
+//            return StringConstants.EMPTY;
+//        }
+//    }
     public static String prepareChunksDir(String subDir) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Executing prepareChunksDir(subDir) ->");
-        }
+        String finalPath = appendSeparator(
+                appendSeparator(UPLOAD_ROOT_DIR, subDir),
+                DIR_CHUNKS
+        );
 
         try {
-            String finalPath = appendSeparator(appendSeparator(UPLOAD_ROOT_DIR, subDir), DIR_CHUNKS);
-
-            File dir = new File(finalPath);
-            if (!dir.exists()) {
-                boolean created = dir.mkdirs();
-                if (created) {
-                    log.info("Created upload directory: {}", dir.getAbsolutePath());
-                } else {
-                    log.warn("Could not create upload directory: {}", dir.getAbsolutePath());
-                }
-            }
-            return finalPath;
+            Path chunksDir = Paths.get(finalPath);
+            Files.createDirectories(chunksDir); 
+            log.info("Upload chunks directory ready: {}", chunksDir.toAbsolutePath());
+            return chunksDir.toString();
         } catch (Exception e) {
-            log.error("Exception in prepareChunksDir(subDir) ->", e);
-            return StringConstants.EMPTY;
+            log.error("Failed to create upload directory: {}", finalPath, e);
+            throw new IllegalStateException(
+                "Upload directory creation failed: " + finalPath,
+                e
+            );
         }
     }
+
+
 
 
     public static int getChunkSize(long fileSize) {
@@ -195,4 +220,12 @@ public class FileHelper {
             return false;
         }
     }
+    
+    public static String getChunksDir(String subDir) {
+        return appendSeparator(
+            appendSeparator(UPLOAD_ROOT_DIR, subDir),
+            DIR_CHUNKS
+        );
+    }
+
 }

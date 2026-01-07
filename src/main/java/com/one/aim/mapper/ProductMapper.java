@@ -30,6 +30,7 @@ public class ProductMapper {
     public ProductCardRs toCardRs(ProductBO bo) {
         if (bo == null) return null;
 
+
         ProductCardRs rs = new ProductCardRs();
 
         rs.setDocId(String.valueOf(bo.getId()));
@@ -42,9 +43,10 @@ public class ProductMapper {
 
         // Main Image
         if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
-            Long fileId = bo.getImageFileIds().get(0);
-            rs.setImage(urlUtils.publicFile(fileId));
+            rs.setImage(urlUtils.publicFile(bo.getImageFileIds().get(0)));
         }
+
+
 
         // Stock Status
         int stock = bo.getStock() == null ? 0 : bo.getStock();
@@ -68,8 +70,8 @@ public class ProductMapper {
     }
 
     // ================================================
-    // PRODUCT DETAILS (For Product Detail Page)
-    // ================================================
+// PRODUCT DETAILS (For Product Detail Page)
+// ================================================
     public ProductDetailsRs toDetails(ProductBO product) {
 
         ProductDetailsRs rs = new ProductDetailsRs();
@@ -87,14 +89,30 @@ public class ProductMapper {
         rs.setLowStock(product.isLowStock());
         rs.setInStock(product.getStock() != null && product.getStock() > 0);
 
-        // Images
-        List<String> imageUrls = product.getImageFileIds().stream()
+        // =====================
+        // IMAGES (ORDER AS STORED IN DB)
+        // =====================
+        List<Long> imageFileIds =
+                product.getImageFileIds() != null
+                        ? product.getImageFileIds()
+                        : Collections.emptyList();
+
+        List<String> imageUrls = imageFileIds.stream()
                 .map(urlUtils::publicFile)
                 .toList();
+
         rs.setImages(imageUrls);
 
-        // Product specifications
+        // FIRST IMAGE = THUMBNAIL
+        if (!imageUrls.isEmpty()) {
+            rs.setThumbnail(imageUrls.get(0));
+        }
+
+        // =====================
+        // PRODUCT SPECIFICATIONS
+        // =====================
         Map<String, String> details = new LinkedHashMap<>();
+
         if (product.getMaterial() != null) details.put("Material", product.getMaterial());
         if (product.getSole() != null) details.put("Sole", product.getSole());
         if (product.getClosure() != null) details.put("Closure", product.getClosure());
@@ -115,30 +133,22 @@ public class ProductMapper {
                 log.error("Error parsing specifications JSON", e);
             }
         }
+
         rs.setDetails(details);
 
-        // Rating summary
-        rs.setAverageRating(
-                product.getReviewCount() != null && product.getReviewCount() > 0
-                        ? product.getAverageRating()
-                        : null
-        );
-
-        rs.setReviewCount(
-                product.getReviewCount() != null ? product.getReviewCount() : 0L
-        );
 
 
-        // Rating distribution (placeholder for now)
-        rs.setRatingDistribution(Collections.emptyList());
+        //  NO RATINGS HERE
 
         return rs;
     }
 
 
+
+
     // ================================================
-    // PRODUCT RS (For Seller Dashboard / Admin)
-    // ================================================
+// PRODUCT RS (For Seller Dashboard / Admin)
+// ================================================
     public ProductRs toProductRs(ProductBO bo) {
         if (bo == null) {
             log.warn("ProductBO is NULL");
@@ -172,16 +182,23 @@ public class ProductMapper {
         rs.setAverageRating(bo.getAverageRating());
         rs.setReviewCount(bo.getReviewCount());
 
-        // Images
-        if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
-            List<String> imageUrls = bo.getImageFileIds().stream()
-                    .map(urlUtils::publicFile)
-                    .collect(Collectors.toList());
-            rs.setImages(imageUrls);
+        // =====================
+        // IMAGES (ORDER AS STORED IN DB)
+        // =====================
+        List<Long> imageFileIds =
+                bo.getImageFileIds() != null ? bo.getImageFileIds() : Collections.emptyList();
 
-            if (!imageUrls.isEmpty()) {
-                rs.setImage(imageUrls.get(0));
-            }
+        List<String> imageUrls = imageFileIds.stream()
+                .map(urlUtils::publicFile)
+                .toList();
+
+        rs.setImages(imageUrls);
+
+        // FIRST IMAGE = THUMBNAIL
+        if (!imageFileIds.isEmpty()) {
+            rs.setThumbnail(imageUrls.get(0));
+            rs.setImage(imageUrls.get(0));               // main image
+            rs.setThumbnailFileId(imageFileIds.get(0)); // for seller edit UI
         }
 
         rs.setInStock(bo.getStock() != null && bo.getStock() > 0);
@@ -191,22 +208,37 @@ public class ProductMapper {
         return rs;
     }
 
+
+
     // ================================================
     // REVIEW MAPPER
     // ================================================
-    private ReviewRs toReviewRs(ReviewBO review) {
+    public ReviewRs toReviewRs(ReviewBO review) {
         ReviewRs rs = new ReviewRs();
+
         rs.setId(review.getId());
         rs.setUserName(review.getUser().getFullName());
-        rs.setUserAvatar(null); // Set if you have user avatar
-        rs.setDate(review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         rs.setRating(review.getRating());
         rs.setComment(review.getComment());
         rs.setLikes(review.getLikes());
         rs.setDislikes(review.getDislikes());
         rs.setVerifiedPurchase(review.isVerified());
+        rs.setDate(
+                review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        );
+
+        //  USER AVATAR
+        if (review.getUser().getImageFileId() != null) {
+            rs.setUserAvatar(
+                    urlUtils.publicFile(review.getUser().getImageFileId())
+            );
+        } else {
+            rs.setUserAvatar(null); // frontend fallback
+        }
+
         return rs;
     }
+
 
     // ================================================
     // RATING DISTRIBUTION
