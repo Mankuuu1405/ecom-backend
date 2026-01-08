@@ -1,0 +1,857 @@
+package com.one.aim.service.impl;
+
+import com.one.aim.bo.*;
+import com.one.aim.constants.ErrorCodes;
+import com.one.aim.constants.MessageCodes;
+import com.one.aim.controller.OrderNotificationController;
+import com.one.aim.mapper.OrderMapper;
+import com.one.aim.repo.*;
+import com.one.aim.rq.OrderRq;
+import com.one.aim.rs.OrderRs;
+import com.one.aim.rs.data.OrderDataRs;
+import com.one.aim.rs.data.OrderDataRsList;
+import com.one.aim.service.*;
+import com.one.utils.AuthUtils;
+import com.one.vm.core.BaseRs;
+import com.one.vm.utils.ResponseUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.compress.utils.ArchiveUtils.sanitize;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class OrderServiceImpl implements OrderService {
+
+    private final OrderRepo orderRepo;
+    private final CartRepo cartRepo;
+    private final UserRepo userRepo;
+    private final AddressRepo addressRepo;
+    private final OrderNotificationController orderNotificationController;
+    private final InvoiceService invoiceService;
+    private final InvoiceRepo invoiceRepo;
+    private final FileService fileService;
+    private final UserActivityService userActivityService;
+    private final ProductRepo productRepo;
+    private final SellerRepo sellerRepo;
+    private final AdminSettingService adminSettingService;
+    private final OrderMapper orderMapper;
+    //Notification
+    private final NotificationService notificationService;
+
+    public BaseRs getOrders() {
+        List<OrderBO> list = orderRepo.findAll();
+        return ResponseUtils.success(
+                new OrderDataRsList("Orders loaded",
+                        orderMapper.mapToOrderRsList(list))
+        );
+
+    }
+
+//    @Override
+//    @Transactional
+//    public BaseRs placeOrder(OrderRq rq) throws Exception {
+//
+//        Long userId = AuthUtils.findLoggedInUser().getDocId();
+//        if (userId == null) {
+//            return ResponseUtils.failure("AUTH_REQUIRED", "User not authenticated");
+//        }
+//
+//        List<CartBO> cartItems = cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
+//        if (cartItems == null || cartItems.isEmpty()) {
+//            return ResponseUtils.failure("CART_EMPTY", "Your cart is empty.");
+//        }
+//
+//        long subTotal = 0L;
+//        long totalTax = 0L;
+//        long totalShipping = 0L;
+//
+//        long freeShippingAbove =
+//                adminSettingService.getLongValue("free_shipping_min_order_amount", 0);
+//
+//        long discountPercent =
+//                adminSettingService.getLongValue("global_discount_percent", 0);
+//
+//        for (CartBO cart : cartItems) {
+//
+//            ProductBO product = cart.getProduct();
+//            if (product == null || !product.isActive()) {
+//                return ResponseUtils.failure("PRODUCT_INVALID",
+//                        "Product " + cart.getPname() + " is unavailable");
+//            }
+//
+//            int qty = Math.max(cart.getQuantity(), 1);
+//            int available = Optional.ofNullable(product.getStock()).orElse(0);
+//
+//            if (available < qty) {
+//                return ResponseUtils.failure("INSUFFICIENT_STOCK",
+//                        product.getName() + " - only " + available + " left.");
+//            }
+//
+//            long linePrice = product.getPrice().longValue() * qty;
+//            subTotal += linePrice;
+//
+//            String category = sanitize(product.getCategoryName());
+//
+//            double taxPercent = adminSettingService.getDoubleValue(
+//                    "tax_" + category,
+//                    adminSettingService.getDoubleValue("default_tax_percent", 0)
+//            );
+//
+//            double shippingCharge = adminSettingService.getDoubleValue(
+//                    "shipping_" + category,
+//                    adminSettingService.getDoubleValue("delivery_charges_fixed", 0)
+//            );
+//
+//            totalTax += Math.round(linePrice * taxPercent / 100);
+//            totalShipping += Math.round(shippingCharge * qty);
+//
+//            product.setStock(available - qty);
+//            product.updateLowStock();
+//            productRepo.save(product);
+//
+//            cart.setPrice(product.getPrice().longValue());
+//            cartRepo.save(cart);
+//        }
+//
+//        long discountAmount = Math.round(subTotal * discountPercent / 100);
+//
+//        if (subTotal >= freeShippingAbove) {
+//            totalShipping = 0;
+//        }
+//
+//        // Payment gateway fee support (for Razorpay / card payments)
+//        double pgFeePercent =
+//                adminSettingService.getDoubleValue("payment_charge_percent", 0.0);
+//
+//        long pgFeeAmount = Math.round(subTotal * pgFeePercent / 100);
+//
+//        long grandTotal = subTotal + totalTax + totalShipping + pgFeeAmount - discountAmount;
+//
+//        AddressBO shippingAddress = resolveShippingAddress(rq, userId);
+//        UserBO user = userRepo.findById(userId).orElseThrow();
+//
+//        OrderBO order = new OrderBO();
+//        order.setUser(user);
+//        order.setOrderTime(LocalDateTime.now());
+//        order.setOrderStatus("INITIAL");
+//        order.setSubTotal(subTotal);
+//        order.setTaxAmount(totalTax);
+//        order.setDeliveryCharge(totalShipping);
+//        order.setDiscountAmount(discountAmount);
+//        order.setPaymentCharge(pgFeeAmount);
+//        order.setTotalAmount(grandTotal);
+//        order.setShippingAddress(shippingAddress);
+//
+//        String pm = normalizePaymentMethod(rq.getPaymentMethod());
+//        order.setPaymentMethod(pm);
+//        order.setPaymentStatus(paymentStatusFromMethod(pm));
+//
+//        order.setInvoiceno(
+//                adminSettingService.get("order_prefix")
+//                        + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"))
+//        );
+//
+//        orderRepo.save(order);
+//
+//        List<OrderItemBO> items = new ArrayList<>();
+//        for (CartBO cart : cartItems) {
+//            ProductBO product = cart.getProduct();
+//            items.add(OrderItemBO.builder()
+//                    .order(order)
+//                    .product(product)
+//                    .sellerId(product.getSeller().getId())
+//                    .productName(product.getName())
+//                    .productCategory(product.getCategoryName())
+//                    .unitPrice(cart.getPrice())
+//                    .quantity(cart.getQuantity())
+//                    .totalPrice(cart.getPrice() * cart.getQuantity())
+//                    .build());
+//        }
+//
+//        order.setOrderItems(items);
+//        orderRepo.save(order);
+//
+//        cartItems.forEach(c -> c.setEnabled(false));
+//        cartRepo.saveAll(cartItems);
+//
+//        invoiceService.generateInvoice(order.getOrderId());
+//
+//        userActivityService.log(
+//                userId,
+//                "ORDER_PLACED",
+//                "Order " + order.getOrderId() + " placed"
+//        );
+//
+//        sendOrderNotifications(order);
+//
+//        return ResponseUtils.success(Map.of(
+//                "orderId", order.getOrderId(),
+//                "subTotal", subTotal,
+//                "taxAmount", totalTax,
+//                "shipping", totalShipping,
+//                "discount", discountAmount,
+//                "paymentCharge", pgFeeAmount,
+//                "grandTotal", grandTotal,
+//                "paymentMethod", pm,
+//                "paymentStatus", order.getPaymentStatus()
+//        ));
+//    }
+
+
+
+    @Override
+    public BaseRs retrieveOrder(String orderId) throws Exception {
+        log.debug("Executing retrieveOrder() for orderId: {}", orderId);
+
+        try {
+            return orderRepo.findByOrderId(orderId)
+                    .map(order -> {
+                        OrderRs orderRs = orderMapper.mapToOrderRs(order);
+                        return ResponseUtils.success(
+                                new OrderDataRs(MessageCodes.MC_RETRIEVED_SUCCESSFUL, orderRs)
+                        );
+                    })
+                    .orElseGet(() -> {
+                        log.error(ErrorCodes.EC_ORDER_NOT_FOUND);
+                        return ResponseUtils.failure(ErrorCodes.EC_ORDER_NOT_FOUND);
+                    });
+        } catch (Exception e) {
+            log.error("Exception in retrieveOrder()", e);
+            return ResponseUtils.failure(ErrorCodes.EC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+//    @Override
+//    public BaseRs retrieveOrder(Long id) throws Exception {
+//
+//        if (log.isDebugEnabled()) {
+//            log.debug("Executing retrieveOrder() ->");
+//        }
+//        try {
+////			Optional<UserBO> optUser = userRepo.findById(AuthUtils.findLoggedInUser().getDocId());
+////			if (optUser.isEmpty()) {
+////				log.error(ErrorCodes.EC_USER_NOT_FOUND);
+////				return ResponseUtils.failure(ErrorCodes.EC_USER_NOT_FOUND);
+////			}
+//            Optional<OrderBO> optOrder = orderRepo.findById(id);
+//            if (optOrder.isEmpty()) {
+//                log.error(ErrorCodes.EC_ORDER_NOT_FOUND);
+//                return ResponseUtils.failure(ErrorCodes.EC_ORDER_NOT_FOUND);
+//            }
+//            OrderBO orderBO = optOrder.get();
+//            OrderRs orderRs = OrderMapper.mapToOrderRs(orderBO);
+//            String message = MessageCodes.MC_RETRIEVED_SUCCESSFUL;
+//            return ResponseUtils.success(new OrderDataRs(message, orderRs));
+//        } catch (Exception e) {
+//            log.error("Exception in retrieveOrder() ->" + e);
+//            return null;
+//        }
+//    }
+
+    @Override
+    public BaseRs retrieveOrders(int page, int size, String sortBy, String direction, String status) throws Exception {
+
+        Sort sort = direction.equalsIgnoreCase("ASC") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<OrderBO> pagedOrders;
+
+        // If status filter exists
+        if (status != null && !status.isBlank()) {
+            pagedOrders = orderRepo.findByOrderStatusIgnoreCase(status, pageable);
+        } else {
+            pagedOrders = orderRepo.findAll(pageable);
+        }
+
+        List<Map<String, Object>> orderList = pagedOrders.getContent().stream().map(o -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("docId", o.getOrderId());
+            m.put("orderTime", o.getOrderTime());
+            m.put("totalAmount", o.getTotalAmount());
+            m.put("status", o.getOrderStatus());
+            m.put("itemCount", o.getOrderItems().size());
+            m.put("user", Map.of(
+                    "userName", o.getUser().getFullName(),
+                    "email", o.getUser().getEmail()
+            ));
+            String sellerEmail = o.getOrderItems().stream()
+                    .map(oi -> sellerRepo.findById(oi.getSellerId())
+                            .map(SellerBO::getEmail)
+                            .orElse("N/A"))
+                    .findFirst()
+                    .orElse("N/A");
+            String sellerName = o.getOrderItems().stream()
+                    .map(oi -> sellerRepo.findById(oi.getSellerId())
+                            .map(s -> s.getFullName())  // or getSellerName() depending on field
+                            .orElse("N/A"))
+                    .findFirst()
+                    .orElse("N/A");
+
+            m.put("seller", Map.of(
+                    "sellerName",sellerName ,
+                    "email", sellerEmail
+            ));
+
+            return m;
+        }).toList();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("orders", orderList);
+        data.put("currentPage", pagedOrders.getNumber());
+        data.put("totalPages", pagedOrders.getTotalPages());
+        data.put("totalItems", pagedOrders.getTotalElements());
+        data.put("pageSize", pagedOrders.getSize());
+
+        return ResponseUtils.success(data);
+    }
+
+//    @Override
+//    public BaseRs retrieveOrders() throws Exception {
+//        return null;
+//    }
+
+
+    @Override
+    public void updateDeliveryStatus(String orderId, String status) {
+        // no-op
+    }
+
+    @Override
+    public BaseRs retrieveOrdersUser() throws Exception {
+        Long userId = AuthUtils.getLoggedUserId();
+
+        List<OrderBO> orders =
+                orderRepo.findAllByUser_IdOrderByOrderTimeDesc(userId);
+
+        userActivityService.log(
+                userId,
+                "VIEW_ORDERS",
+                "Viewed order history"
+        );
+
+        return ResponseUtils.success(
+                orderMapper.mapToOrderRsList(orders)
+        );
+    }
+
+    @Override
+    public BaseRs retrieveAllOrders() throws Exception {
+        return ResponseUtils.success("Not implemented yet");
+    }
+
+    @Override
+    @Transactional
+    public BaseRs cancelOrder(String orderId) throws Exception {
+
+        Long userId = AuthUtils.findLoggedInUser().getDocId();
+        if (userId == null)
+            throw new RuntimeException("User not authenticated");
+
+        OrderBO order = orderRepo.findByOrderId(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getId().equals(userId)) {
+            return ResponseUtils.failure("NOT_ALLOWED", "You cannot cancel this order.");
+        }
+
+        if (!"INITIAL".equalsIgnoreCase(order.getOrderStatus())) {
+            return ResponseUtils.failure("CANNOT_CANCEL", "Order already processed");
+        }
+
+        // restore stock
+        for (OrderItemBO item : order.getOrderItems()) {
+
+            ProductBO product = item.getProduct();
+            if (product != null) {
+                int current = product.getStock() == null ? 0 : product.getStock();
+                int qty = item.getQuantity();
+                product.setStock(current + qty);
+                product.updateLowStock();
+                productRepo.save(product);
+            }
+        }
+
+
+        order.setOrderStatus("CANCELLED");
+        order.setPaymentStatus("CANCELLED");
+        orderRepo.save(order);
+
+        userActivityService.log(
+                userId,
+                "ORDER_CANCELLED",
+                "Cancelled order ID: " + order.getOrderId()
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderId", order.getOrderId());
+        response.put("orderStatus", order.getOrderStatus());
+        response.put("paymentStatus", order.getPaymentStatus());
+
+        return ResponseUtils.success(response);
+    }
+
+    @Override
+    public BaseRs retrieveOrdersForSeller(
+            int page,
+            int size,
+            String sortBy,
+            String direction,
+            String status
+    ) throws Exception {
+
+        String email = AuthUtils.findLoggedInUser().getEmail();
+
+        SellerBO seller = sellerRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        Long sellerId = seller.getId();
+
+        Sort sort = direction.equalsIgnoreCase("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<OrderBO> pagedOrders =
+                orderRepo.findOrdersForSeller(sellerId, status, pageable);
+
+        List<OrderRs> orderList =
+                orderMapper.mapToOrderRsList(pagedOrders.getContent());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orders", orderList);
+        response.put("page", pagedOrders.getNumber());
+        response.put("size", pagedOrders.getSize());
+        response.put("totalPages", pagedOrders.getTotalPages());
+        response.put("totalElements", pagedOrders.getTotalElements());
+        response.put("isLast", pagedOrders.isLast());
+
+        return ResponseUtils.success(response);
+    }
+
+
+    private double getAdminValue(String key, double defaultValue) {
+        try {
+            String v = adminSettingService.get(key);
+            return (v == null || v.isBlank()) ? defaultValue : Double.parseDouble(v);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private double getTaxPercent(ProductBO product) {
+        String cat = Optional.ofNullable(product.getCategoryName())
+                .orElse("")
+                .toLowerCase()
+                .replace(" ", "_");
+
+        return getAdminValue("tax_" + cat,
+                getAdminValue("default_tax_percent", 0));
+    }
+
+    private double getShippingCharge(ProductBO product) {
+        String cat = Optional.ofNullable(product.getCategoryName())
+                .orElse("")
+                .toLowerCase()
+                .replace(" ", "_");
+
+        return 0;
+    }
+
+
+    private double parseDoubleSafe(String key, double defaultValue) {
+        try {
+            String v = adminSettingService.get(key);
+            return (v == null || v.isBlank()) ? defaultValue : Double.parseDouble(v);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private String normalizePaymentMethod(String pm) {
+        if (pm == null) return "COD";
+        return pm.trim().toUpperCase();
+    }
+
+    private String paymentStatusFromMethod(String pm) {
+        return pm.equals("COD") ? "COD_PENDING" : "CREATED";
+    }
+
+    private AddressBO resolveShippingAddress(OrderRq rq, Long userId) {
+        if (rq.getAddressId() != null) {
+            AddressBO address = addressRepo.findById(rq.getAddressId())
+                    .orElseThrow(() -> new RuntimeException("Invalid addressId"));
+
+            if (!address.getUserid().equals(userId))
+                throw new RuntimeException("Address does not belong to user");
+
+            return address;
+        }
+
+        return addressRepo.findFirstByUseridAndIsDefault(userId, true)
+                .orElseThrow(() -> new RuntimeException("No default address found"));
+    }
+
+
+    private SellerBO findSellerFromOrder(OrderBO order) {
+
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+            return null;
+        }
+
+        OrderItemBO item = order.getOrderItems().get(0);
+        ProductBO product = item.getProduct();
+
+        return product != null ? product.getSeller() : null;
+    }
+
+
+    private void sendOrderNotifications(OrderBO order) {
+        UserBO buyer = order.getUser();
+        String orderNo = order.getOrderId(); // This is a String
+
+        // Get all unique sellers from the order
+        Set<SellerBO> uniqueSellers = order.getOrderItems().stream()
+                .map(item -> item.getProduct().getSeller())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // --------------------------------------------------
+        // 1. NOTIFY BUYER (once)
+        // --------------------------------------------------
+        Long orderImageId = null;
+        if (!order.getOrderItems().isEmpty()) {
+            ProductBO firstProduct = order.getOrderItems().get(0).getProduct();
+            if (firstProduct.getImageFileIds() != null && !firstProduct.getImageFileIds().isEmpty()) {
+                orderImageId = firstProduct.getImageFileIds().get(0);
+            }
+        }
+
+        notificationService.notifyUser(
+                buyer.getId(),
+                "ORDER_PLACED",
+                "Order Confirmed",
+                "Your order #" + orderNo + " has been placed successfully",
+                orderImageId,
+                order.getId(),
+                "/account/orders"
+        );
+
+        // --------------------------------------------------
+        // 2. NOTIFY EACH SELLER (for their products only)
+        // --------------------------------------------------
+        for (SellerBO seller : uniqueSellers) {
+            List<OrderItemBO> sellerItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct().getSeller().equals(seller))
+                    .toList();
+
+            String productNames;
+            Long sellerImageId = null;
+
+            if (sellerItems.size() == 1) {
+                OrderItemBO item = sellerItems.get(0);
+                ProductBO product = item.getProduct();
+                productNames = product.getName();
+
+                if (product.getImageFileIds() != null && !product.getImageFileIds().isEmpty()) {
+                    sellerImageId = product.getImageFileIds().get(0);
+                }
+            } else {
+                productNames = sellerItems.stream()
+                        .map(item -> item.getProduct().getName())
+                        .limit(3)
+                        .collect(Collectors.joining(", "));
+
+                if (sellerItems.size() > 3) {
+                    productNames += " and " + (sellerItems.size() - 3) + " more";
+                }
+
+                ProductBO firstProduct = sellerItems.get(0).getProduct();
+                if (firstProduct.getImageFileIds() != null && !firstProduct.getImageFileIds().isEmpty()) {
+                    sellerImageId = firstProduct.getImageFileIds().get(0);
+                }
+            }
+
+            long sellerTotal = sellerItems.stream()
+                    .mapToLong(OrderItemBO::getTotalPrice)
+                    .sum();
+
+            notificationService.notifyUser(
+                    seller.getId(),
+                    "NEW_ORDER",
+                    "New Order #" + orderNo,
+                    String.format("%d item(s) ordered: %s (₹%,d)",
+                            sellerItems.size(),
+                            productNames,
+                            sellerTotal),
+                    sellerImageId,
+                    null,
+                    "/seller/orders/" + orderNo
+            );
+        }
+
+        // --------------------------------------------------
+        // 3. NOTIFY ADMIN (with ALL sellers details)
+        // --------------------------------------------------
+        String adminMessage = buildAdminNotificationMessage(buyer, order, uniqueSellers);
+
+        notificationService.notifyAdmins(
+                "ORDER_PLACED",
+                "New Order Placed",
+                adminMessage,
+                null,
+                order.getOrderItems().get(0).getProduct(),
+                order,
+                "/admin/orders/" + orderNo  // ✅ String orderNo
+        );
+    }
+
+    // --------------------------------------------------
+// ✅ FIXED: Proper String Concatenation (NO formatting errors)
+// --------------------------------------------------
+    private String buildAdminNotificationMessage(UserBO buyer, OrderBO order, Set<SellerBO> sellers) {
+        StringBuilder message = new StringBuilder();
+
+        // Header with customer and order info
+        message.append("👤 Customer: ").append(buyer.getFullName())
+                .append(" (ID: ").append(buyer.getId())
+                .append(") 📋 Order ID: ").append(order.getOrderId()) // ✅ String - just append
+                .append(" 💰 Total Amount: ₹").append(String.format("%,d", order.getTotalAmount()))
+                .append(" 💳 Payment: ").append(order.getPaymentMethod())
+                .append(" 📦 Items: ").append(order.getOrderItems().size())
+                .append(" 🔖 Status: ").append(order.getOrderStatus())
+                .append("\n\n");
+
+        // ✅ Add each seller's details
+        int sellerIndex = 1;
+        for (SellerBO seller : sellers) {
+            List<OrderItemBO> sellerItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct().getSeller().equals(seller))
+                    .toList();
+
+            if (sellerItems.isEmpty()) continue;
+
+            OrderItemBO firstItem = sellerItems.get(0);
+            ProductBO product = firstItem.getProduct();
+
+            // Build product info
+            String productInfo = product.getName();
+            if (sellerItems.size() > 1) {
+                productInfo += " (+" + (sellerItems.size() - 1) + " more)";
+            }
+
+            // Add seller details
+            message.append("👤 Seller ").append(sellerIndex++).append(": ")
+//                    .append(seller.getStoreName() != null ? seller.getStoreName() : "Unknown Store")
+                    .append(" (SLR-").append(seller.getId()).append(")")
+                    .append("\n📦 Product: ").append(productInfo)
+                    .append(" (ID: ").append(product.getId()).append(")")
+                    .append("\n📧 ").append(seller.getEmail() != null ? seller.getEmail() : "N/A");
+
+            // Add spacing between sellers (but not after the last one)
+            if (sellerIndex <= sellers.size()) {
+                message.append("\n\n");
+            }
+        }
+
+        return message.toString();
+    }
+
+    @Override
+    public long calculateCartTotal(Long userId) {
+
+        List<CartBO> carts =
+                cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
+
+        if (carts == null || carts.isEmpty()) {
+            return 0;
+        }
+
+        long total = 0;
+        for (CartBO cart : carts) {
+            int qty = Math.max(cart.getQuantity(), 1);
+            total += cart.getProduct().getPrice().longValue() * qty;
+        }
+        return total;
+    }
+
+    @Override
+    @Transactional
+    public OrderBO placeOrderAfterPayment(
+            Long userId,
+            String paymentMethod,
+            PaymentBO payment, AddressBO shippingAddress) throws Exception {
+
+
+
+        // --------------------------------------------------
+        // 1. FETCH CART
+        // --------------------------------------------------
+        List<CartBO> cartItems =
+                cartRepo.findAllByUserAddToCart_IdAndEnabled(userId, true);
+
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new RuntimeException("CART_EMPTY");
+        }
+
+        long subTotal = 0L;
+        long totalTax = 0L;
+        long totalShipping = 0L;
+
+        long freeShippingAbove =
+                adminSettingService.getLongValue("free_shipping_min_order_amount", 0);
+
+        long discountPercent =
+                adminSettingService.getLongValue("global_discount_percent", 0);
+
+        // --------------------------------------------------
+        // 2. VALIDATE STOCK + CALCULATE PRICE
+        // --------------------------------------------------
+        for (CartBO cart : cartItems) {
+
+            ProductBO product = cart.getProduct();
+            if (product == null || !product.isActive()) {
+                throw new RuntimeException(
+                        "Product " + cart.getPname() + " unavailable"
+                );
+            }
+
+            int qty = Math.max(cart.getQuantity(), 1);
+            int available = Optional.ofNullable(product.getStock()).orElse(0);
+
+            if (available < qty) {
+                throw new RuntimeException(
+                        product.getName() + " - only " + available + " left."
+                );
+            }
+
+            long linePrice = product.getPrice().longValue() * qty;
+            subTotal += linePrice;
+
+            String category = sanitize(product.getCategoryName());
+
+            double taxPercent = adminSettingService.getDoubleValue(
+                    "tax_" + category,
+                    adminSettingService.getDoubleValue("default_tax_percent", 0)
+            );
+
+            double shippingCharge = adminSettingService.getDoubleValue(
+                    "shipping_" + category,
+                    adminSettingService.getDoubleValue("delivery_charges_fixed", 0)
+            );
+
+            totalTax += Math.round(linePrice * taxPercent / 100);
+            totalShipping += Math.round(shippingCharge * qty);
+
+            //  STOCK REDUCTION (SAFE NOW – PAYMENT DONE)
+            product.setStock(available - qty);
+            product.updateLowStock();
+            productRepo.save(product);
+
+            cart.setPrice(product.getPrice().longValue());
+            cartRepo.save(cart);
+        }
+
+        long discountAmount = Math.round(subTotal * discountPercent / 100);
+
+        if (subTotal >= freeShippingAbove) {
+            totalShipping = 0;
+        }
+
+        long pgFeeAmount = 0; // payment already done
+
+        long grandTotal =
+                subTotal + totalTax + totalShipping + pgFeeAmount - discountAmount;
+
+        // --------------------------------------------------
+        // 3. CREATE ORDER
+        // --------------------------------------------------
+        UserBO user = userRepo.findById(userId).orElseThrow();
+
+        OrderBO order = new OrderBO();
+        order.setUser(user);
+        order.setShippingAddress(shippingAddress);
+        order.setOrderTime(LocalDateTime.now());
+        order.setOrderStatus("PLACED");
+        order.setPaymentMethod(paymentMethod);
+        order.setPaymentStatus(paymentMethod.equals("COD") ? "COD_PENDING" : "PAID");
+        order.setSubTotal(subTotal);
+        order.setTaxAmount(totalTax);
+        order.setDeliveryCharge(totalShipping);
+        order.setDiscountAmount(discountAmount);
+        order.setPaymentCharge(pgFeeAmount);
+        order.setTotalAmount(grandTotal);
+
+        order.setInvoiceno(
+                adminSettingService.get("order_prefix")
+                        + LocalDateTime.now().format(
+                        DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")
+                )
+        );
+
+        orderRepo.save(order);
+
+        // --------------------------------------------------
+        // 4. ORDER ITEMS
+        // --------------------------------------------------
+        List<OrderItemBO> items = new ArrayList<>();
+        for (CartBO cart : cartItems) {
+            ProductBO product = cart.getProduct();
+
+            items.add(OrderItemBO.builder()
+                    .order(order)
+                    .product(product)
+                    .sellerId(product.getSeller().getId())
+                    .productName(product.getName())
+                    .productCategory(product.getCategoryName())
+                    .unitPrice(cart.getPrice())
+                    .quantity(cart.getQuantity())
+                    .totalPrice(cart.getPrice() * cart.getQuantity())
+                    .build());
+        }
+
+        order.setOrderItems(items);
+        orderRepo.save(order);
+
+        // --------------------------------------------------
+        // 5. DISABLE CART
+        // --------------------------------------------------
+        cartItems.forEach(c -> c.setEnabled(false));
+        cartRepo.saveAll(cartItems);
+
+        // --------------------------------------------------
+        // 6. POST-ORDER ACTIONS
+        // --------------------------------------------------
+        invoiceService.generateInvoice(order.getOrderId());
+
+        userActivityService.log(
+                userId,
+                "ORDER_PLACED",
+                "Order " + order.getOrderId() + " placed"
+        );
+
+        sendOrderNotifications(order);
+
+        return order;
+    }
+
+
+}
