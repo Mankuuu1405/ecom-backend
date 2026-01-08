@@ -264,7 +264,7 @@ public class OrderServiceImpl implements OrderService {
 //    }
 
     @Override
-    public BaseRs retrieveOrders(int page, int size, String sortBy, String direction, String status) throws Exception {
+    public BaseRs retrieveOrders(int page, int size, String sortBy, String direction, String status, String paymentMethod) throws Exception {
 
         Sort sort = direction.equalsIgnoreCase("ASC") ?
                 Sort.by(sortBy).ascending() :
@@ -288,6 +288,7 @@ public class OrderServiceImpl implements OrderService {
             m.put("totalAmount", o.getTotalAmount());
             m.put("status", o.getOrderStatus());
             m.put("itemCount", o.getOrderItems().size());
+            m.put("paymentMethod", o.getPaymentMethod());
             m.put("user", Map.of(
                     "userName", o.getUser().getFullName(),
                     "email", o.getUser().getEmail()

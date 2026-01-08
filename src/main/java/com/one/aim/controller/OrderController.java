@@ -150,10 +150,11 @@ public class OrderController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "orderTime") String sortBy,
             @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) String paymentMethod,
             @RequestParam(required = false) String status
     ) throws Exception {
         return ResponseEntity.ok(
-                orderService.retrieveOrders(page, size, sortBy, direction, status)
+                orderService.retrieveOrders(page, size, sortBy, direction, status , paymentMethod)
         );
     }
 
