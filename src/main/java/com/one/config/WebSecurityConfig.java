@@ -135,7 +135,9 @@ public class WebSecurityConfig {
                                 "/api/files/public/**",
                                 "/api/public/pdp/**",
 				"/api/debug/config",
-				"/api/category/all"
+				"/api/category/all",
+                                "/api/debug/config",
+                                "/api/public/promotions/active"
                         ).permitAll()
 
                         // ======================================

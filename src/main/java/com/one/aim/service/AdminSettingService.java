@@ -34,5 +34,8 @@ public interface AdminSettingService {
 
 
     boolean getBooleanValue(String key, boolean defaultValue);
+
+    byte[] getSellerDetailsPdf(String sellerId);
+
 }
 

@@ -1,6 +1,9 @@
 package com.one.aim.service.impl;
 
+import com.one.aim.bo.BannerBO;
 import com.one.aim.bo.ProductBO;
+import com.one.aim.bo.PromotionBO;
+import com.one.aim.constants.ContentStatus;
 import com.one.aim.mapper.CategoryMapper;
 import com.one.aim.mapper.ProductMapper;
 import com.one.aim.repo.*;
@@ -35,6 +38,7 @@ public class HomePageServiceImpl implements HomePageService {
     private final UrlUtils urlUtils;
     private final ReviewRepository reviewRepo;
     private final BlogRepo blogRepo;
+    private final PromotionRepository promotionRepo;
 
     @Override
     public HomePageRs getHomePage(int limit) {
@@ -82,19 +86,26 @@ public class HomePageServiceImpl implements HomePageService {
             );
         }
 
+        List<PromotionRs> promotions = getActivePromotions(2);
+
+        if (!promotions.isEmpty()) {
+            sections.add(HomeSectionRs.promotions(
+                    "Special Offers",
+                    promotions
+            ));
+        }
 
         // =========================
 // BLOGS
 // =========================
-        List<BlogCardRs> blogs = getBlogs(3);
+        List<BlogCardRs> blogs = getPublishedBlogs(3);
 
         if (!blogs.isEmpty()) {
-            sections.add(
-                    HomeSectionRs.blogs(
-                            "From Our Blog",
-                            blogs
-                    )
-            );
+            sections.add(HomeSectionRs.blogs(
+                    "From Our Blog",
+                    blogs,
+                    "/blog"
+            ));
         }
 
 
@@ -128,7 +139,7 @@ public class HomePageServiceImpl implements HomePageService {
         // FINAL RESPONSE
         // =========================
         return HomePageRs.builder()
-                .banners(getBanners())
+                .banners(getActiveBanners())
                 .sections(sections)
                 .build();
     }
@@ -191,20 +202,29 @@ public class HomePageServiceImpl implements HomePageService {
     // ======================================================
     // BANNERS (ABSOLUTE IMAGE URL)
     // ======================================================
-    private List<BannerRs> getBanners() {
+    private List<BannerRs> getActiveBanners() {
+        LocalDateTime now = LocalDateTime.now();
 
-        return bannerRepo.findActiveBanners()
-                .stream()
-                .map(b -> new BannerRs(
-                        b.getId(),
-                        b.getTitle(),
-                        b.getSubtitle(),
-                        b.getImageFileId() != null
-                                ? urlUtils.publicFile(b.getImageFileId())
-                                : urlUtils.defaultBanner(),
-                        b.getButtonText(),
-                        b.getButtonLink()
-                ))
+        // Get all PUBLISHED banners that are currently active
+        List<BannerBO> activeBanners = bannerRepo.findActiveBanners(
+                ContentStatus.PUBLISHED,
+                now
+        );
+
+        return activeBanners.stream()
+                .sorted(Comparator.comparing(BannerBO::getPriority).reversed())
+                .map(banner -> BannerRs.builder()
+                        .id(banner.getId())
+                        .title(banner.getTitle())
+                        .subtitle(banner.getSubtitle())
+                        .imageUrl(banner.getImageFileId() != null
+                                ? urlUtils.publicFile(banner.getImageFileId())
+                                : urlUtils.defaultBanner())
+                        .buttonText(banner.getButtonText())
+                        .buttonLink(banner.getButtonLink())
+                        .priority(banner.getPriority())
+                        .position(banner.getPosition())
+                        .build())
                 .toList();
     }
 
@@ -231,19 +251,82 @@ public class HomePageServiceImpl implements HomePageService {
     }
 
 
-    private List<BlogCardRs> getBlogs(int limit) {
+    private List<BlogCardRs> getPublishedBlogs(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
-        return blogRepo.findByActiveTrueOrderByCreatedAtDesc(pageable)
+
+        // Get only PUBLISHED blogs, ordered by publish date
+        return blogRepo.findByStatus(ContentStatus.PUBLISHED, pageable)
+                .getContent()
                 .stream()
-                .map(b -> new BlogCardRs(
-                        b.getTitle(),
-                        b.getSlug(),
-                        urlUtils.publicFile(b.getImageFileId())
-                ))
+                .map(blog -> BlogCardRs.builder()
+                        .id(blog.getId())
+                        .title(blog.getTitle())
+                        .slug(blog.getSlug())
+                        .imageUrl(blog.getImageFileId() != null
+                                ? urlUtils.publicFile(blog.getImageFileId())
+                                : urlUtils.defaultImage())
+                        .metaDescription(blog.getMetaDescription())
+                        .author(blog.getAuthor())
+                        .publishedAt(blog.getPublishedAt())
+                        .viewCount(blog.getViewCount())
+                        .build())
                 .toList();
     }
 
+    private List<PromotionRs> getActivePromotions(int limit) {
+        LocalDateTime now = LocalDateTime.now();
 
+        // Get all active promotions (PUBLISHED status, within date range)
+        List<PromotionBO> activePromotions = promotionRepo.findActivePromotions(
+                ContentStatus.PUBLISHED,
+                now
+        );
 
+        return activePromotions.stream()
+                .sorted(Comparator.comparing(PromotionBO::getPriority).reversed())
+                .limit(limit)
+                .map(promo -> PromotionRs.builder()
+                        .id(promo.getId())
+                        .title(promo.getTitle())
+                        .description(promo.getDescription())
+                        .imageUrl(promo.getImageFileId() != null
+                                ? urlUtils.publicFile(promo.getImageFileId())
+                                : urlUtils.defaultImage())
+                        .discountPercentage(promo.getDiscountPercentage())
+                        .discountCode(promo.getDiscountCode())
+                        .startDate(promo.getStartDate())
+                        .endDate(promo.getEndDate())
+                        .build())
+                .toList();
+    }
+
+    private String getTimeAgo(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "recently";
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        long days = java.time.Duration.between(dateTime, now).toDays();
+
+        if (days == 0) {
+            long hours = java.time.Duration.between(dateTime, now).toHours();
+            if (hours == 0) {
+                long minutes = java.time.Duration.between(dateTime, now).toMinutes();
+                return minutes + " minute" + (minutes != 1 ? "s" : "") + " ago";
+            }
+            return hours + " hour" + (hours != 1 ? "s" : "") + " ago";
+        } else if (days < 7) {
+            return days + " day" + (days != 1 ? "s" : "") + " ago";
+        } else if (days < 30) {
+            long weeks = days / 7;
+            return weeks + " week" + (weeks != 1 ? "s" : "") + " ago";
+        } else if (days < 365) {
+            long months = days / 30;
+            return months + " month" + (months != 1 ? "s" : "") + " ago";
+        } else {
+            long years = days / 365;
+            return years + " year" + (years != 1 ? "s" : "") + " ago";
+        }
+    }
 }
 

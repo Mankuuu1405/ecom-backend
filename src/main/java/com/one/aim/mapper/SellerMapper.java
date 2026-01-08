@@ -47,6 +47,8 @@ public class SellerMapper {
             rs.setImageUrl(urlUtils.privateFile(bo.getImageFileId()));
         }
 
+        rs.setResumePdfUrl("/aimdev/api/admin/seller/" + bo.getSellerId() + "/resume.pdf");
+
 
         return rs;
     }

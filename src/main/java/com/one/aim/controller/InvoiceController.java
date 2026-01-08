@@ -1,8 +1,6 @@
 package com.one.aim.controller;
 
-import com.itextpdf.html2pdf.HtmlConverter;
 import com.one.aim.bo.InvoiceBO;
-import com.one.aim.bo.OrderBO;
 import com.one.aim.bo.SellerBO;
 import com.one.aim.constants.ErrorCodes;
 import com.one.aim.repo.SellerRepo;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.one.aim.service.InvoiceService;
+<<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
@@ -26,6 +25,9 @@ import java.util.Map;
 
 
 @Slf4j
+=======
+
+>>>>>>> f1e4a1a (Backup local backend changes before pull)
 @RestController
 @RequestMapping("/api/invoice")
 @RequiredArgsConstructor

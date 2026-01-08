@@ -55,12 +55,21 @@ public class HomeSectionRs {
                 .build();
     }
 
-    // ===================== BLOGS =====================
-    public static HomeSectionRs blogs(String title, List<BlogCardRs> items) {
+    public static HomeSectionRs promotions(String title, List<PromotionRs> promotions) {
         return HomeSectionRs.builder()
                 .title(title)
-                .type("BLOGS")
-                .items(items)
+                .type("promotions")
+                .viewAllUrl(null)
+                .items(promotions)
+                .build();
+    }
+    // ===================== BLOGS =====================
+    public static HomeSectionRs blogs(String title, List<BlogCardRs> blogs, String link) {
+        return HomeSectionRs.builder()
+                .title(title)
+                .type("blogs")
+                .viewAllUrl(link)
+                .items(blogs)
                 .build();
     }
 }

@@ -188,4 +188,21 @@ public class AdminSettingController {
                 .body(zipBytes);
     }
 
+    @GetMapping("/{sellerId}/resume.pdf")
+    public ResponseEntity<byte[]> downloadSellerResume(@PathVariable String sellerId) {
+        log.info("🚀 Controller hit for seller resume download: {}", sellerId);
+
+        byte[] pdfBytes = adminSettingService.getSellerDetailsPdf(sellerId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"seller-" + sellerId + "-resume.pdf\"");
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        log.info("📤 Sending PDF file ({} bytes)", pdfBytes.length);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(pdfBytes.length)
+                .body(pdfBytes);
+    }
 }

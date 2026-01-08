@@ -9,21 +9,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
-@RequestMapping("/api/admin/blogs")
-@RequiredArgsConstructor
-@Transactional
-public class AdminBlogController {
-
-    private final BlogService blogService;
-
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createBlog(
-            @ModelAttribute BlogCreateRq rq,
-            @RequestPart("image") MultipartFile image
-    ) throws Exception {
-        blogService.createBlog(rq, image);
-        return ResponseEntity.ok("Blog created successfully");
-    }
-}
+//@RestController
+//@RequestMapping("/api/admin/blogs")
+//@RequiredArgsConstructor
+//@Transactional
+//public class AdminBlogController {
+//
+//    private final BlogService blogService;
+//
+//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<?> createBlog(
+//            @ModelAttribute BlogCreateRq rq,
+//            @RequestPart("image") MultipartFile image
+//    ) throws Exception {
+//        blogService.createBlog(rq, image);
+//        return ResponseEntity.ok("Blog created successfully");
+//    }
+//}
 

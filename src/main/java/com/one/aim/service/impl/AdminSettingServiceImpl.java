@@ -1,5 +1,10 @@
 package com.one.aim.service.impl;
 
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.Image;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import com.one.aim.bo.AdminSettingsBO;
 import com.one.aim.bo.FileBO;
 import com.one.aim.bo.SellerBO;
@@ -10,12 +15,15 @@ import com.one.aim.repo.SellerRepo;
 import com.one.aim.rs.SellerRs;
 import com.one.aim.service.AdminSettingService;
 import com.one.aim.service.EmailService;
+import com.one.utils.UrlUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import com.lowagie.text.Document;
 
 import java.io.ByteArrayOutputStream;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +41,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     private final EmailService emailService;
     private final FileRepo fileRepo;
     private final SellerMapper sellerMapper;
+    private final UrlUtils urlUtils;
 
     @PostConstruct
     public void init() {
@@ -296,6 +305,116 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             return defaultValue;
         }
     }
+
+    @Override
+    public byte[] getSellerDetailsPdf(String sellerId) {
+        log.info("📥 Generating Resume PDF for sellerId: {}", sellerId);
+
+        SellerBO seller = sellerRepo.findBySellerId(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        log.info("🧾 Seller → name: {}, email: {}, phone: {}, imageFileId: {}",
+                seller.getFullName(), seller.getEmail(), seller.getPhoneNo(), seller.getImageFileId());
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            Document doc = new Document();
+            PdfWriter.getInstance(doc, baos);
+            doc.open();
+            log.info("🖨 PDF document opened");
+
+            // ---------- Embed Seller Image (DB → fallback to Disk) ----------
+            if (seller.getImageFileId() != null) {
+                Long imageId = seller.getImageFileId();
+                log.info("🖼 Seller has imageFileId linked → {}", imageId);
+
+                FileBO imageFile = fileRepo.findById(imageId).orElse(null);
+
+                if (imageFile != null && imageFile.getInputstream() != null && imageFile.getInputstream().length > 0) {
+                    log.info("🖼 Embedding image from DB → name: {}", imageFile.getName());
+                    try {
+                        Image img = Image.getInstance(imageFile.getInputstream());
+                        img.scaleToFit(100, 100);
+                        img.setAlignment(Image.ALIGN_CENTER);
+                        doc.add(img);
+                        log.info("✔ Image embedded from DB successfully");
+                    } catch (Exception imgErr) {
+                        log.error("🔥 Failed to embed DB image for fileId {} → {}", imageId, imgErr.getMessage());
+                    }
+                } else {
+                    log.warn("⚠ DB image is missing/empty for fileId {}, trying disk fallback...", imageId);
+
+                    try {
+                        String diskPath = urlUtils.privateFile(seller.getImageFileId());// stored path in DB (example: "/api/files/private/2/view")
+                        if (diskPath != null) {
+                            // convert to actual local file system path if stored
+                            String localDiskPath = diskPath.startsWith("/") ? diskPath.substring(1) : diskPath;
+                            log.info("🗂 Disk fallback path → {}", localDiskPath);
+
+                            Image img = Image.getInstance(localDiskPath);
+                            img.scaleToFit(100, 100);
+                            img.setAlignment(Image.ALIGN_CENTER);
+                            doc.add(img);
+                            log.info("✔ Image embedded using disk fallback");
+                        } else {
+                            log.warn("⚠ No valid disk path stored for seller {}", seller.getSellerId());
+                        }
+                    } catch (Exception diskErr) {
+                        log.error("🔥 Disk fallback failed for fileId {} → {}", imageId, diskErr.getMessage());
+                    }
+                }
+            } else {
+                log.info("ℹ No imageFileId linked to seller {}", seller.getSellerId());
+            }
+
+            // ---------- Resume Text Section ----------
+            doc.add(new Paragraph("\n"));
+
+            Font titleFont = new Font(Font.HELVETICA, 16, Font.BOLD);
+            Paragraph title = new Paragraph(seller.getFullName(), titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            doc.add(title);
+
+            doc.add(new Paragraph("\n"));
+
+            Font sectionFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+            doc.add(new Paragraph("Contact Information", sectionFont));
+            doc.add(new Paragraph("Email: " + seller.getEmail()));
+            doc.add(new Paragraph("Phone: " + seller.getPhoneNo()));
+
+            doc.add(new Paragraph("\n"));
+
+            doc.add(new Paragraph("Business Details", sectionFont));
+            doc.add(new Paragraph("GSTIN: " + seller.getGst()));
+            doc.add(new Paragraph("PAN: " + seller.getPanCard()));
+            doc.add(new Paragraph("Aadhaar: " + seller.getAdhaar()));
+
+            doc.add(new Paragraph("\n"));
+
+//            doc.add(new Paragraph("Account Status", sectionFont));
+//            doc.add(new Paragraph("Verified: " + seller.isVerified()));
+//            doc.add(new Paragraph("Locked: " + seller.isLocked()));
+//            doc.add(new Paragraph("Rejected: " + seller.isRejected()));
+
+            doc.add(new Paragraph("\n"));
+
+            Font footerFont = new Font(Font.HELVETICA, 10, Font.ITALIC);
+            Paragraph footer = new Paragraph("Created On: " + seller.getCreatedAt(), footerFont);
+            footer.setAlignment(Element.ALIGN_CENTER);
+            doc.add(footer);
+
+            doc.close();
+            log.info("📤 PDF generation complete ({} bytes)", baos.size());
+
+        } catch (Exception e) {
+            log.error("🔥 PDF GENERATION FAILED → {}", e.getMessage());
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
+
+        return baos.toByteArray();
+    }
+
 
 
     private void initSettingIfMissing(String key, String defaultValue) {

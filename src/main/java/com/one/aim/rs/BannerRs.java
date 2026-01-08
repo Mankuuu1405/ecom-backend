@@ -1,20 +1,29 @@
 package com.one.aim.rs;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.one.aim.constants.ContentStatus;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BannerRs {
     private Long id;
     private String title;
     private String subtitle;
-    private String image;
+    private Long imageFileId;
+    private String imageUrl;
     private String buttonText;
     private String buttonLink;
+    private ContentStatus status;
+    private LocalDateTime scheduledPublishAt;
+    private LocalDateTime scheduledUnpublishAt;
+    private Integer priority;
+    private String position;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 
