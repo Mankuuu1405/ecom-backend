@@ -62,4 +62,3 @@ public class BlogBO {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 }
-

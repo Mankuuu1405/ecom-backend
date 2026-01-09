@@ -29,4 +29,3 @@ public class BlogCardRs {
     private LocalDateTime updatedAt;
     private LocalDateTime publishedAt;
 }
-

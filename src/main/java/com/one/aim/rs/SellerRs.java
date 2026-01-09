@@ -33,4 +33,5 @@ public class SellerRs implements Serializable {
     private boolean emailVerified;
     private LocalDateTime createdAt;
     private String resumePdfUrl;
+
 }

@@ -140,7 +140,8 @@ public class WebSecurityConfig {
                                 "/api/public/promotions/active",
                                 "/api/public/blogs",
                                 "api/public/banners/active",
-                                "/api/v1/public/pages/**"
+                                "/api/v1/public/pages/**",
+                                "/api/public/pdp/**"
                         ).permitAll()
 
                         // ======================================
@@ -203,12 +204,14 @@ public class WebSecurityConfig {
                                 "/api/seller/me",
                                 "/api/seller/carts",
                                 "/api/seller/product/**",
+
                                 "/api/seller/download/**",
                                 "/api/seller/all/invoices",
                                 "/api/seller/analytics/**"
                         ).hasAuthority("SELLER")
 
-                        .requestMatchers("/api/admin/category/active")
+
+                        .requestMatchers("/api/admin/category/active","/api/seller/product/**")
                         .hasAnyAuthority("ADMIN", "SELLER")
 
                         // ======================================

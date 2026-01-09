@@ -218,11 +218,16 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public BaseRs updateProduct(ProductRq rq) {
         try {
-            validateSellerAccess();
+            String role = AuthUtils.getLoggedUserRole();
+            if (!"ADMIN".equalsIgnoreCase(role)) {
+                validateSellerAccess(); // only validate seller
+            }
+            //validateSellerAccess();
 
             if (rq.getDocId() == null) {
                 return ResponseUtils.failure(ErrorCodes.EC_REQUIRED_DOCID, "Product ID required");
             }
+
 
             Long productId = Long.valueOf(rq.getDocId());
             ProductBO product = productRepo.findById(productId).orElse(null);
@@ -230,9 +235,10 @@ public class ProductServiceImpl implements ProductService {
             if (product == null) {
                 return ResponseUtils.failure(ErrorCodes.EC_PRODUCT_NOT_FOUND, "Product not found");
             }
+            Long loggedUserId = AuthUtils.getLoggedUserId();
 
-            Long sellerId = AuthUtils.getLoggedUserId();
-            if (!product.getSeller().getId().equals(sellerId)) {
+            //Long sellerId = AuthUtils.getLoggedUserId();
+            if (!"ADMIN".equalsIgnoreCase(role) && !product.getSeller().getId().equals(loggedUserId)) {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized");
             }
 
@@ -414,16 +420,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public BaseRs uploadProductImages(Long productId, List<MultipartFile> files) {
-        validateSellerAccess();
+        //validateSellerAccess();
 
         try {
+            String role = AuthUtils.getLoggedUserRole();
+            if (!"ADMIN".equalsIgnoreCase(role)) {
+                validateSellerAccess();
+            }
+
             ProductBO bo = productRepo.findById(productId).orElse(null);
             if (bo == null) {
                 return ResponseUtils.failure(ErrorCodes.EC_PRODUCT_NOT_FOUND, "Product not found");
             }
 
-            Long sellerId = AuthUtils.findLoggedInUser().getDocId();
-            if (!bo.getSeller().getId().equals(sellerId)) {
+            Long loggedUserId = AuthUtils.getLoggedUserId();
+
+            //Long sellerId = AuthUtils.findLoggedInUser().getDocId();
+            if (!"ADMIN".equalsIgnoreCase(role) && !bo.getSeller().getId().equals(loggedUserId)) {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized image upload");
             }
 
@@ -520,12 +533,14 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public BaseRs deleteProductImage(Long productId, Long imageId) {
         try {
-            Long sellerId = AuthUtils.getLoggedUserId();
+            String role = AuthUtils.getLoggedUserRole();
+            //Long sellerId = AuthUtils.getLoggedUserId();
+            Long loggedUserId = AuthUtils.getLoggedUserId();
 
             ProductBO product = productRepo.findById(productId)
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
-            if (!product.getSeller().getId().equals(sellerId)) {
+            if (!"ADMIN".equalsIgnoreCase(role) && !product.getSeller().getId().equals(loggedUserId) ) {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized");
             }
 
@@ -580,15 +595,17 @@ public class ProductServiceImpl implements ProductService {
                 return ResponseUtils.failure(ErrorCodes.EC_PRODUCT_NOT_FOUND, "Product not found");
             }
 
-            Long sellerId = AuthUtils.getLoggedUserId();
-            if (!bo.getSeller().getId().equals(sellerId)) {
+            Long loggedUserId = AuthUtils.getLoggedUserId();
+            String role = AuthUtils.getLoggedUserRole();
+            //Long sellerId = AuthUtils.getLoggedUserId();
+            if (!bo.getSeller().getId().equals(loggedUserId) && !"ADMIN".equalsIgnoreCase(role)) {
                 return ResponseUtils.failure(ErrorCodes.EC_UNAUTHORIZED, "Unauthorized");
             }
 
             bo.setActive(false);
             productRepo.save(bo);
 
-            userActivityService.log(sellerId,
+            userActivityService.log(loggedUserId,
                     "PRODUCT_DELETED",
                     "Deleted product: " + bo.getName());
 
@@ -1037,6 +1054,11 @@ public class ProductServiceImpl implements ProductService {
 
         Long id = AuthUtils.getLoggedUserId();
         String role = AuthUtils.getLoggedUserRole();
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            //return seller;
+            return null;
+        }
 
         if (!"SELLER".equalsIgnoreCase(role)) {
             throw new RuntimeException("Only seller can access this resource.");

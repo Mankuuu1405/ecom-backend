@@ -39,8 +39,8 @@ public class FileHelper {
                 date = LocalDate.now();
             }
             dir = dir + File.separator + date.getYear() + File.separator + date.getMonthValue()
-                            + File.separator + date.getDayOfMonth() + File.separator
-                            + UUID.randomUUID();
+                    + File.separator + date.getDayOfMonth() + File.separator
+                    + UUID.randomUUID();
             return dir;
         } catch (Exception e) {
             log.error("Exception in prepareSubDir(context, date) ->" + e);
@@ -139,7 +139,7 @@ public class FileHelper {
             }
             if (prefixPath.endsWith(StringConstants.FORWARD_SLASH)) {
                 prefixPath = prefixPath.substring(0,
-                                prefixPath.lastIndexOf(StringConstants.FORWARD_SLASH));
+                        prefixPath.lastIndexOf(StringConstants.FORWARD_SLASH));
             }
             if (!suffixPath.startsWith(File.separator)) {
                 suffixPath = File.separator + suffixPath;

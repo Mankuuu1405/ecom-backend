@@ -50,6 +50,7 @@ public class SellerMapper {
         rs.setResumePdfUrl("/aimdev/api/admin/seller/" + bo.getSellerId() + "/resume.pdf");
 
 
+
         return rs;
     }
 

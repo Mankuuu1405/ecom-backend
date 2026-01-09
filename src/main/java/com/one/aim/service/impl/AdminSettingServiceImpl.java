@@ -5,6 +5,7 @@ import com.lowagie.text.Font;
 import com.lowagie.text.Image;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
+
 import com.one.aim.bo.AdminSettingsBO;
 import com.one.aim.bo.FileBO;
 import com.one.aim.bo.SellerBO;
@@ -16,6 +17,7 @@ import com.one.aim.rs.SellerRs;
 import com.one.aim.service.AdminSettingService;
 import com.one.aim.service.EmailService;
 import com.one.utils.UrlUtils;
+
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import com.lowagie.text.Document;
 
 import java.io.ByteArrayOutputStream;
 
+
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
     private final EmailService emailService;
     private final FileRepo fileRepo;
     private final SellerMapper sellerMapper;
+
     private final UrlUtils urlUtils;
 
     @PostConstruct
@@ -305,6 +310,7 @@ public class AdminSettingServiceImpl implements AdminSettingService {
             return defaultValue;
         }
     }
+
 
     @Override
     public byte[] getSellerDetailsPdf(String sellerId) {

@@ -26,4 +26,23 @@ import org.springframework.web.multipart.MultipartFile;
 //        return ResponseEntity.ok("Blog created successfully");
 //    }
 //}
+//=======
+//@RestController
+//@RequestMapping("/api/admin/blogs")
+//@RequiredArgsConstructor
+//@Transactional
+//public class AdminBlogController {
+//
+//    private final BlogService blogService;
+//
+//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<?> createBlog(
+//            @ModelAttribute BlogCreateRq rq,
+//            @RequestPart("image") MultipartFile image
+//    ) throws Exception {
+//        blogService.createBlog(rq, image);
+//        return ResponseEntity.ok("Blog created successfully");
+//    }
+//}
+//>>>>>>> origin/v1.1-product
 

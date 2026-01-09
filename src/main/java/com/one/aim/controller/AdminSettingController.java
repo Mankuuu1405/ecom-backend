@@ -188,6 +188,7 @@ public class AdminSettingController {
                 .body(zipBytes);
     }
 
+
     @GetMapping("/{sellerId}/resume.pdf")
     public ResponseEntity<byte[]> downloadSellerResume(@PathVariable String sellerId) {
         log.info("🚀 Controller hit for seller resume download: {}", sellerId);

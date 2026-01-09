@@ -10,4 +10,3 @@ public class ReviewCardRs {
     private int rating;
     private String comment;
 }
-

@@ -39,7 +39,8 @@ public class ProductController {
     // ===========================================================
     // UPDATE PRODUCT (SELLER ONLY)
     // ===========================================================
-    @PreAuthorize("hasAuthority('SELLER')")
+
+    @PreAuthorize("hasAuthority('SELLER') or hasAuthority('ADMIN')")
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseRs> updateProduct(@ModelAttribute ProductRq rq) throws Exception {
         log.debug("Executing RESTfulService [PUT /api/seller/product/update]");
@@ -98,7 +99,8 @@ public class ProductController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    @PreAuthorize("hasAuthority('SELLER')")
+
+    @PreAuthorize("hasAnyAuthority('SELLER', 'ADMIN')")
     @GetMapping("/list")
     public ResponseEntity<BaseRs> listMyProducts(
             @RequestParam(defaultValue = "false") boolean showInactive
