@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 2026-01-09 00:00:00.012 [MessageBroker-9] DEBUG org.hibernate.SQL - select bb1_0.id,bb1_0.author,bb1_0.content,bb1_0.created_at,bb1_0.image_file_id,bb1_0.keywords,bb1_0.meta_description,bb1_0.published_at,bb1_0.scheduled_publish_at,bb1_0.slug,bb1_0.status,bb1_0.title,bb1_0.updated_at,bb1_0.view_count from blogs bb1_0 where bb1_0.status=? and bb1_0.scheduled_publish_at<=?
 2026-01-09 00:00:00.010 [MessageBroker-3] INFO  c.o.u.ContentScheduler - Starting scheduled content processing...
 2026-01-09 00:00:00.036 [MessageBroker-9] INFO  c.o.a.s.i.BlogServiceImpl - Published 0 scheduled blogs
@@ -3889,3 +3890,228 @@ java.io.FileNotFoundException: File not found
 2026-01-07 20:28:28.381 [RMI TCP Connection(9)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2026-01-07 20:28:28.693 [RMI TCP Connection(9)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
 >>>>>>> origin/v1.1-product
+=======
+2026-01-09 00:00:08.324 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:00:08.858 [RMI TCP Connection(38)-127.0.0.1] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:00:09.131 [RMI TCP Connection(38)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-2 - Shutdown initiated...
+2026-01-09 00:00:09.168 [RMI TCP Connection(38)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-2 - Shutdown completed.
+2026-01-09 00:00:56.130 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 5652 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2026-01-09 00:00:56.140 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2026-01-09 00:01:08.663 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:01:08.672 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 00:01:08.674 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 00:01:09.028 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 00:01:14.228 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 00:01:15.442 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6540912d
+2026-01-09 00:01:15.448 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 00:01:38.597 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.736 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.743 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.748 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.754 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.760 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.765 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.771 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.778 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.784 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.790 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.798 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.805 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.818 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.824 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.831 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.839 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.844 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.853 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.859 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.865 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.870 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.876 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.887 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.893 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.902 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.909 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.915 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.920 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.927 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:38.939 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:01:43.174 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 00:01:43.178 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 00:01:53.369 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-01-09 00:01:53.423 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:01:53.423 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2026-01-09 00:01:53.424 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:01:53.425 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2026-01-09 00:01:53.425 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:01:53.425 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2026-01-09 00:01:53.425 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:01:53.425 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2026-01-09 00:01:53.426 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:01:53.426 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2026-01-09 00:01:56.071 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:01:56.232 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 66.539 seconds (process running for 72.359)
+2026-01-09 00:02:37.345 [http-nio-8989-exec-1] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-09 00:02:38.558 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/public/category/browse
+2026-01-09 00:02:39.489 [http-nio-8989-exec-1] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-01-09 00:02:39.502 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/public/category/browse
+2026-01-09 00:02:40.541 [http-nio-8989-exec-1] DEBUG c.o.a.c.PublicCategoryController - REST [GET /api/public/category/browse]
+2026-01-09 00:02:41.234 [http-nio-8989-exec-1] DEBUG org.hibernate.SQL - select cb1_0.id,cb1_0.active,cb1_0.created_at,cb1_0.delivery_charge,cb1_0.image_file_id,cb1_0.name,cb1_0.popular,cb1_0.return_policy_days,cb1_0.slug,cb1_0.tax_percent,cb1_0.updated_at from categories cb1_0 where cb1_0.active
+2026-01-09 00:02:42.726 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2026-01-09 00:02:42.794 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2026-01-09 00:02:42.819 [http-nio-8989-exec-3] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-01-09 00:02:42.928 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2026-01-09 00:02:43.740 [http-nio-8989-exec-3] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:02:43.800 [http-nio-8989-exec-3] DEBUG org.hibernate.SQL - select sb1_0.id,sb1_0.active,sb1_0.adhaar,sb1_0.created_at,sb1_0.email,sb1_0.email_verified,sb1_0.full_name,sb1_0.gst,sb1_0.image_file_id,sb1_0.locked,sb1_0.login,sb1_0.pan_card,sb1_0.password,sb1_0.pending_email,sb1_0.phone_no,sb1_0.rejected,sb1_0.reset_token,sb1_0.reset_token_expiry,sb1_0.role,sb1_0.seller_id,sb1_0.updated_at,sb1_0.verification_token,sb1_0.verification_token_expiry,sb1_0.verified from seller sb1_0 where sb1_0.email=?
+2026-01-09 00:02:43.838 [http-nio-8989-exec-3] DEBUG org.hibernate.SQL - select ub1_0.id,ub1_0.active,ub1_0.created_at,ub1_0.deleted,ub1_0.email,ub1_0.email_verified,ub1_0.full_name,ub1_0.image_file_id,ub1_0.logged_in,ub1_0.password,ub1_0.pending_email,ub1_0.phone_no,ub1_0.reset_token,ub1_0.reset_token_expiry,ub1_0.role,ub1_0.updated_at,ub1_0.verification_token,ub1_0.verification_token_expiry from user ub1_0 where ub1_0.email=?
+2026-01-09 00:02:45.579 [http-nio-8989-exec-3] DEBUG org.hibernate.SQL - select vb1_0.id,vb1_0.adhaar,vb1_0.email,vb1_0.full_name,vb1_0.gst,vb1_0.image,vb1_0.is_varified,vb1_0.login,vb1_0.pancard,vb1_0.password,vb1_0.phone_no,vb1_0.roll from vendor vb1_0 where vb1_0.email=?
+2026-01-09 00:02:46.226 [http-nio-8989-exec-3] DEBUG org.hibernate.SQL - select dpb1_0.id,dpb1_0.aadhar_no,dpb1_0.bike_no,dpb1_0.city,dpb1_0.driving_licence,dpb1_0.email,dpb1_0.full_name,dpb1_0.pan,dpb1_0.password,dpb1_0.phone_no,dpb1_0.status from delivery_person dpb1_0 where dpb1_0.email=?
+2026-01-09 00:02:46.295 [http-nio-8989-exec-3] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Failed to find user ''
+2026-01-09 00:02:55.803 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:02:57.680 [RMI TCP Connection(8)-127.0.0.1] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:02:58.594 [RMI TCP Connection(8)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 00:02:58.777 [RMI TCP Connection(8)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-09 00:03:28.974 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 21.0.5 with PID 8116 (C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend\target\classes started by abhis in C:\Users\abhis\OneDrive\Documents\WebArcligthIntern\BackEnd\ecom-backend)
+2026-01-09 00:03:28.983 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2026-01-09 00:03:39.561 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:03:39.565 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 00:03:39.567 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 00:03:39.869 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 00:03:41.547 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 00:03:43.370 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@68981300
+2026-01-09 00:03:43.376 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 00:04:04.999 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.087 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.093 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.097 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.105 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.108 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.112 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.116 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.120 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.124 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.128 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.133 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.139 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.143 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.147 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.151 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.157 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.160 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.165 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.169 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.173 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.178 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.182 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.187 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.192 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.196 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.201 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.207 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.211 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.217 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:05.222 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 00:04:08.094 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 00:04:08.096 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 00:04:12.675 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-01-09 00:04:12.712 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:04:12.712 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2026-01-09 00:04:12.713 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:04:12.713 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2026-01-09 00:04:12.713 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:04:12.713 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2026-01-09 00:04:12.714 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:04:12.714 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2026-01-09 00:04:12.714 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 00:04:12.714 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2026-01-09 00:04:14.077 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:04:14.169 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 48.713 seconds (process running for 59.746)
+2026-01-09 00:04:42.601 [http-nio-8989-exec-1] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-09 00:04:42.680 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2026-01-09 00:04:42.840 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2026-01-09 00:04:42.874 [http-nio-8989-exec-2] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-01-09 00:04:42.879 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2026-01-09 00:04:43.218 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:04:43.246 [http-nio-8989-exec-2] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2026-01-09 00:04:43.336 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - insert into user_activity (activity_type,created_at,description,user_id) values (?,?,?,?)
+2026-01-09 00:05:55.030 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2026-01-09 00:05:55.144 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2026-01-09 00:05:55.766 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2026-01-09 00:06:03.328 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:06:03.982 [http-nio-8989-exec-4] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2026-01-09 00:06:04.028 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2026-01-09 00:06:04.627 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from user ub1_0
+2026-01-09 00:06:04.864 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from seller sb1_0
+2026-01-09 00:06:04.942 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from product pb1_0
+2026-01-09 00:06:05.034 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from orders ob1_0
+2026-01-09 00:06:05.098 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select sum(oib1_0.total_price) from order_items oib1_0
+2026-01-09 00:06:05.235 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select month(ob1_0.created_at),sum(ob1_0.total_amount) from orders ob1_0 where ob1_0.created_at>=? group by month(ob1_0.created_at) order by month(ob1_0.created_at)
+2026-01-09 00:06:05.261 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select ob1_0.order_status,count(ob1_0.id) from orders ob1_0 group by ob1_0.order_status
+2026-01-09 00:06:05.289 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select ub1_0.id,ub1_0.active,ub1_0.created_at,ub1_0.deleted,ub1_0.email,ub1_0.email_verified,ub1_0.full_name,ub1_0.image_file_id,ub1_0.logged_in,ub1_0.password,ub1_0.pending_email,ub1_0.phone_no,ub1_0.reset_token,ub1_0.reset_token_expiry,ub1_0.role,ub1_0.updated_at,ub1_0.verification_token,ub1_0.verification_token_expiry from user ub1_0
+2026-01-09 00:06:09.371 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select sb1_0.id,sb1_0.active,sb1_0.adhaar,sb1_0.created_at,sb1_0.email,sb1_0.email_verified,sb1_0.full_name,sb1_0.gst,sb1_0.image_file_id,sb1_0.locked,sb1_0.login,sb1_0.pan_card,sb1_0.password,sb1_0.pending_email,sb1_0.phone_no,sb1_0.rejected,sb1_0.reset_token,sb1_0.reset_token_expiry,sb1_0.role,sb1_0.seller_id,sb1_0.updated_at,sb1_0.verification_token,sb1_0.verification_token_expiry,sb1_0.verified from seller sb1_0
+2026-01-09 00:08:25.726 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/public/category/browse
+2026-01-09 00:08:25.878 [http-nio-8989-exec-8] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-01-09 00:08:25.888 [http-nio-8989-exec-8] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/public/category/browse
+2026-01-09 00:08:25.988 [http-nio-8989-exec-8] DEBUG c.o.a.c.PublicCategoryController - REST [GET /api/public/category/browse]
+2026-01-09 00:08:26.610 [http-nio-8989-exec-8] DEBUG org.hibernate.SQL - select cb1_0.id,cb1_0.active,cb1_0.created_at,cb1_0.delivery_charge,cb1_0.image_file_id,cb1_0.name,cb1_0.popular,cb1_0.return_policy_days,cb1_0.slug,cb1_0.tax_percent,cb1_0.updated_at from categories cb1_0 where cb1_0.active
+2026-01-09 00:08:54.124 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/auth/admin/signin
+2026-01-09 00:08:54.147 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing POST /api/auth/admin/signin
+2026-01-09 00:08:54.154 [http-nio-8989-exec-1] DEBUG o.s.s.w.a.AnonymousAuthenticationFilter - Set SecurityContextHolder to anonymous SecurityContext
+2026-01-09 00:08:54.154 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Secured POST /api/auth/admin/signin
+2026-01-09 00:08:54.243 [http-nio-8989-exec-1] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:08:54.331 [http-nio-8989-exec-1] DEBUG o.s.s.a.d.DaoAuthenticationProvider - Authenticated user
+2026-01-09 00:08:54.414 [http-nio-8989-exec-1] DEBUG org.hibernate.SQL - insert into user_activity (activity_type,created_at,description,user_id) values (?,?,?,?)
+2026-01-09 00:09:43.563 [http-nio-8989-exec-6] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2026-01-09 00:09:43.563 [http-nio-8989-exec-3] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/admin/dashboard
+2026-01-09 00:09:43.719 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2026-01-09 00:09:44.056 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:09:44.275 [http-nio-8989-exec-5] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2026-01-09 00:09:44.291 [http-nio-8989-exec-5] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2026-01-09 00:09:45.365 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select count(*) from user ub1_0
+2026-01-09 00:09:45.816 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select count(*) from seller sb1_0
+2026-01-09 00:09:46.115 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select count(*) from product pb1_0
+2026-01-09 00:09:46.378 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select count(*) from orders ob1_0
+2026-01-09 00:09:46.509 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select sum(oib1_0.total_price) from order_items oib1_0
+2026-01-09 00:09:46.693 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select month(ob1_0.created_at),sum(ob1_0.total_amount) from orders ob1_0 where ob1_0.created_at>=? group by month(ob1_0.created_at) order by month(ob1_0.created_at)
+2026-01-09 00:09:46.830 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select ob1_0.order_status,count(ob1_0.id) from orders ob1_0 group by ob1_0.order_status
+2026-01-09 00:09:47.635 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select ub1_0.id,ub1_0.active,ub1_0.created_at,ub1_0.deleted,ub1_0.email,ub1_0.email_verified,ub1_0.full_name,ub1_0.image_file_id,ub1_0.logged_in,ub1_0.password,ub1_0.pending_email,ub1_0.phone_no,ub1_0.reset_token,ub1_0.reset_token_expiry,ub1_0.role,ub1_0.updated_at,ub1_0.verification_token,ub1_0.verification_token_expiry from user ub1_0
+2026-01-09 00:09:47.836 [http-nio-8989-exec-5] DEBUG org.hibernate.SQL - select sb1_0.id,sb1_0.active,sb1_0.adhaar,sb1_0.created_at,sb1_0.email,sb1_0.email_verified,sb1_0.full_name,sb1_0.gst,sb1_0.image_file_id,sb1_0.locked,sb1_0.login,sb1_0.pan_card,sb1_0.password,sb1_0.pending_email,sb1_0.phone_no,sb1_0.rejected,sb1_0.reset_token,sb1_0.reset_token_expiry,sb1_0.role,sb1_0.seller_id,sb1_0.updated_at,sb1_0.verification_token,sb1_0.verification_token_expiry,sb1_0.verified from seller sb1_0
+2026-01-09 00:09:48.117 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/admin/dashboard
+2026-01-09 00:09:48.154 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:09:48.168 [http-nio-8989-exec-4] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2026-01-09 00:09:48.173 [http-nio-8989-exec-4] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/admin/dashboard
+2026-01-09 00:09:48.187 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from user ub1_0
+2026-01-09 00:09:48.214 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from seller sb1_0
+2026-01-09 00:09:48.233 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from product pb1_0
+2026-01-09 00:09:48.249 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select count(*) from orders ob1_0
+2026-01-09 00:09:48.261 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select sum(oib1_0.total_price) from order_items oib1_0
+2026-01-09 00:09:48.264 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select month(ob1_0.created_at),sum(ob1_0.total_amount) from orders ob1_0 where ob1_0.created_at>=? group by month(ob1_0.created_at) order by month(ob1_0.created_at)
+2026-01-09 00:09:48.269 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select ob1_0.order_status,count(ob1_0.id) from orders ob1_0 group by ob1_0.order_status
+2026-01-09 00:09:48.276 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select ub1_0.id,ub1_0.active,ub1_0.created_at,ub1_0.deleted,ub1_0.email,ub1_0.email_verified,ub1_0.full_name,ub1_0.image_file_id,ub1_0.logged_in,ub1_0.password,ub1_0.pending_email,ub1_0.phone_no,ub1_0.reset_token,ub1_0.reset_token_expiry,ub1_0.role,ub1_0.updated_at,ub1_0.verification_token,ub1_0.verification_token_expiry from user ub1_0
+2026-01-09 00:09:48.307 [http-nio-8989-exec-4] DEBUG org.hibernate.SQL - select sb1_0.id,sb1_0.active,sb1_0.adhaar,sb1_0.created_at,sb1_0.email,sb1_0.email_verified,sb1_0.full_name,sb1_0.gst,sb1_0.image_file_id,sb1_0.locked,sb1_0.login,sb1_0.pan_card,sb1_0.password,sb1_0.pending_email,sb1_0.phone_no,sb1_0.rejected,sb1_0.reset_token,sb1_0.reset_token_expiry,sb1_0.role,sb1_0.seller_id,sb1_0.updated_at,sb1_0.verification_token,sb1_0.verification_token_expiry,sb1_0.verified from seller sb1_0
+2026-01-09 00:10:03.689 [http-nio-8989-exec-1] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/orders/all?page=0&size=10&sortBy=orderTime&direction=desc
+2026-01-09 00:10:03.698 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Securing OPTIONS /api/orders/all?page=0&size=10&sortBy=orderTime&direction=desc
+2026-01-09 00:10:03.712 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/orders/all?page=0&size=10&sortBy=orderTime&direction=desc
+2026-01-09 00:10:03.815 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Securing GET /api/orders/all?page=0&size=10&sortBy=orderTime&direction=desc
+2026-01-09 00:10:03.830 [http-nio-8989-exec-10] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:10:03.842 [http-nio-8989-exec-10] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2026-01-09 00:10:03.856 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - select ab1_0.id,ab1_0.active,ab1_0.created_at,ab1_0.email,ab1_0.email_verified,ab1_0.full_name,ab1_0.image,ab1_0.login,ab1_0.password,ab1_0.phone_no,ab1_0.reset_token,ab1_0.reset_token_expiry,ab1_0.role,ab1_0.updated_at,ab1_0.verification_token,ab1_0.verification_token_expiry from admin ab1_0 where ab1_0.email=?
+2026-01-09 00:10:03.864 [http-nio-8989-exec-10] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/orders/all?page=0&size=10&sortBy=orderTime&direction=desc
+2026-01-09 00:10:03.865 [http-nio-8989-exec-2] INFO  c.o.s.j.AuthTokenFilter - Authenticated [ADMIN] (cahogi4245@datehype.com)
+2026-01-09 00:10:03.866 [http-nio-8989-exec-2] DEBUG o.s.s.w.FilterChainProxy - Secured GET /api/orders/all?page=0&size=10&sortBy=orderTime&direction=desc
+2026-01-09 00:10:04.813 [http-nio-8989-exec-10] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.OrderController.getAllOrders(int,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String) throws java.lang.Exception; target is of class [com.one.aim.controller.OrderController]
+2026-01-09 00:10:04.813 [http-nio-8989-exec-2] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorizing method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.OrderController.getAllOrders(int,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String) throws java.lang.Exception; target is of class [com.one.aim.controller.OrderController]
+2026-01-09 00:10:05.127 [http-nio-8989-exec-10] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.OrderController.getAllOrders(int,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String) throws java.lang.Exception; target is of class [com.one.aim.controller.OrderController]
+2026-01-09 00:10:05.127 [http-nio-8989-exec-2] DEBUG o.s.s.a.m.AuthorizationManagerBeforeMethodInterceptor - Authorized method invocation ReflectiveMethodInvocation: public org.springframework.http.ResponseEntity com.one.aim.controller.OrderController.getAllOrders(int,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String) throws java.lang.Exception; target is of class [com.one.aim.controller.OrderController]
+2026-01-09 00:10:05.243 [http-nio-8989-exec-10] DEBUG org.hibernate.SQL - select ob1_0.id,ob1_0.created_at,ob1_0.delivery_charge,ob1_0.delivery_person_id,ob1_0.discount_amount,ob1_0.invoiceno,ob1_0.order_id,ob1_0.order_status,ob1_0.order_time,ob1_0.payment_charge,ob1_0.payment_id,ob1_0.payment_method,ob1_0.payment_status,ob1_0.payment_time,ob1_0.razorpay_order_id,ob1_0.razorpay_payment_id,ob1_0.razorpay_signature,ob1_0.address_id,ob1_0.sub_total,ob1_0.tax_amount,ob1_0.total_amount,ob1_0.updated_at,ob1_0.user_id from orders ob1_0 order by ob1_0.order_time desc limit ?,?
+2026-01-09 00:10:05.243 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - select ob1_0.id,ob1_0.created_at,ob1_0.delivery_charge,ob1_0.delivery_person_id,ob1_0.discount_amount,ob1_0.invoiceno,ob1_0.order_id,ob1_0.order_status,ob1_0.order_time,ob1_0.payment_charge,ob1_0.payment_id,ob1_0.payment_method,ob1_0.payment_status,ob1_0.payment_time,ob1_0.razorpay_order_id,ob1_0.razorpay_payment_id,ob1_0.razorpay_signature,ob1_0.address_id,ob1_0.sub_total,ob1_0.tax_amount,ob1_0.total_amount,ob1_0.updated_at,ob1_0.user_id from orders ob1_0 order by ob1_0.order_time desc limit ?,?
+2026-01-09 00:10:05.959 [http-nio-8989-exec-10] DEBUG org.hibernate.SQL - select oi1_0.order_id,oi1_0.id,oi1_0.created_at,oi1_0.product_id,oi1_0.product_category,oi1_0.product_name,oi1_0.quantity,oi1_0.seller_id,oi1_0.total_price,oi1_0.unit_price,oi1_0.updated_at from order_items oi1_0 where oi1_0.order_id=?
+2026-01-09 00:10:05.959 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - select oi1_0.order_id,oi1_0.id,oi1_0.created_at,oi1_0.product_id,oi1_0.product_category,oi1_0.product_name,oi1_0.quantity,oi1_0.seller_id,oi1_0.total_price,oi1_0.unit_price,oi1_0.updated_at from order_items oi1_0 where oi1_0.order_id=?
+2026-01-09 00:10:06.272 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - select ub1_0.id,ub1_0.active,ub1_0.created_at,ub1_0.deleted,ub1_0.email,ub1_0.email_verified,ub1_0.full_name,ub1_0.image_file_id,ub1_0.logged_in,ub1_0.password,ub1_0.pending_email,ub1_0.phone_no,ub1_0.reset_token,ub1_0.reset_token_expiry,ub1_0.role,ub1_0.updated_at,ub1_0.verification_token,ub1_0.verification_token_expiry from user ub1_0 where ub1_0.id=?
+2026-01-09 00:10:06.274 [http-nio-8989-exec-10] DEBUG org.hibernate.SQL - select ub1_0.id,ub1_0.active,ub1_0.created_at,ub1_0.deleted,ub1_0.email,ub1_0.email_verified,ub1_0.full_name,ub1_0.image_file_id,ub1_0.logged_in,ub1_0.password,ub1_0.pending_email,ub1_0.phone_no,ub1_0.reset_token,ub1_0.reset_token_expiry,ub1_0.role,ub1_0.updated_at,ub1_0.verification_token,ub1_0.verification_token_expiry from user ub1_0 where ub1_0.id=?
+2026-01-09 00:10:06.483 [http-nio-8989-exec-10] DEBUG org.hibernate.SQL - select sb1_0.id,sb1_0.active,sb1_0.adhaar,sb1_0.created_at,sb1_0.email,sb1_0.email_verified,sb1_0.full_name,sb1_0.gst,sb1_0.image_file_id,sb1_0.locked,sb1_0.login,sb1_0.pan_card,sb1_0.password,sb1_0.pending_email,sb1_0.phone_no,sb1_0.rejected,sb1_0.reset_token,sb1_0.reset_token_expiry,sb1_0.role,sb1_0.seller_id,sb1_0.updated_at,sb1_0.verification_token,sb1_0.verification_token_expiry,sb1_0.verified from seller sb1_0 where sb1_0.id=?
+2026-01-09 00:10:06.481 [http-nio-8989-exec-2] DEBUG org.hibernate.SQL - select sb1_0.id,sb1_0.active,sb1_0.adhaar,sb1_0.created_at,sb1_0.email,sb1_0.email_verified,sb1_0.full_name,sb1_0.gst,sb1_0.image_file_id,sb1_0.locked,sb1_0.login,sb1_0.pan_card,sb1_0.password,sb1_0.pending_email,sb1_0.phone_no,sb1_0.rejected,sb1_0.reset_token,sb1_0.reset_token_expiry,sb1_0.role,sb1_0.seller_id,sb1_0.updated_at,sb1_0.verification_token,sb1_0.verification_token_expiry,sb1_0.verified from seller sb1_0 where sb1_0.id=?
+2026-01-09 00:13:20.775 [tomcat-shutdown] INFO  o.a.c.h.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:13:20.841 [RMI TCP Connection(19)-127.0.0.1] INFO  o.a.c.h.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8989"]
+2026-01-09 00:13:21.064 [RMI TCP Connection(19)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 00:13:21.196 [RMI TCP Connection(19)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+>>>>>>> origin/v1.2-order-ocd

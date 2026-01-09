@@ -20,7 +20,8 @@ public interface OrderService {
             int size,
             String sortBy,
             String direction,
-            String status
+            String status,
+            String paymentMethod
     ) throws Exception;
 
 //	public BaseRs retrieveOrders() throws Exception;
