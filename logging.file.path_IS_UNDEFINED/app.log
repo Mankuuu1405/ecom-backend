@@ -4115,3 +4115,610 @@ java.io.FileNotFoundException: File not found
 2026-01-09 00:13:21.064 [RMI TCP Connection(19)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2026-01-09 00:13:21.196 [RMI TCP Connection(19)-127.0.0.1] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
 >>>>>>> origin/v1.2-order-ocd
+2026-01-09 21:50:18.682 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 23.0.2 with PID 29872 (E:\WebArcLight\e-com-website-main\target\classes started by 91805 in E:\WebArcLight\e-com-website-main)
+2026-01-09 21:50:18.684 [restartedMain] INFO  c.one.AimApplication - The following 1 profile is active: "dev"
+2026-01-09 21:50:22.925 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 21:50:22.929 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 21:50:22.930 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 21:50:23.032 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 21:50:24.048 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 21:50:55.214 [restartedMain] ERROR o.h.e.j.s.SqlExceptionHelper - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+2026-01-09 21:50:57.891 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 21:51:28.911 [restartedMain] ERROR o.h.e.j.s.SqlExceptionHelper - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+2026-01-09 21:51:28.922 [restartedMain] ERROR o.s.o.j.LocalContainerEntityManagerFactoryBean - Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.exception.JDBCConnectionException: Unable to open JDBC Connection for DDL execution [Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.] [n/a]
+2026-01-09 21:51:28.923 [restartedMain] ERROR o.s.b.w.e.t.TomcatStarter - Error starting Tomcat context. Exception: org.springframework.beans.factory.UnsatisfiedDependencyException. Message: Error creating bean with name 'webSecurityConfig' defined in file [E:\WebArcLight\e-com-website-main\target\classes\com\one\config\WebSecurityConfig.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userDetailsServiceImpl' defined in file [E:\WebArcLight\e-com-website-main\target\classes\com\one\service\impl\UserDetailsServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'userRepo' defined in com.one.aim.repo.UserRepo defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Cannot resolve reference to bean 'jpaSharedEM_entityManagerFactory' while setting bean property 'entityManager'
+2026-01-09 22:05:54.938 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 23.0.2 with PID 33224 (E:\WebArcLight\e-com-website-main\target\classes started by 91805 in E:\WebArcLight\e-com-website-main)
+2026-01-09 22:05:54.942 [restartedMain] INFO  c.one.AimApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-09 22:05:59.506 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:05:59.511 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 22:05:59.511 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 22:05:59.641 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 22:06:00.723 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 22:06:01.346 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@fb8746c
+2026-01-09 22:06:01.349 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 22:06:04.099 [restartedMain] DEBUG org.hibernate.SQL - alter table informational_pages modify column title varchar(255) not null
+2026-01-09 22:06:08.804 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.842 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.845 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.847 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.850 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.852 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.857 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.860 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.863 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.867 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.869 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.874 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.877 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.880 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.883 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.887 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.890 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.893 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.895 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.897 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.899 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.903 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.907 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.909 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.912 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.915 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.919 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.922 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.926 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.929 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:08.931 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:06:09.989 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 22:06:09.989 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 22:06:11.082 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 22:06:11.097 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-09 22:06:11.104 [restartedMain] INFO  o.a.c.c.StandardService - Stopping service [Tomcat]
+2026-01-09 22:06:11.160 [restartedMain] ERROR o.s.b.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1155)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1121)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1056)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.one.AimApplication.main(AimApplication.java:12)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: java.lang.RuntimeException: Could not postProcess org.springframework.security.config.annotation.web.builders.WebSecurity@22e4a44 of type class org.springframework.security.config.annotation.web.builders.WebSecurity
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:71)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration.setFilterChainProxySecurityConfigurer(WebSecurityConfiguration.java:145)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:854)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509)
+	... 22 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospectorRequestTransformer': Cannot resolve reference to bean 'mvcHandlerMappingIntrospector' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:206)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:227)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1525)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1483)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$1.getIfUnique(DefaultListableBeanFactory.java:468)
+	at org.springframework.security.config.annotation.web.builders.WebSecurity.setApplicationContext(WebSecurity.java:428)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.invokeAwareInterfaces(ApplicationContextAwareProcessor.java:110)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.postProcessBeforeInitialization(ApplicationContextAwareProcessor.java:85)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:423)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1804)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:413)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.initializeBeanIfNeeded(AutowireBeanFactoryObjectPostProcessor.java:98)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:67)
+	... 28 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospector' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1812)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 51 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1812)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeansOfType(DefaultListableBeanFactory.java:721)
+	at org.springframework.context.support.AbstractApplicationContext.getBeansOfType(AbstractApplicationContext.java:1426)
+	at org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors(BeanFactoryUtils.java:372)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.initHandlerMappings(HandlerMappingIntrospector.java:135)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.afterPropertiesSet(HandlerMappingIntrospector.java:123)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1859)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1808)
+	... 58 common frames omitted
+Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.validateMethodMapping(AbstractHandlerMethodMapping.java:676)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.register(AbstractHandlerMethodMapping.java:637)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.registerHandlerMethod(AbstractHandlerMethodMapping.java:331)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:509)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:84)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lambda$detectHandlerMethods$2(AbstractHandlerMethodMapping.java:298)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:987)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.detectHandlerMethods(AbstractHandlerMethodMapping.java:296)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.processCandidateBean(AbstractHandlerMethodMapping.java:265)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.initHandlerMethods(AbstractHandlerMethodMapping.java:224)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.afterPropertiesSet(AbstractHandlerMethodMapping.java:212)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.afterPropertiesSet(RequestMappingHandlerMapping.java:239)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1859)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1808)
+	... 71 common frames omitted
+2026-01-09 22:08:15.440 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 23.0.2 with PID 13088 (E:\WebArcLight\e-com-website-main\target\classes started by 91805 in E:\WebArcLight\e-com-website-main)
+2026-01-09 22:08:15.445 [restartedMain] INFO  c.one.AimApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-09 22:08:19.462 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:08:19.467 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 22:08:19.467 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 22:08:19.614 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 22:08:20.891 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 22:08:21.629 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@76433882
+2026-01-09 22:08:21.633 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 22:08:25.391 [restartedMain] DEBUG org.hibernate.SQL - alter table informational_pages modify column title varchar(255) not null
+2026-01-09 22:08:30.422 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.453 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.456 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.460 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.461 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.464 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.466 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.468 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.472 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.475 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.477 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.479 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.483 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.486 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.489 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.492 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.496 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.500 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.503 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.506 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.508 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.512 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.515 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.519 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.521 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.524 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.526 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.530 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.534 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.536 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:30.539 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:08:31.600 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 22:08:31.601 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 22:08:32.551 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 22:08:32.564 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-09 22:08:32.570 [restartedMain] INFO  o.a.c.c.StandardService - Stopping service [Tomcat]
+2026-01-09 22:08:32.625 [restartedMain] ERROR o.s.b.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1155)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1121)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1056)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.one.AimApplication.main(AimApplication.java:12)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: java.lang.RuntimeException: Could not postProcess org.springframework.security.config.annotation.web.builders.WebSecurity@8a9756d of type class org.springframework.security.config.annotation.web.builders.WebSecurity
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:71)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration.setFilterChainProxySecurityConfigurer(WebSecurityConfiguration.java:145)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:854)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509)
+	... 22 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospectorRequestTransformer': Cannot resolve reference to bean 'mvcHandlerMappingIntrospector' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:206)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:227)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1525)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1483)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$1.getIfUnique(DefaultListableBeanFactory.java:468)
+	at org.springframework.security.config.annotation.web.builders.WebSecurity.setApplicationContext(WebSecurity.java:428)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.invokeAwareInterfaces(ApplicationContextAwareProcessor.java:110)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.postProcessBeforeInitialization(ApplicationContextAwareProcessor.java:85)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:423)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1804)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:413)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.initializeBeanIfNeeded(AutowireBeanFactoryObjectPostProcessor.java:98)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:67)
+	... 28 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospector' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1812)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 51 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1812)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeansOfType(DefaultListableBeanFactory.java:721)
+	at org.springframework.context.support.AbstractApplicationContext.getBeansOfType(AbstractApplicationContext.java:1426)
+	at org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors(BeanFactoryUtils.java:372)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.initHandlerMappings(HandlerMappingIntrospector.java:135)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.afterPropertiesSet(HandlerMappingIntrospector.java:123)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1859)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1808)
+	... 58 common frames omitted
+Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.validateMethodMapping(AbstractHandlerMethodMapping.java:676)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.register(AbstractHandlerMethodMapping.java:637)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.registerHandlerMethod(AbstractHandlerMethodMapping.java:331)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:509)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:84)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lambda$detectHandlerMethods$2(AbstractHandlerMethodMapping.java:298)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:987)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.detectHandlerMethods(AbstractHandlerMethodMapping.java:296)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.processCandidateBean(AbstractHandlerMethodMapping.java:265)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.initHandlerMethods(AbstractHandlerMethodMapping.java:224)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.afterPropertiesSet(AbstractHandlerMethodMapping.java:212)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.afterPropertiesSet(RequestMappingHandlerMapping.java:239)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1859)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1808)
+	... 71 common frames omitted
+2026-01-09 22:10:58.950 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 23.0.2 with PID 26532 (E:\WebArcLight\e-com-website-main\target\classes started by 91805 in E:\WebArcLight\e-com-website-main)
+2026-01-09 22:10:58.954 [restartedMain] INFO  c.one.AimApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-09 22:11:03.102 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:11:03.106 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 22:11:03.106 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 22:11:03.211 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 22:11:04.190 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 22:11:04.682 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@16713f34
+2026-01-09 22:11:04.684 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 22:11:07.062 [restartedMain] DEBUG org.hibernate.SQL - alter table informational_pages modify column title varchar(255) not null
+2026-01-09 22:11:11.378 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.414 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.418 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.421 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.425 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.428 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.432 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.436 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.440 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.444 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.447 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.450 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.454 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.458 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.461 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.464 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.468 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.472 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.475 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.479 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.483 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.486 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.490 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.492 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.496 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.500 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.502 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.506 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.508 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.510 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:11.513 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:11:12.442 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 22:11:12.443 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 22:11:13.414 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 22:11:13.426 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-09 22:11:13.432 [restartedMain] INFO  o.a.c.c.StandardService - Stopping service [Tomcat]
+2026-01-09 22:11:13.485 [restartedMain] ERROR o.s.b.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration': Injection of autowired dependencies failed
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:515)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1445)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1155)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1121)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1056)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.one.AimApplication.main(AimApplication.java:12)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: java.lang.RuntimeException: Could not postProcess org.springframework.security.config.annotation.web.builders.WebSecurity@17a33c92 of type class org.springframework.security.config.annotation.web.builders.WebSecurity
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:71)
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration.setFilterChainProxySecurityConfigurer(WebSecurityConfiguration.java:145)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement.inject(AutowiredAnnotationBeanPostProcessor.java:854)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:146)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:509)
+	... 22 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospectorRequestTransformer': Cannot resolve reference to bean 'mvcHandlerMappingIntrospector' while setting constructor argument
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:377)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveValueIfNecessary(BeanDefinitionValueResolver.java:135)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveConstructorArguments(ConstructorResolver.java:691)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:206)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:227)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1525)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveNamedBean(DefaultListableBeanFactory.java:1483)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveBean(DefaultListableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$1.getIfUnique(DefaultListableBeanFactory.java:468)
+	at org.springframework.security.config.annotation.web.builders.WebSecurity.setApplicationContext(WebSecurity.java:428)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.invokeAwareInterfaces(ApplicationContextAwareProcessor.java:110)
+	at org.springframework.context.support.ApplicationContextAwareProcessor.postProcessBeforeInitialization(ApplicationContextAwareProcessor.java:85)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:423)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1804)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:413)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.initializeBeanIfNeeded(AutowireBeanFactoryObjectPostProcessor.java:98)
+	at org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor.postProcess(AutowireBeanFactoryObjectPostProcessor.java:67)
+	... 28 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'mvcHandlerMappingIntrospector' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1812)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.BeanDefinitionValueResolver.resolveReference(BeanDefinitionValueResolver.java:365)
+	... 51 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1812)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:347)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeansOfType(DefaultListableBeanFactory.java:721)
+	at org.springframework.context.support.AbstractApplicationContext.getBeansOfType(AbstractApplicationContext.java:1426)
+	at org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors(BeanFactoryUtils.java:372)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.initHandlerMappings(HandlerMappingIntrospector.java:135)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.afterPropertiesSet(HandlerMappingIntrospector.java:123)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1859)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1808)
+	... 58 common frames omitted
+Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'blogController' method 
+com.one.aim.controller.BlogController#createBlog(BlogCreateRq, MultipartFile)
+to {POST [/api/admin/blogs], consumes [multipart/form-data]}: There is already 'adminBlogController' bean method
+com.one.aim.controller.AdminBlogController#createBlog(BlogCreateRq, MultipartFile) mapped.
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.validateMethodMapping(AbstractHandlerMethodMapping.java:676)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.register(AbstractHandlerMethodMapping.java:637)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.registerHandlerMethod(AbstractHandlerMethodMapping.java:331)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:509)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:84)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lambda$detectHandlerMethods$2(AbstractHandlerMethodMapping.java:298)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:987)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.detectHandlerMethods(AbstractHandlerMethodMapping.java:296)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.processCandidateBean(AbstractHandlerMethodMapping.java:265)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.initHandlerMethods(AbstractHandlerMethodMapping.java:224)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.afterPropertiesSet(AbstractHandlerMethodMapping.java:212)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.afterPropertiesSet(RequestMappingHandlerMapping.java:239)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1859)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1808)
+	... 71 common frames omitted
+2026-01-09 22:12:00.422 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 23.0.2 with PID 32540 (E:\WebArcLight\e-com-website-main\target\classes started by 91805 in E:\WebArcLight\e-com-website-main)
+2026-01-09 22:12:00.426 [restartedMain] INFO  c.one.AimApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-09 22:12:04.346 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:12:04.350 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 22:12:04.351 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 22:12:04.452 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 22:12:05.282 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 22:12:05.814 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@15e25fa3
+2026-01-09 22:12:05.816 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 22:12:08.184 [restartedMain] DEBUG org.hibernate.SQL - alter table informational_pages modify column title varchar(255) not null
+2026-01-09 22:12:12.394 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.430 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.434 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.437 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.442 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.444 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.448 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.450 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.453 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.458 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.461 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.465 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.467 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.470 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.473 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.476 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.480 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.483 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.486 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.489 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.493 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.496 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.499 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.501 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.505 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.507 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.510 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.512 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.514 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.517 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:12.520 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:12:13.319 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 22:12:13.320 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 22:12:15.502 [restartedMain] WARN  o.s.s.c.a.w.c.AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry - One of the patterns in [/api/auth/**, /api/files/public/**, /api/public/pdp/**, /api/debug/config, /api/category/all, /api/debug/config, /api/public/promotions/active, /api/public/blogs, api/public/banners/active, /api/v1/public/pages/**, /api/public/pdp/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2026-01-09 22:12:15.600 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-01-09 22:12:15.612 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:12:15.614 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2026-01-09 22:12:15.614 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:12:15.614 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2026-01-09 22:12:15.614 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:12:15.614 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2026-01-09 22:12:15.614 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:12:15.614 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2026-01-09 22:12:15.614 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:12:15.614 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2026-01-09 22:12:16.260 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:12:16.312 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 16.796 seconds (process running for 17.851)
+2026-01-09 22:12:50.439 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 22:12:50.449 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-09 22:12:56.374 [restartedMain] INFO  c.one.AimApplication - Starting AimApplication using Java 23.0.2 with PID 32568 (E:\WebArcLight\e-com-website-main\target\classes started by 91805 in E:\WebArcLight\e-com-website-main)
+2026-01-09 22:12:56.377 [restartedMain] INFO  c.one.AimApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-09 22:13:00.195 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:13:00.198 [restartedMain] INFO  o.a.c.c.StandardService - Starting service [Tomcat]
+2026-01-09 22:13:00.198 [restartedMain] INFO  o.a.c.c.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2026-01-09 22:13:00.301 [restartedMain] INFO  o.a.c.c.C.[.[.[/aimdev] - Initializing Spring embedded WebApplicationContext
+2026-01-09 22:13:01.274 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Starting...
+2026-01-09 22:13:01.872 [restartedMain] INFO  c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2ea05f83
+2026-01-09 22:13:01.874 [restartedMain] INFO  c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-09 22:13:04.962 [restartedMain] DEBUG org.hibernate.SQL - alter table informational_pages modify column title varchar(255) not null
+2026-01-09 22:13:10.706 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.742 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.745 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.747 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.750 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.753 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.756 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.759 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.762 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.766 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.770 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.772 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.776 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.778 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.783 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.787 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.791 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.795 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.799 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.802 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.805 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.808 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.812 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.815 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.819 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.822 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.826 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.830 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.832 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.835 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:10.840 [restartedMain] DEBUG org.hibernate.SQL - select asb1_0.id,asb1_0.setting_key,asb1_0.setting_value from admin_settings asb1_0 where asb1_0.setting_key=?
+2026-01-09 22:13:12.036 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-01-09 22:13:12.037 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-09 22:13:14.398 [restartedMain] WARN  o.s.s.c.a.w.c.AuthorizeHttpRequestsConfigurer$AuthorizationManagerRequestMatcherRegistry - One of the patterns in [/api/auth/**, /api/files/public/**, /api/public/pdp/**, /api/debug/config, /api/category/all, /api/debug/config, /api/public/promotions/active, /api/public/blogs, api/public/banners/active, /api/v1/public/pages/**, /api/public/pdp/**] is missing a leading slash. This is discouraged; please include the leading slash in all your request matcher patterns. In future versions of Spring Security, leaving out the leading slash will result in an exception.
+2026-01-09 22:13:14.528 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, AuthTokenFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-01-09 22:13:14.550 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:13:14.550 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui.html'], Ant [pattern='/swagger-ui.html']]
+2026-01-09 22:13:14.550 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:13:14.550 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/swagger-ui/**'], Ant [pattern='/swagger-ui/**']]
+2026-01-09 22:13:14.551 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:13:14.551 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/v3/api-docs/**'], Ant [pattern='/v3/api-docs/**']]
+2026-01-09 22:13:14.551 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:13:14.551 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/actuator/**'], Ant [pattern='/actuator/**']]
+2026-01-09 22:13:14.551 [restartedMain] WARN  o.s.s.c.a.w.b.WebSecurity - You are asking Spring Security to ignore Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2026-01-09 22:13:14.551 [restartedMain] DEBUG o.s.s.w.DefaultSecurityFilterChain - Will not secure Deferred [Mvc [pattern='/error/**'], Ant [pattern='/error/**']]
+2026-01-09 22:13:15.277 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8989"]
+2026-01-09 22:13:15.330 [restartedMain] INFO  c.one.AimApplication - Started AimApplication in 19.906 seconds (process running for 20.879)
+2026-01-09 22:13:19.004 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-09 22:13:19.013 [SpringApplicationShutdownHook] INFO  c.z.h.HikariDataSource - HikariPool-1 - Shutdown completed.

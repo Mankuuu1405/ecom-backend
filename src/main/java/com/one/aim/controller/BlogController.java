@@ -23,7 +23,7 @@ public class BlogController {
 
     private final BlogService blogService;
 
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping(value = "/add", consumes = {"multipart/form-data"})
     public ResponseEntity<BlogCardRs> createBlog(
             @RequestPart("blog") @Valid BlogCreateRq rq,
             @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
