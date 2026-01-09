@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,27 +55,26 @@ public class PromotionServiceImpl implements PromotionService {
         PromotionBO promotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Promotion not found with ID: " + id));
 
-        // Handle new image upload if provided
         if (image != null && !image.isEmpty()) {
-            // Delete old image if exists
             if (promotion.getImageFileId() != null) {
-                try {
-                    fileService.deleteFile(promotion.getImageFileId());
-                } catch (Exception e) {
-                    log.warn("Failed to delete old promotion image: {}", e.getMessage());
-                }
+                try { fileService.deleteFile(promotion.getImageFileId()); }
+                catch (Exception e) { log.warn("Failed to delete old image: {}", e.getMessage()); }
             }
 
-            // Upload new image
             FileBO uploadedFile = fileService.uploadAndReturnFile(image);
             rq.setImageFileId(uploadedFile.getId());
+        } else {
+            //  Preserve old image when no new image is selected
+            rq.setImageFileId(promotion.getImageFileId());
         }
 
         promotionMapper.updateEntityFromDTO(rq, promotion);
-        PromotionBO updatedPromotion = promotionRepository.save(promotion);
-        log.info("Promotion updated with ID: {}", updatedPromotion.getId());
-        return toResponseWithImageUrl(updatedPromotion);
+        PromotionBO updated = promotionRepository.save(promotion);
+        log.info("Promotion updated with ID: {}", updated.getId());
+
+        return promotionMapper.toResponseDTO(updated);
     }
+
 
     @Override
     @Transactional(readOnly = true)

@@ -15,8 +15,11 @@ import java.time.LocalDateTime;
 public class InformationalPageRs {
     private Long id;
     private PageType pageType;
-    private String title;
-    private String content;
+
+    // Computed field - not stored in DB
+    private String title; // Set from pageType.getDisplayName()
+
+    private String contentJson;
     private ContentStatus status;
     private String metaDescription;
     private LocalDateTime createdAt;

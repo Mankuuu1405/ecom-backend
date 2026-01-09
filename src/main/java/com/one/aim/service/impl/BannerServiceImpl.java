@@ -56,27 +56,22 @@ public class BannerServiceImpl implements BannerService {
         BannerBO banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Banner not found with ID: " + id));
 
-        // Handle new image upload if provided
         if (image != null && !image.isEmpty()) {
-            // Delete old image if exists
             if (banner.getImageFileId() != null) {
-                try {
-                    fileService.deleteFile(banner.getImageFileId());
-                } catch (Exception e) {
-                    log.warn("Failed to delete old banner image: {}", e.getMessage());
-                }
+                try { fileService.deleteFile(banner.getImageFileId()); }
+                catch (Exception e) { log.warn("Failed to delete old image: {}", e.getMessage()); }
             }
-
-            // Upload new image
             FileBO uploadedFile = fileService.uploadAndReturnFile(image);
             rq.setImageFileId(uploadedFile.getId());
+        } else {
+            rq.setImageFileId(banner.getImageFileId()); // keep old
         }
 
         bannerMapper.updateEntityFromDTO(rq, banner);
-        BannerBO updatedBanner = bannerRepository.save(banner);
-        log.info("Banner updated with ID: {}", updatedBanner.getId());
-        return toResponseWithImageUrl(updatedBanner);
+        BannerBO updated = bannerRepository.save(banner);
+        return bannerMapper.toResponseDTO(updated);
     }
+
 
     @Override
     @Transactional(readOnly = true)

@@ -11,8 +11,8 @@ public class InformationalPageMapper {
     public InformationalPageBO toEntity(InformationalPageRq dto) {
         return InformationalPageBO.builder()
                 .pageType(dto.getPageType())
-                .title(dto.getTitle())
-                .content(dto.getContent())
+                .title(generateTitle(dto))  // Auto-generate title
+                .contentJson(dto.getContentJson())
                 .status(dto.getStatus())
                 .metaDescription(dto.getMetaDescription())
                 .build();
@@ -23,7 +23,7 @@ public class InformationalPageMapper {
                 .id(entity.getId())
                 .pageType(entity.getPageType())
                 .title(entity.getTitle())
-                .content(entity.getContent())
+                .contentJson(entity.getContentJson())
                 .status(entity.getStatus())
                 .metaDescription(entity.getMetaDescription())
                 .createdAt(entity.getCreatedAt())
@@ -33,9 +33,18 @@ public class InformationalPageMapper {
 
     public void updateEntityFromDTO(InformationalPageRq dto, InformationalPageBO entity) {
         entity.setPageType(dto.getPageType());
-        entity.setTitle(dto.getTitle());
-        entity.setContent(dto.getContent());
+        entity.setTitle(generateTitle(dto));  // Auto-generate title on update
+        entity.setContentJson(dto.getContentJson());
         entity.setStatus(dto.getStatus());
         entity.setMetaDescription(dto.getMetaDescription());
+    }
+
+    // Helper method to generate title
+    private String generateTitle(InformationalPageRq dto) {
+        // Use provided title if available, otherwise generate from pageType
+        if (dto.getTitle() != null && !dto.getTitle().trim().isEmpty()) {
+            return dto.getTitle();
+        }
+        return dto.getPageType().getDisplayName();
     }
 }

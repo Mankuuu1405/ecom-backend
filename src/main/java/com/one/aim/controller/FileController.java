@@ -209,7 +209,6 @@ public class FileController {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
-<<<<<<< HEAD
 @GetMapping("/debug/config")
 public ResponseEntity<?> getConfig() {
     Map<String, String> config = new HashMap<>();
@@ -220,6 +219,4 @@ public ResponseEntity<?> getConfig() {
     return ResponseEntity.ok(config);
 }
 
-=======
->>>>>>> f1e4a1a (Backup local backend changes before pull)
 }

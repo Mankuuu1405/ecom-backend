@@ -137,7 +137,10 @@ public class WebSecurityConfig {
 				"/api/debug/config",
 				"/api/category/all",
                                 "/api/debug/config",
-                                "/api/public/promotions/active"
+                                "/api/public/promotions/active",
+                                "/api/public/blogs",
+                                "api/public/banners/active",
+                                "/api/v1/public/pages/**"
                         ).permitAll()
 
                         // ======================================
@@ -248,12 +251,6 @@ public class WebSecurityConfig {
 
         return source;
     }
-
-
-
-
-
-
 
 
     // ---------------------------------------------------------------

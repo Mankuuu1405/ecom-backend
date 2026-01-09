@@ -30,7 +30,8 @@ public class InformationalPageBO {
     private String title;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+    private String contentJson;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

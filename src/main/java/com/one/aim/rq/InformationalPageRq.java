@@ -16,12 +16,12 @@ public class InformationalPageRq {
     @NotNull(message = "Page type is required")
     private PageType pageType;
 
-    @NotBlank(message = "Title is required")
+    // Make it optional - backend will auto-generate if not provided
     @Size(max = 255, message = "Title must not exceed 255 characters")
     private String title;
 
     @NotBlank(message = "Content is required")
-    private String content;
+    private String contentJson;
 
     private ContentStatus status;
 
