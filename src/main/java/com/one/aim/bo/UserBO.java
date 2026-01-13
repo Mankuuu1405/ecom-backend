@@ -40,7 +40,7 @@ public class UserBO {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(length = 15, unique = true)
+    @Column(nullable = false, length = 15, unique = true)
     private String phoneNo;
 
     @Column(nullable = false)

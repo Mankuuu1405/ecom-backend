@@ -64,6 +64,7 @@ public class UserServiceImpl implements UserService {
             return ResponseUtils.failure(ErrorCodes.EC_INVALID_INPUT, errors);
         }
 
+        // ================= EMAIL =================
         String email = rq.getEmail().trim().toLowerCase();
 
         if (adminRepo.findByEmailIgnoreCase(email).isPresent()
@@ -72,19 +73,23 @@ public class UserServiceImpl implements UserService {
             return ResponseUtils.failure("EMAIL_EXISTS", "Email already registered.");
         }
 
-        String phone = null;
+        // ================= PHONE (MANDATORY) =================
+        String phone = PhoneUtils.normalize(rq.getPhoneNo());
 
-        if (Utils.isNotEmpty(rq.getPhoneNo())) {
-            phone = PhoneUtils.normalize(rq.getPhoneNo());
-
-            if (userRepo.existsByPhoneNo(phone) ||
-                    sellerRepo.existsByPhoneNo(phone) ||
-                    adminRepo.existsByPhoneNo(phone)) {
-                return ResponseUtils.failure("PHONE_EXISTS", "Phone number already exists.");
-            }
+        if (Utils.isEmpty(phone) || !PhoneUtils.isValid(phone)) {
+            return ResponseUtils.failure(
+                    ErrorCodes.EC_INVALID_INPUT,
+                    "Invalid phone number."
+            );
         }
 
+        if (userRepo.existsByPhoneNo(phone)
+                || sellerRepo.existsByPhoneNo(phone)
+                || adminRepo.existsByPhoneNo(phone)) {
+            return ResponseUtils.failure("PHONE_EXISTS", "Phone number already exists.");
+        }
 
+        // ================= USER CREATE =================
         UserBO user = new UserBO();
         user.setFullName(rq.getFullName());
         user.setEmail(email);
@@ -94,12 +99,9 @@ public class UserServiceImpl implements UserService {
         user.setActive(false);
         user.setLoggedIn(false);
 
-        if (Utils.isNotEmpty(rq.getPassword())) {
-            user.setPassword(passwordEncoder.encode(rq.getPassword()));
-        }
+        user.setPassword(passwordEncoder.encode(rq.getPassword()));
 
-        // NO IMAGE HANDLING FOR SIGNUP NOW
-
+        // ================= EMAIL VERIFICATION =================
         String token = TokenUtils.generateVerificationToken();
         user.setVerificationToken(token);
         user.setVerificationTokenExpiry(TokenUtils.generateExpiry());

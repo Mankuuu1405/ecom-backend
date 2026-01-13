@@ -22,11 +22,22 @@ public interface ReviewRepository extends JpaRepository<ReviewBO, Long> {
     boolean existsByUser_IdAndProduct_Id(Long userId, Long productId);
     Optional<ReviewBO> findByUser_IdAndProduct_Id(Long userId, Long productId);
 
-    @Query("SELECT AVG(r.rating) FROM ReviewBO r WHERE r.product.id = :productId")
-    Double getAverageRatingByProductId(@Param("productId") Long productId);
+    @Query("""
+SELECT AVG(r.rating)
+FROM ReviewBO r
+WHERE r.product.id = :productId
+AND r.verified = true
+""")
+    Double getAverageRatingByProductId(Long productId);
 
-    @Query("SELECT COUNT(r) FROM ReviewBO r WHERE r.product.id = :productId")
-    Long getReviewCountByProductId(@Param("productId") Long productId);
+    @Query("""
+SELECT COUNT(r)
+FROM ReviewBO r
+WHERE r.product.id = :productId
+AND r.verified = true
+""")
+    Long getReviewCountByProductId(Long productId);
+
 
     @Query("""
    SELECT r FROM ReviewBO r

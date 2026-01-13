@@ -1,16 +1,21 @@
 package com.one.aim.constants;
 
 public enum PageType {
+
+    // ================= CUSTOMER SERVICE =================
+    HELP_CENTER("Help Center"),
     FAQ("Frequently Asked Questions"),
-    ABOUT_US("About Us"),
+    RETURNS_REFUNDS("Returns & Refunds"),
+    SHIPPING_POLICY("Shipping Information"),
     CONTACT_US("Contact Us"),
-    TERMS_CONDITIONS("Terms & Conditions"),
-    PRIVACY_POLICY("Privacy Policy"),
-    RETURN_POLICY("Return Policy"),
-    SHIPPING_POLICY("Shipping Policy"),
-    COOKIE_POLICY("Cookie Policy"),
+
+    // ================= ABOUT & LEGAL =================
+    ABOUT_US("About Us"),
     CAREERS("Careers"),
-    HELP_CENTER("Help Center");
+    PRESS_CENTER("Press Center"),
+    TERMS_OF_SERVICE("Terms of Service"),
+    PRIVACY_POLICY("Privacy Policy"),
+    COOKIE_POLICY("Cookie Policy");
 
     private final String displayName;
 
@@ -22,31 +27,31 @@ public enum PageType {
         return displayName;
     }
 
-    /**
-     * Get the frontend route path for this page type
-     */
     public String getRoutePath() {
         switch (this) {
             case FAQ:
                 return "/faq";
-            case ABOUT_US:
-                return "/about";
+            case HELP_CENTER:
+                return "/help-center";
+            case RETURNS_REFUNDS:
+                return "/returns-refunds";
+            case SHIPPING_POLICY:
+                return "/shipping";
             case CONTACT_US:
                 return "/contact";
-            case TERMS_CONDITIONS:
+            case ABOUT_US:
+                return "/about";
+            case CAREERS:
+                return "/careers";
+            case PRESS_CENTER:
+                return "/press";
+            case TERMS_OF_SERVICE:
                 return "/terms";
             case PRIVACY_POLICY:
                 return "/privacy";
-            case RETURN_POLICY:
-                return "/returns";
-            case SHIPPING_POLICY:
-                return "/shipping";
             case COOKIE_POLICY:
                 return "/cookie";
-            case CAREERS:
-                return "/careers";
-            case HELP_CENTER:
-                return "/help-center";
+
             default:
                 return "/" + this.name().toLowerCase().replace("_", "-");
         }

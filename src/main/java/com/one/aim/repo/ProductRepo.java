@@ -29,7 +29,12 @@ public interface ProductRepo extends JpaRepository<ProductBO, Long>, JpaSpecific
     Page<ProductBO> findByActiveTrueAndFeaturedTrueOrderByUpdatedAtDesc(Pageable pageable);
 
 
-    Page<ProductBO> findByActiveTrueAndBestSellerTrue(Pageable pageable);
+    Page<ProductBO> findByActiveTrueAndReviewCountGreaterThanOrderByAverageRatingDescReviewCountDesc(
+            Long minReviewCount,
+            Pageable pageable
+    );
+
+
 
     Page<ProductBO> findByActiveTrueAndNewArrivalTrue(Pageable pageable);
 

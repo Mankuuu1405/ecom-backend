@@ -22,7 +22,9 @@ public class InformationalPageMapper {
         return InformationalPageRs.builder()
                 .id(entity.getId())
                 .pageType(entity.getPageType())
-                .title(entity.getTitle())
+                .title(entity.getTitle() != null
+                        ? entity.getTitle()
+                        : entity.getPageType().getDisplayName())
                 .contentJson(entity.getContentJson())
                 .status(entity.getStatus())
                 .metaDescription(entity.getMetaDescription())
@@ -30,6 +32,7 @@ public class InformationalPageMapper {
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }
+
 
     public void updateEntityFromDTO(InformationalPageRq dto, InformationalPageBO entity) {
         entity.setPageType(dto.getPageType());

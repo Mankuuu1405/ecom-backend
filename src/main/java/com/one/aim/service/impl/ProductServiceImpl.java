@@ -959,9 +959,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductCardRs> getBestSellers(int page, int size, String sort) {
 
-        Pageable pageable = PageRequest.of(page, size, parseSort(sort));
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Order.desc("averageRating"),
+                        Sort.Order.desc("reviewCount")
+                )
+        );
 
-        return productRepo.findByActiveTrueAndBestSellerTrue(pageable)
+        return productRepo
+                .findByActiveTrueAndReviewCountGreaterThanOrderByAverageRatingDescReviewCountDesc(
+                        0L, pageable
+                )
                 .map(productMapper::toCardRs);
     }
 

@@ -13,5 +13,18 @@ public class PhoneUtils {
 
         return phone;
     }
+
+    public static boolean isValid(String phone) {
+        if (phone == null) return false;
+
+        phone = phone.replaceAll("\\D", "");
+
+        if (phone.length() == 12 && phone.startsWith("91")) {
+            phone = phone.substring(2);
+        }
+
+        return phone.length() == 10 && phone.matches("[6-9][0-9]{9}");
+    }
 }
+
 

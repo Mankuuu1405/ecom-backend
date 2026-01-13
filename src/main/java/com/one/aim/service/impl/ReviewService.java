@@ -204,6 +204,25 @@ public class ReviewService {
         reviewRepo.save(review);
     }
 
+    @Transactional
+    public void updateProductRating(Long productId) {
+
+        Double avg = reviewRepo.getAverageRatingByProductId(productId);
+        Long count = reviewRepo.getReviewCountByProductId(productId);
+
+        ProductBO product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setAverageRating(avg != null ? round(avg) : 0.0);
+        product.setReviewCount(count != null ? count : 0L);
+
+        productRepo.save(product);
+    }
+
+    private double round(double v) {
+        return Math.round(v * 10.0) / 10.0;
+    }
+
     private void recalculateProductRating(ProductBO product) {
 
         Double avg = reviewRepo.getAverageRatingByProductId(product.getId());
