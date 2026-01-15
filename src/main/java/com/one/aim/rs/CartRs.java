@@ -20,6 +20,10 @@ public class CartRs implements Serializable {
     private String pname;
     private String description;
     private long price;
+    private Boolean onSale;        // true if discount applied
+    private Integer discountPercent; // e.g. 20
+    private Long offerPrice;       // discounted unit price
+
 
     private String category;
 

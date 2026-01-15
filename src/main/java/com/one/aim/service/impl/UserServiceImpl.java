@@ -305,15 +305,42 @@ public class UserServiceImpl implements UserService {
         // -----------------------------
         if (rq.hasPasswordUpdate()) {
 
-            if (!rq.isPasswordDataValid())
-                return ResponseUtils.failure("EC_INVALID_PASSWORD", rq.passwordErrorMessage());
+            //  Validate input format & strength
+            if (!rq.isPasswordDataValid()) {
+                return ResponseUtils.failure(
+                        "EC_INVALID_PASSWORD",
+                        rq.passwordErrorMessage()
+                );
+            }
 
-            if (!passwordEncoder.matches(rq.getOldPassword(), user.getPassword()))
-                return ResponseUtils.failure("EC_INVALID_PASSWORD", "Old password incorrect.");
+            //  Verify old password
+            if (!passwordEncoder.matches(
+                    rq.getOldPassword(),
+                    user.getPassword())) {
+                return ResponseUtils.failure(
+                        "EC_INVALID_PASSWORD",
+                        "Old password is incorrect."
+                );
+            }
 
-            user.setPassword(passwordEncoder.encode(rq.getNewPassword()));
+            //  Prevent reusing old password
+            if (passwordEncoder.matches(
+                    rq.getNewPassword(),
+                    user.getPassword())) {
+                return ResponseUtils.failure(
+                        "EC_INVALID_PASSWORD",
+                        "New password cannot be same as old password."
+                );
+            }
+
+            //  Hash & save new password
+            user.setPassword(
+                    passwordEncoder.encode(rq.getNewPassword())
+            );
+
             updated = true;
         }
+
 
         // -----------------------------
         // EMAIL CHANGE (WITH VERIFICATION)

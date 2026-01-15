@@ -360,40 +360,47 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public BaseRs cancelOrder(String orderId) throws Exception {
+    public BaseRs cancelOrder(String orderId) {
 
         Long userId = AuthUtils.findLoggedInUser().getDocId();
-        if (userId == null)
+        if (userId == null) {
             throw new RuntimeException("User not authenticated");
+        }
 
         OrderBO order = orderRepo.findByOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
+        // Ownership check
         if (!order.getUser().getId().equals(userId)) {
             return ResponseUtils.failure("NOT_ALLOWED", "You cannot cancel this order.");
         }
 
-        if (!"INITIAL".equalsIgnoreCase(order.getOrderStatus())) {
-            return ResponseUtils.failure("CANNOT_CANCEL", "Order already processed");
+        //  SINGLE SOURCE OF TRUTH
+        if (!"PLACED".equalsIgnoreCase(order.getOrderStatus())) {
+            return ResponseUtils.failure(
+                    "CANNOT_CANCEL",
+                    "Order cannot be cancelled once it is " + order.getOrderStatus().toLowerCase()
+            );
         }
 
-        // restore stock
+        // Restore stock
         for (OrderItemBO item : order.getOrderItems()) {
-
             ProductBO product = item.getProduct();
             if (product != null) {
                 int current = product.getStock() == null ? 0 : product.getStock();
-                int qty = item.getQuantity();
-                product.setStock(current + qty);
+                product.setStock(current + item.getQuantity());
                 product.updateLowStock();
                 productRepo.save(product);
             }
         }
 
-
+        // Update order
         order.setOrderStatus("CANCELLED");
         order.setPaymentStatus("CANCELLED");
         orderRepo.save(order);
+
+        // Notifications + logs
+        sendOrderCancelledNotifications(order);
 
         userActivityService.log(
                 userId,
@@ -401,13 +408,14 @@ public class OrderServiceImpl implements OrderService {
                 "Cancelled order ID: " + order.getOrderId()
         );
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("orderId", order.getOrderId());
-        response.put("orderStatus", order.getOrderStatus());
-        response.put("paymentStatus", order.getPaymentStatus());
-
-        return ResponseUtils.success(response);
+        return ResponseUtils.success(Map.of(
+                "orderId", order.getOrderId(),
+                "orderStatus", order.getOrderStatus(),
+                "paymentStatus", order.getPaymentStatus(),
+                "message", "Order cancelled successfully"
+        ));
     }
+
 
     @Override
     public BaseRs retrieveOrdersForSeller(
@@ -612,7 +620,7 @@ public class OrderServiceImpl implements OrderService {
         // --------------------------------------------------
         // 3. NOTIFY ADMIN (with ALL sellers details)
         // --------------------------------------------------
-        String adminMessage = buildAdminNotificationMessage(buyer, order, uniqueSellers);
+        String adminMessage = buildAdminOrderPlacedMessage(buyer, order, uniqueSellers);
 
         notificationService.notifyAdmins(
                 "ORDER_PLACED",
@@ -628,49 +636,175 @@ public class OrderServiceImpl implements OrderService {
     // --------------------------------------------------
 // ✅ FIXED: Proper String Concatenation (NO formatting errors)
 // --------------------------------------------------
-    private String buildAdminNotificationMessage(UserBO buyer, OrderBO order, Set<SellerBO> sellers) {
+    private String buildAdminOrderPlacedMessage(
+            UserBO buyer,
+            OrderBO order,
+            Set<SellerBO> sellers) {
+
         StringBuilder message = new StringBuilder();
 
-        // Header with customer and order info
-        message.append("👤 Customer: ").append(buyer.getFullName())
-                .append(" (ID: ").append(buyer.getId())
-                .append(") 📋 Order ID: ").append(order.getOrderId()) // ✅ String - just append
-                .append(" 💰 Total Amount: ₹").append(String.format("%,d", order.getTotalAmount()))
-                .append(" 💳 Payment: ").append(order.getPaymentMethod())
-                .append(" 📦 Items: ").append(order.getOrderItems().size())
-                .append(" 🔖 Status: ").append(order.getOrderStatus())
-                .append("\n\n");
+        message.append(" ORDER PLACED\n\n")
+                .append("👤 Customer: ").append(buyer.getFullName())
+//                .append(" (ID: ").append(buyer.getId()).append(")\n")
+                .append("📋 Order ID: ").append(order.getOrderId()).append("\n")
+                .append("💰 Amount: ₹").append(String.format("%,d", order.getTotalAmount())).append("\n")
+                .append("💳 Payment: ").append(order.getPaymentMethod()).append("\n")
+                .append("📦 Items: ").append(order.getOrderItems().size()).append("\n")
+                .append("🔖 Status: ").append(order.getOrderStatus()).append("\n\n");
 
-        // ✅ Add each seller's details
-        int sellerIndex = 1;
+        int index = 1;
         for (SellerBO seller : sellers) {
+
             List<OrderItemBO> sellerItems = order.getOrderItems().stream()
                     .filter(item -> item.getProduct().getSeller().equals(seller))
                     .toList();
 
             if (sellerItems.isEmpty()) continue;
 
-            OrderItemBO firstItem = sellerItems.get(0);
-            ProductBO product = firstItem.getProduct();
-
-            // Build product info
+            ProductBO product = sellerItems.get(0).getProduct();
             String productInfo = product.getName();
+
             if (sellerItems.size() > 1) {
                 productInfo += " (+" + (sellerItems.size() - 1) + " more)";
             }
 
-            // Add seller details
-            message.append("👤 Seller ").append(sellerIndex++).append(": ")
-//                    .append(seller.getStoreName() != null ? seller.getStoreName() : "Unknown Store")
-                    .append(" (SLR-").append(seller.getId()).append(")")
-                    .append("\n📦 Product: ").append(productInfo)
-                    .append(" (ID: ").append(product.getId()).append(")")
-                    .append("\n📧 ").append(seller.getEmail() != null ? seller.getEmail() : "N/A");
+            message.append("👤 Seller ").append(index++).append(": ")
+                    .append("ID").append(seller.getSellerId()).append("\n")
+                    .append("📦 Product: ").append(productInfo).append("\n")
+                    .append("📧 ").append(seller.getEmail() != null ? seller.getEmail() : "N/A")
+                    .append("\n\n");
+        }
 
-            // Add spacing between sellers (but not after the last one)
-            if (sellerIndex <= sellers.size()) {
-                message.append("\n\n");
+        return message.toString();
+    }
+
+
+
+    private void sendOrderCancelledNotifications(OrderBO order) {
+
+        UserBO buyer = order.getUser();
+        String orderNo = order.getOrderId();
+
+        // --------------------------------------------------
+        // Get unique sellers
+        // --------------------------------------------------
+        Set<SellerBO> uniqueSellers = order.getOrderItems().stream()
+                .map(item -> item.getProduct().getSeller())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // --------------------------------------------------
+        // 1. NOTIFY BUYER
+        // --------------------------------------------------
+        Long orderImageId = null;
+        if (!order.getOrderItems().isEmpty()) {
+            ProductBO firstProduct = order.getOrderItems().get(0).getProduct();
+            if (firstProduct.getImageFileIds() != null && !firstProduct.getImageFileIds().isEmpty()) {
+                orderImageId = firstProduct.getImageFileIds().get(0);
             }
+        }
+
+        notificationService.notifyUser(
+                buyer.getId(),
+                "ORDER_CANCELLED",
+                "Order Cancelled",
+                "Your order #" + orderNo + " has been cancelled successfully",
+                orderImageId,
+                order.getId(),
+                "/account/orders"
+        );
+
+        // --------------------------------------------------
+        // 2. NOTIFY SELLERS
+        // --------------------------------------------------
+        for (SellerBO seller : uniqueSellers) {
+
+            List<OrderItemBO> sellerItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct().getSeller().equals(seller))
+                    .toList();
+
+            if (sellerItems.isEmpty()) continue;
+
+            String productNames = sellerItems.stream()
+                    .map(item -> item.getProduct().getName())
+                    .limit(3)
+                    .collect(Collectors.joining(", "));
+
+            if (sellerItems.size() > 3) {
+                productNames += " and " + (sellerItems.size() - 3) + " more";
+            }
+
+            Long sellerImageId = null;
+            ProductBO firstProduct = sellerItems.get(0).getProduct();
+            if (firstProduct.getImageFileIds() != null && !firstProduct.getImageFileIds().isEmpty()) {
+                sellerImageId = firstProduct.getImageFileIds().get(0);
+            }
+
+            notificationService.notifyUser(
+                    seller.getId(),
+                    "ORDER_CANCELLED",
+                    "Order Cancelled #" + orderNo,
+                    sellerItems.size() + " item(s) cancelled: " + productNames,
+                    sellerImageId,
+                    null,
+                    "/seller/orders/" + orderNo
+            );
+        }
+
+        // --------------------------------------------------
+        // 3. NOTIFY ADMIN
+        // --------------------------------------------------
+        String adminMessage = buildAdminOrderCancelledMessage(buyer, order, uniqueSellers);
+
+        notificationService.notifyAdmins(
+                "ORDER_CANCELLED",
+                "Order Cancelled",
+                adminMessage,
+                null,
+                order.getOrderItems().get(0).getProduct(),
+                order,
+                "/admin/orders/" + orderNo
+        );
+    }
+
+
+    private String buildAdminOrderCancelledMessage(
+            UserBO buyer,
+            OrderBO order,
+            Set<SellerBO> sellers) {
+
+        StringBuilder message = new StringBuilder();
+
+        message.append("❌ ORDER CANCELLED\n\n")
+                .append("👤 Customer: ").append(buyer.getFullName())
+//                .append(" (ID: ").append(buyer.getId()).append(")\n")
+                .append("📋 Order ID: ").append(order.getOrderId()).append("\n")
+                .append("💰 Amount: ₹").append(String.format("%,d", order.getTotalAmount())).append("\n")
+                .append("💳 Payment: ").append(order.getPaymentMethod()).append("\n")
+                .append("📦 Items: ").append(order.getOrderItems().size()).append("\n")
+                .append("🔖 Status: ").append(order.getOrderStatus()).append("\n\n");
+
+        int index = 1;
+        for (SellerBO seller : sellers) {
+
+            List<OrderItemBO> sellerItems = order.getOrderItems().stream()
+                    .filter(item -> item.getProduct().getSeller().equals(seller))
+                    .toList();
+
+            if (sellerItems.isEmpty()) continue;
+
+            ProductBO product = sellerItems.get(0).getProduct();
+            String productInfo = product.getName();
+
+            if (sellerItems.size() > 1) {
+                productInfo += " (+" + (sellerItems.size() - 1) + " more)";
+            }
+
+            message.append("👤 Seller ").append(index++).append(": ")
+                    .append("ID").append(seller.getSellerId()).append("\n")
+                    .append("📦 Product: ").append(productInfo).append("\n")
+                    .append("📧 ").append(seller.getEmail() != null ? seller.getEmail() : "N/A")
+                    .append("\n\n");
         }
 
         return message.toString();
@@ -687,12 +821,21 @@ public class OrderServiceImpl implements OrderService {
         }
 
         long total = 0;
+
         for (CartBO cart : carts) {
             int qty = Math.max(cart.getQuantity(), 1);
-            total += cart.getProduct().getPrice().longValue() * qty;
+
+            long unitPrice =
+                    cart.isOnSale()
+                            ? cart.getOfferPrice()
+                            : cart.getPrice();
+
+            total += unitPrice * qty;
         }
+
         return total;
     }
+
 
     @Override
     @Transactional
@@ -853,6 +996,26 @@ public class OrderServiceImpl implements OrderService {
 
         return order;
     }
+
+    @Override
+    public BaseRs getOrderDetailsForUser(String orderId, Long userId) {
+
+        OrderBO order = orderRepo.findByOrderIdAndUser_Id(orderId, userId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+
+        // 🔐 OWNERSHIP CHECK
+        if (!order.getUser().getId().equals(userId)) {
+            return ResponseUtils.failure("NOT_ALLOWED", "You cannot view this order");
+        }
+
+        OrderRs orderRs = orderMapper.mapToOrderRs(order);
+
+        return ResponseUtils.success(
+                new OrderDataRs("Order details loaded", orderRs)
+        );
+    }
+
 
 
 }

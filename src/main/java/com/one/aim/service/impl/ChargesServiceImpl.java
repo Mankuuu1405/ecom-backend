@@ -69,7 +69,11 @@ public class ChargesServiceImpl implements ChargesService {
             }
 
             int quantity = Math.max(cart.getQuantity(), 1);
-            long unitPrice = product.getPrice().longValue();
+            long unitPrice =
+                    cart.isOnSale()
+                            ? cart.getOfferPrice()
+                            : cart.getPrice();
+
             long itemSubtotal = unitPrice * quantity;
 
             // Get category

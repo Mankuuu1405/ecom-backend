@@ -38,5 +38,9 @@ public class ProductDetailsRs {
     private Double averageRating;              // 3.0
     private Long reviewCount;                  // 1
     private List<RatingDistributionRs> ratingDistribution;
+
+    private Boolean onSale;
+    private Double offerPrice;        // discounted selling price (₹)
+    private Integer discountPercent;  // discount % (auto OR manual)
 }
 

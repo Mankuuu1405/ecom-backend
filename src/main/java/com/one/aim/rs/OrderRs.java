@@ -20,13 +20,23 @@ public class OrderRs implements Serializable {
     private String docId;
     private String orderId;
 
+    //  PRICE BREAKDOWN
+    private Long subTotal;
+    private Long taxAmount;
+    private Long deliveryCharge;
+    private Long discountAmount;
+    private Long paymentCharge;
     private Long totalAmount;
-    private String paymentMethod;      
+
+    //  ORDER META
+    private String paymentMethod;
     private String paymentStatus;
     private LocalDateTime orderTime;
-    private UserRs user;
-//    private List<CartRs> orderedItems;
     private String orderStatus;
+
+    //  RELATIONS
+    private UserRs user;
+    private AddressRs shippingAddress;
     private List<OrderItemRs> orderedItems;
 
 }

@@ -12,6 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class UpdateRq {
 
+    private static final String STRONG_PASSWORD_REGEX =
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+
+
     private String fullName;
     private String phoneNo;
 
@@ -46,23 +50,19 @@ public class UpdateRq {
             return false;
         }
 
-        // New password length
-        if (newPassword.length() < 6) {
+        // Strong password validation
+        if (!newPassword.matches(STRONG_PASSWORD_REGEX)) {
             return false;
         }
 
-        // New password & confirm must match
+        // New & confirm must match
         if (!newPassword.equals(confirmPassword)) {
-            return false;
-        }
-
-        // New password cannot be same as old password
-        if (oldPassword.equals(newPassword)) {
             return false;
         }
 
         return true;
     }
+
 
     // ===========================================================
     // Helper: Provide specific password validation error message
@@ -75,12 +75,8 @@ public class UpdateRq {
             return "All password fields (old, new, confirm) are required.";
         }
 
-        if (newPassword.length() < 6) {
-            return "New password must be at least 6 characters.";
-        }
-
-        if (oldPassword.equals(newPassword)) {
-            return "New password cannot be same as old password.";
+        if (!newPassword.matches(STRONG_PASSWORD_REGEX)) {
+            return "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.";
         }
 
         if (!newPassword.equals(confirmPassword)) {
@@ -89,4 +85,5 @@ public class UpdateRq {
 
         return "Invalid password details.";
     }
+
 }

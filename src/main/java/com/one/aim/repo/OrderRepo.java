@@ -343,7 +343,6 @@ public interface OrderRepo extends JpaRepository<OrderBO, Long> {
     );
 
 
-
-
+    Optional<OrderBO> findByOrderIdAndUser_Id(String orderId, Long userId);
 }
 

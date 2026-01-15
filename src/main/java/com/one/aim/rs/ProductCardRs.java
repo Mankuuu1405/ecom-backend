@@ -19,5 +19,8 @@ public class ProductCardRs {
     private String shortDescription;   // NEW: Short description (max 100 chars)
     private Double averageRating;
     private Long reviewCount;
+    private Boolean onSale;
+    private Double offerPrice;        // discounted selling price (₹)
+    private Integer discountPercent;  // discount % (auto OR manual)
 }
 

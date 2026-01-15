@@ -11,11 +11,15 @@ public enum PageType {
 
     // ================= ABOUT & LEGAL =================
     ABOUT_US("About Us"),
+    SELLER_TERMS("Seller Terms"),
     CAREERS("Careers"),
     PRESS_CENTER("Press Center"),
     TERMS_OF_SERVICE("Terms of Service"),
     PRIVACY_POLICY("Privacy Policy"),
-    COOKIE_POLICY("Cookie Policy");
+    COOKIE_POLICY("Cookie Policy"),
+    ACCESSIBILITY("Accessibility"),
+    SITEMAP("Sitemap"),
+    AFFILIATE_PROGRAM("Affiliate Program");
 
     private final String displayName;
 
@@ -51,6 +55,14 @@ public enum PageType {
                 return "/privacy";
             case COOKIE_POLICY:
                 return "/cookie";
+            case ACCESSIBILITY:
+                return "/accessibility";
+            case SITEMAP:
+                return "/sitemap";
+            case AFFILIATE_PROGRAM:
+                return "/affiliate-program";
+            case SELLER_TERMS:
+                return "/seller-terms";
 
             default:
                 return "/" + this.name().toLowerCase().replace("_", "-");

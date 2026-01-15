@@ -204,12 +204,13 @@ public class PublicProductController {
     public ResponseEntity<?> saleProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "discountPercent,desc") String sort
+            @RequestParam(defaultValue = "updatedAt,desc") String sort
     ) {
         return ResponseEntity.ok(
                 productService.getSaleProducts(page, size, sort)
         );
     }
+
 
     // ===========================================================
 // FACET COUNTS (BRANDS + PRICE RANGE)

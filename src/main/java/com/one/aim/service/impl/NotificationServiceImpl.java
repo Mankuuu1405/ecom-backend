@@ -131,16 +131,7 @@ public class NotificationServiceImpl implements NotificationService {
                 break;
 
             case "ORDER_PLACED":
-                if (order != null) {
-                    desc.append("👤 Customer: ").append(order.getUser().getFullName())
-                            .append(" (ID: ").append(order.getUser().getId()).append(")")
-                            .append("\n🧾 Order ID: ").append(order.getOrderId())  //  Changed from getInvoiceno() to getOrderId()
-                            .append("\n💰 Total Amount: ₹").append(order.getTotalAmount())
-                            .append("\n💳 Payment: ").append(order.getPaymentMethod())
-                            .append("\n📦 Items: ").append(order.getOrderItems() != null ? order.getOrderItems().size() : 0)
-                            .append("\n📍 Status: ").append(order.getOrderStatus());
-                }
-                break;
+                return baseDescription;
 
             case "SELLER_REGISTRATION":
                 if (seller != null) {

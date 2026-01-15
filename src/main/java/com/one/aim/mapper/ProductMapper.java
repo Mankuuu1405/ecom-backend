@@ -40,6 +40,15 @@ public class ProductMapper {
         rs.setPrice(bo.getPrice());
         rs.setCategoryName(bo.getCategoryName());
         rs.setCategoryId(bo.getCategoryId());
+        rs.setOnSale(bo.isOnSale());
+
+        if (bo.isOnSale()) {
+            rs.setOfferPrice(bo.getOfferPrice());
+            rs.setDiscountPercent(bo.getDiscountPercent());
+        } else {
+            rs.setOfferPrice(null);
+            rs.setDiscountPercent(null);
+        }
 
         // Main Image
         if (bo.getImageFileIds() != null && !bo.getImageFileIds().isEmpty()) {
@@ -88,6 +97,16 @@ public class ProductMapper {
         rs.setActive(product.isActive());
         rs.setLowStock(product.isLowStock());
         rs.setInStock(product.getStock() != null && product.getStock() > 0);
+        rs.setOnSale(product.isOnSale());
+
+        if (product.isOnSale()) {
+            rs.setOfferPrice(product.getOfferPrice());
+            rs.setDiscountPercent(product.getDiscountPercent());
+        } else {
+            rs.setOfferPrice(null);
+            rs.setDiscountPercent(null);
+        }
+
 
         // =====================
         // IMAGES (ORDER AS STORED IN DB)
@@ -204,6 +223,10 @@ public class ProductMapper {
         rs.setInStock(bo.getStock() != null && bo.getStock() > 0);
         rs.setCreatedAt(bo.getCreatedAt());
         rs.setUpdatedAt(bo.getUpdatedAt());
+        rs.setOnSale(bo.isOnSale());
+        rs.setOfferPrice(bo.getOfferPrice());
+        rs.setDiscountPercent(bo.getDiscountPercent());
+
 
         return rs;
     }

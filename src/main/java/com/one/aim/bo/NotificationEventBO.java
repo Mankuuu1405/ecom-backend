@@ -18,7 +18,11 @@ public class NotificationEventBO {
     private String type;          // ORDER_PLACED, PRODUCT_ADDED, SELLER_REGISTERED, SYSTEM
 
     private String title;
+
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
 
     private Long imageFileId;
     private String redirectUrl;

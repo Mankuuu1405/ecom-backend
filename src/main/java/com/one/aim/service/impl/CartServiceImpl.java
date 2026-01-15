@@ -102,20 +102,35 @@ public class CartServiceImpl implements CartService {
         }
 
         // ========================
-        // NEW ITEM ADD
-        // ========================
+// NEW ITEM ADD
+// ========================
         CartBO cart = new CartBO();
         cart.setUserAddToCart(user);
         cart.setProduct(product);
         cart.setPname(product.getName());
-        cart.setPrice(
-                product.getPrice() == null ? 0L : product.getPrice().longValue()
-        );
+
+// ORIGINAL PRICE SNAPSHOT
+        long originalPrice =
+                product.getPrice() == null ? 0L : product.getPrice().longValue();
+        cart.setPrice(originalPrice);
+
+//  DISCOUNT SNAPSHOT (CRITICAL FIX)
+        cart.setOnSale(product.isOnSale());
+        cart.setDiscountPercent(product.getDiscountPercent());
+
+// FINAL UNIT PRICE SNAPSHOT
+        if (product.isOnSale() && product.getOfferPrice() != null) {
+            cart.setOfferPrice(product.getOfferPrice().longValue());
+        } else {
+            cart.setOfferPrice(originalPrice);
+        }
+
         cart.setQuantity(1);
         cart.setEnabled(true);
         cart.setSellerId(product.getSeller().getSellerId());
 
         cartRepo.save(cart);
+
 
         userActivityService.log(
                 userId,

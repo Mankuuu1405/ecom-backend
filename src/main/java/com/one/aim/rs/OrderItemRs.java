@@ -13,11 +13,14 @@ public class OrderItemRs {
     private String productName;
     private String productCategory;
 
-    private Long sellerId;
+//    private Long sellerId;
 
     private Long unitPrice;
     private Integer quantity;
     private Long totalPrice;
+
+    private String productSlug;
+
 
     private String imageUrl;
 }

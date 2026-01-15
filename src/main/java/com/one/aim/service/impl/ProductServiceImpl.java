@@ -105,7 +105,76 @@ public class ProductServiceImpl implements ProductService {
             bo.setPrice(rq.getPrice());
             bo.setStock(rq.getStock());
             bo.setBrand(rq.getBrand());
-            bo.setOnSale(rq.isOnSale());
+            boolean onSale = Boolean.TRUE.equals(rq.getOnSale());
+            bo.setOnSale(onSale);
+
+            if (onSale) {
+
+                Double price = rq.getPrice();
+                Double offerPrice = rq.getOfferPrice();
+                Integer discountPercent = rq.getDiscountPercent();
+
+                if (price == null || price <= 0) {
+                    return ResponseUtils.failure(
+                            ErrorCodes.EC_INVALID_INPUT,
+                            "Original price must be greater than 0 for sale"
+                    );
+                }
+
+                //  both given
+                if (offerPrice != null && discountPercent != null) {
+                    return ResponseUtils.failure(
+                            ErrorCodes.EC_INVALID_INPUT,
+                            "Provide either offer price OR discount percent, not both"
+                    );
+                }
+
+                //  none given
+                if (offerPrice == null && discountPercent == null) {
+                    return ResponseUtils.failure(
+                            ErrorCodes.EC_INVALID_INPUT,
+                            "Offer price or discount percent required when product is on sale"
+                    );
+                }
+
+                //  discount % → calculate offer price
+                if (discountPercent != null) {
+                    if (discountPercent <= 0 || discountPercent >= 100) {
+                        return ResponseUtils.failure(
+                                ErrorCodes.EC_INVALID_INPUT,
+                                "Discount percent must be between 1 and 99"
+                        );
+                    }
+
+                    offerPrice = price - (price * discountPercent / 100);
+                }
+
+                //  offer price → calculate %
+                if (offerPrice != null) {
+                    if (offerPrice <= 0 || offerPrice >= price) {
+                        return ResponseUtils.failure(
+                                ErrorCodes.EC_INVALID_INPUT,
+                                "Offer price must be less than original price"
+                        );
+                    }
+
+                    discountPercent =
+                            Math.min(99, Math.max(1,
+                                    (int) Math.round(((price - offerPrice) / price) * 100)
+                            ));
+
+
+                }
+
+                bo.setOfferPrice(roundTwoDecimals(offerPrice));
+                bo.setDiscountPercent(discountPercent);
+
+            } else {
+                //  Not on sale → clear offer
+                bo.setOfferPrice(null);
+                bo.setDiscountPercent(null);
+            }
+
             bo.setNewArrival(true);
             bo.setBestSeller(false);
             bo.setSpecificationsJson(rq.getSpecificationsJson());
@@ -254,6 +323,10 @@ public class ProductServiceImpl implements ProductService {
                     rq.getStock() == null &&
                     rq.getCategoryId() == null &&
                     rq.getCustomCategoryName() == null &&
+                    rq.getOnSale() == null &&
+                    rq.getOfferPrice() == null &&
+                    rq.getDiscountPercent() == null &&
+
                     (rq.getImages() == null || rq.getImages().isEmpty())) {
 
                 if (product.isActive() != rq.getActive()) {
@@ -292,9 +365,21 @@ public class ProductServiceImpl implements ProductService {
 
             if (rq.getPrice() != null && rq.getPrice() > 0
                     && !rq.getPrice().equals(product.getPrice())) {
+
                 changes.put("Price", "₹" + product.getPrice() + " → ₹" + rq.getPrice());
                 product.setPrice(rq.getPrice());
+
+                if (product.isOnSale()) {
+                    product.setOfferPrice(null);
+                    product.setDiscountPercent(null);
+                    product.setOnSale(false);
+                    changes.put("Discount", "Removed (price changed)");
+                }
             }
+
+
+
+
 
             boolean stockChanged = false;
             if (rq.getStock() != null && !rq.getStock().equals(product.getStock())) {
@@ -304,10 +389,83 @@ public class ProductServiceImpl implements ProductService {
                 stockChanged = true;
             }
 
-            if (rq.isOnSale() != product.isOnSale()) {
-                changes.put("Sale Status", product.isOnSale() ? "On Sale → Regular" : "Regular → On Sale");
-                product.setOnSale(rq.isOnSale());
+            if (rq.getOnSale() != null) {
+
+                boolean newOnSale = rq.getOnSale();
+
+                if (newOnSale != product.isOnSale()) {
+                    changes.put(
+                            "Sale Status",
+                            product.isOnSale() ? "On Sale → Regular" : "Regular → On Sale"
+                    );
+                    product.setOnSale(newOnSale);
+                }
+
+                if (newOnSale) {
+
+                    Double price = product.getPrice();
+                    Double offerPrice = rq.getOfferPrice();
+                    Integer discountPercent = rq.getDiscountPercent();
+
+                    if (price == null || price <= 0) {
+                        return ResponseUtils.failure(
+                                ErrorCodes.EC_INVALID_INPUT,
+                                "Original price must be greater than 0 for sale"
+                        );
+                    }
+
+                    if (offerPrice != null && discountPercent != null) {
+                        return ResponseUtils.failure(
+                                ErrorCodes.EC_INVALID_INPUT,
+                                "Provide either offer price OR discount percent"
+                        );
+                    }
+
+                    if (offerPrice == null && discountPercent == null) {
+                        return ResponseUtils.failure(
+                                ErrorCodes.EC_INVALID_INPUT,
+                                "Offer price or discount percent required when on sale"
+                        );
+                    }
+
+                    if (discountPercent != null) {
+                        if (discountPercent <= 0 || discountPercent >= 100) {
+                            return ResponseUtils.failure(
+                                    ErrorCodes.EC_INVALID_INPUT,
+                                    "Invalid discount percent"
+                            );
+                        }
+                        offerPrice = price - (price * discountPercent / 100);
+                    }
+
+                    if (offerPrice != null) {
+                        if (offerPrice <= 0 || offerPrice >= price) {
+                            return ResponseUtils.failure(
+                                    ErrorCodes.EC_INVALID_INPUT,
+                                    "Invalid offer price"
+                            );
+                        }
+                        discountPercent =
+                                Math.min(99, Math.max(1,
+                                        (int) Math.round(((price - offerPrice) / price) * 100)
+                                ));
+
+
+                    }
+
+                    product.setOfferPrice(roundTwoDecimals(offerPrice));
+                    product.setDiscountPercent(discountPercent);
+
+                    changes.put("Discount", discountPercent + "% OFF");
+
+                } else {
+                    // removed from sale
+                    product.setOfferPrice(null);
+                    product.setDiscountPercent(null);
+                    changes.put("Discount", "Removed");
+                }
             }
+
 
             // =================================================
             // CATEGORY CHANGES
@@ -989,11 +1147,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductCardRs> getSaleProducts(int page, int size, String sort) {
 
-        Pageable pageable = PageRequest.of(page, size, parseSort(sort));
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                (sort != null && !sort.isBlank())
+                        ? parseSort(sort)
+                        : Sort.by("updatedAt").descending()
+        );
 
         return productRepo.findByActiveTrueAndOnSaleTrue(pageable)
                 .map(productMapper::toCardRs);
     }
+
 
     @Override
     @Transactional
@@ -1151,6 +1316,10 @@ public class ProductServiceImpl implements ProductService {
                 "product_" + System.currentTimeMillis() + ".png",
                 "image/png"
         );
+    }
+
+    private double roundTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 
 

@@ -41,6 +41,8 @@ public interface OrderService {
 
     OrderBO placeOrderAfterPayment(Long userId, String paymentMethod, PaymentBO payment, AddressBO shippingAddress) throws Exception;
 
+    BaseRs getOrderDetailsForUser(String orderId, Long userId);
+
 
 
 }

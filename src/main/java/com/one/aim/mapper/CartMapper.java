@@ -43,8 +43,12 @@ public class CartMapper {
             }
 
             // default values
-            rs.setOffer(0);
-            rs.setReturnDay(0);
+            rs.setOffer(bo.getDiscountPercent());
+            rs.setOnSale(bo.isOnSale());
+            rs.setOfferPrice(bo.getOfferPrice());
+            rs.setDiscountPercent(bo.getDiscountPercent());
+
+
 
             // ===============================
             // Image URL

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.one.aim.bo.*;
+import com.one.aim.rs.AddressRs;
 import com.one.aim.rs.OrderItemRs;
 import com.one.aim.rs.OrderRs;
 import com.one.aim.rs.OrderSummaryRs;
@@ -29,28 +30,38 @@ public class OrderMapper {
         if (bo == null) return null;
 
         OrderRs rs = new OrderRs();
+
         rs.setDocId(String.valueOf(bo.getId()));
         rs.setOrderId(bo.getOrderId());
 
-        if (bo.getOrderItems() != null && !bo.getOrderItems().isEmpty()) {
-            rs.setOrderedItems(
-                    bo.getOrderItems() == null
-                            ? Collections.emptyList()
-                            : mapToOrderItemRsList(bo.getOrderItems())
-            );
-
-        }
-
+        //  PRICE BREAKDOWN
+        rs.setSubTotal(bo.getSubTotal());
+        rs.setTaxAmount(bo.getTaxAmount());
+        rs.setDeliveryCharge(bo.getDeliveryCharge());
+        rs.setDiscountAmount(bo.getDiscountAmount());
+        rs.setPaymentCharge(bo.getPaymentCharge());
         rs.setTotalAmount(bo.getTotalAmount());
+
+        //  ORDER META
         rs.setOrderTime(bo.getOrderTime());
         rs.setPaymentMethod(bo.getPaymentMethod());
         rs.setPaymentStatus(bo.getPaymentStatus());
         rs.setOrderStatus(bo.getOrderStatus());
 
+        //  ITEMS
+        rs.setOrderedItems(
+                bo.getOrderItems() == null
+                        ? Collections.emptyList()
+                        : mapToOrderItemRsList(bo.getOrderItems())
+        );
+
+        //  ADDRESS & USER
+        rs.setShippingAddress(mapAddress(bo.getShippingAddress()));
         rs.setUser(userMapper.mapToUserRs(bo.getUser()));
 
         return rs;
     }
+
 
     public List<OrderRs> mapToOrderRsList(List<OrderBO> bos) {
 
@@ -119,7 +130,8 @@ public class OrderMapper {
             rs.setQuantity(item.getQuantity());
             rs.setUnitPrice(item.getUnitPrice());
             rs.setTotalPrice(item.getTotalPrice());
-            rs.setSellerId(item.getSellerId());
+            rs.setProductSlug(item.getProduct().getSlug());
+//            rs.setSellerId(item.getSellerId());
 
             // optional image
             if (item.getProduct() != null
@@ -134,6 +146,20 @@ public class OrderMapper {
             list.add(rs);
         }
         return list;
+    }
+
+    private AddressRs mapAddress(AddressBO address) {
+        if (address == null) return null;
+
+        return new AddressRs(
+                address.getFullName(),
+                address.getStreet(),
+                address.getCity(),
+                address.getState(),
+                address.getZip(),
+                address.getCountry(),
+                address.getPhone()
+        );
     }
 
 }

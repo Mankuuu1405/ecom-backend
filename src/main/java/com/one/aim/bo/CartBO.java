@@ -33,6 +33,10 @@ public class CartBO {
     // snapshot details
     private String pname;
     private long price;
+    boolean onSale;
+    int discountPercent;
+    long offerPrice;
+
 
     private int quantity = 1;
     private boolean enabled = true;

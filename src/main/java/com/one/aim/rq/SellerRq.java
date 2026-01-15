@@ -29,12 +29,19 @@ public class SellerRq extends BaseVM {
     @Size(max = 100, message = "Email must be under 100 characters")
     private String email;
 
-    @Size(max = 15, message = "Phone number must be under 15 characters")
+    @NotBlank
+    @Pattern(regexp = "^[6-9]\\d{9}$")
     private String phoneNo;
 
+
     @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    )
     private String password;
+
 
     @Size(max = 20, message = "GST number must be under 20 characters")
     private String gst;

@@ -39,7 +39,9 @@ public class ProductRq extends BaseVM {
     // private boolean newArrival;
 
     //  Only onSale is allowed for sellers
-    private boolean onSale;
+    private Boolean onSale;
+    private Double offerPrice;        // discounted selling price (₹)
+    private Integer discountPercent;  // discount % (auto OR manual)
 
     private Long categoryId;
     private String customCategoryName;

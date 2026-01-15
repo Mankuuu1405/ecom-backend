@@ -53,4 +53,8 @@ public class ProductRs implements Serializable {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private Boolean onSale;
+    private Double offerPrice;        // discounted selling price (₹)
+    private Integer discountPercent;  // discount % (auto OR manual)
 }

@@ -205,6 +205,22 @@ public class OrderController {
         return chargesService.calculate(userId, addressId, promoCode);
     }
 
+    @GetMapping("/my/{orderId}")
+    public ResponseEntity<?> getMyOrderDetails(@PathVariable String orderId) {
+
+        Long userId = AuthUtils.getLoggedUserId();
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("User not authenticated");
+        }
+
+        return ResponseEntity.ok(
+                orderService.getOrderDetailsForUser(orderId, userId)
+        );
+    }
+
+
+
 
 
 //    @GetMapping("/invoice/{fileName:.+}")

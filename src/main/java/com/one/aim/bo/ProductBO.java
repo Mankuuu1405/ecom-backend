@@ -3,6 +3,9 @@ package com.one.aim.bo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -34,6 +37,17 @@ public class ProductBO {
     private String description;
 
     private Double price;
+
+    @Column(name = "offer_price")
+    @DecimalMin(value = "0.01", message = "Offer price must be > 0")
+    private Double offerPrice;
+
+    @Column(name = "discount_percent")
+    @Min(1)
+    @Max(99)
+    private Integer discountPercent;
+
+
 
     private Integer stock;
 
@@ -106,12 +120,12 @@ public class ProductBO {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        if (slug == null || slug.isEmpty()) {
-            this.slug = UUID.randomUUID().toString();
-        }
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        if (slug == null || slug.isEmpty()) {
+//            this.slug = UUID.randomUUID().toString();
+//        }
+//    }
 
     public void updateLowStock() {
         this.lowStock = (this.stock != null && this.stock <= 5);
@@ -126,10 +140,30 @@ public class ProductBO {
         }
     }
 
+//    @PreUpdate
+//    private void ensureThumbnailBeforeSave() {
+//        ensureThumbnail();
+//    }
+
+    @PrePersist
     @PreUpdate
-    private void ensureThumbnailBeforeSave() {
+    private void beforeSave() {
+
+        //  Ensure slug on create
+        if (slug == null || slug.isEmpty()) {
+            this.slug = UUID.randomUUID().toString();
+        }
+
         ensureThumbnail();
+
+        //  Normalize sale data
+        if (!onSale) {
+            offerPrice = null;
+            discountPercent = null;
+        }
     }
+
+
 
 
 }
