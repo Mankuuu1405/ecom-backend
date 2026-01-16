@@ -203,15 +203,14 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/seller/me",
                                 "/api/seller/carts",
-                                "/api/seller/product/**",
-
                                 "/api/seller/download/**",
                                 "/api/seller/all/invoices",
-                                "/api/seller/analytics/**"
-                        ).hasAuthority("SELLER")
+                                "/api/seller/analytics/**",
+                                "/api/seller/product/**"  //
+                        ).hasAnyAuthority("SELLER", "ADMIN")
 
 
-                        .requestMatchers("/api/admin/category/active","/api/seller/product/**")
+                        .requestMatchers("/api/admin/category/active")
                         .hasAnyAuthority("ADMIN", "SELLER")
 
                         // ======================================

@@ -887,6 +887,11 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Unauthorized access");
         }
 
+//        log.info("ROLE={}, images={}",
+//                role,
+//                bo.getImages() == null ? "null" : bo.getImages().size()
+//        );
+
         return productMapper.toProductRs(bo);
     }
 
