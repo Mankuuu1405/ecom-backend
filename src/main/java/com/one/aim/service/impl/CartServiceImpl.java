@@ -116,7 +116,10 @@ public class CartServiceImpl implements CartService {
 
 //  DISCOUNT SNAPSHOT (CRITICAL FIX)
         cart.setOnSale(product.isOnSale());
-        cart.setDiscountPercent(product.getDiscountPercent());
+        cart.setDiscountPercent(
+                Optional.ofNullable(product.getDiscountPercent()).orElse(0)
+        );
+
 
 // FINAL UNIT PRICE SNAPSHOT
         if (product.isOnSale() && product.getOfferPrice() != null) {

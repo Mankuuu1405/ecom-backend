@@ -61,8 +61,21 @@ public class PaymentServiceImpl implements PaymentService {
         UserBO user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🔹 Calculate amount from CART (NOT ORDER)
-        long amount = orderService.calculateCartTotal(userId); // rupees
+        // ✅ Validate addressId
+        if (rq.getAddressId() == null) {
+            return ResponseUtils.failure("ADDRESS_ID_REQUIRED");
+        }
+
+        // ✅ Verify address belongs to user
+        AddressBO address = addressRepo.findById(rq.getAddressId())
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        if (!address.getUserid().equals(userId)) {
+            return ResponseUtils.failure("ADDRESS_NOT_AUTHORIZED");
+        }
+
+        // Calculate amount from CART
+        long amount = orderService.calculateCartTotal(userId);
 
         if (amount <= 0) {
             return ResponseUtils.failure("CART_EMPTY");
@@ -78,19 +91,20 @@ public class PaymentServiceImpl implements PaymentService {
         com.razorpay.Order razorpayOrder = razorpay.orders.create(options);
         String razorpayOrderId = razorpayOrder.get("id");
 
-        // 🔹 Save PAYMENT ONLY
+        // ✅ Save PAYMENT with addressId
         PaymentBO payment = new PaymentBO();
         payment.setUser(user);
         payment.setAmount(amount);
         payment.setStatus("CREATED");
         payment.setPaymentMethod("ONLINE");
         payment.setRazorpayOrderId(razorpayOrderId);
+        payment.setAddressId(rq.getAddressId()); // ✅ STORE THE ADDRESS ID
         paymentRepo.save(payment);
 
         userActivityService.log(
                 userId,
                 "PAYMENT_INITIATED",
-                "Payment initiated. RazorpayOrderId=" + razorpayOrderId
+                "Payment initiated. RazorpayOrderId=" + razorpayOrderId + ", AddressId=" + rq.getAddressId()
         );
 
         CreatePaymentRs rs = new CreatePaymentRs(

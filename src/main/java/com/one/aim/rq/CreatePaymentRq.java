@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreatePaymentRq {
-    private String orderId;   // ORD-XXXXXX (Business ID)
+    private Long addressId;      //  ADD THIS
+    private String paymentMethod; // ADD THIS (optional, you already know it's ONLINE)
 }

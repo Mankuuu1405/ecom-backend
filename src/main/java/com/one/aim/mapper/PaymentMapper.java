@@ -8,28 +8,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PaymentMapper {
 
-	public static PaymentRs mapToPaymentRs(PaymentBO bo) {
+    private PaymentMapper() {}
 
-		if (log.isDebugEnabled()) {
-			log.debug("Executing mapToPaymentRs(PaymentBO) ->");
-		}
+    public static PaymentRs mapToPaymentRs(PaymentBO bo) {
 
-		try {
-			PaymentRs rs = null;
+        if (bo == null) {
+            log.warn("PaymentBO is NULL");
+            return null;
+        }
 
-			if (null == bo) {
-				log.warn("UserBO is NULL");
-				return rs;
-			}
-			rs = new PaymentRs();
-			rs.setUserId(String.valueOf(bo.getId()));
-			rs.setAmount(String.valueOf(bo.getAmount()));
-			rs.setPaymentMethod(bo.getPaymentMethod());
-			return rs;
-		} catch (Exception e) {
-			log.error("Exception in mapToPaymentRs(PaymentBO) - " + e);
-			return null;
-		}
-	}
+        PaymentRs rs = new PaymentRs();
+        rs.setId(bo.getId());
+        rs.setAmount(bo.getAmount());               // rupees
+        rs.setPaymentMethod(bo.getPaymentMethod());
+        rs.setStatus(bo.getStatus());
+        rs.setRazorpayOrderId(bo.getRazorpayOrderId());
+        rs.setRazorpayPaymentId(bo.getRazorpayPaymentId());
+        rs.setPaymentTime(bo.getPaymentTime());
 
+        return rs;
+    }
 }
+
