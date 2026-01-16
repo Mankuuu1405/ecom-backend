@@ -241,7 +241,7 @@ public class WebSecurityConfig {
         // Allow localhost (for local testing)
         config.setAllowedOriginPatterns(List.of(
     "http://localhost:*",
-    "http://13.233.57.143:3000"
+    "http://43.205.192.54:3000"
 ));
  
 
