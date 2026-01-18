@@ -56,6 +56,10 @@ public class OrderItemBO {
     @Column(name = "unit_price", nullable = false)
     private Long unitPrice;
 
+    @Column(name = "original_price")
+    private Long originalPrice;
+
+
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

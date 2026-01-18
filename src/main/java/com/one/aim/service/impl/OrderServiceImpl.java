@@ -887,7 +887,11 @@ public class OrderServiceImpl implements OrderService {
                 );
             }
 
-            long linePrice = product.getPrice().longValue() * qty;
+            long unitPrice = cart.isOnSale()
+                    ? cart.getOfferPrice()
+                    : cart.getPrice();
+
+            long linePrice = unitPrice * qty;
             subTotal += linePrice;
 
             String category = sanitize(product.getCategoryName());
@@ -910,7 +914,7 @@ public class OrderServiceImpl implements OrderService {
             product.updateLowStock();
             productRepo.save(product);
 
-            cart.setPrice(product.getPrice().longValue());
+//            cart.setPrice(product.getPrice().longValue());
             cartRepo.save(cart);
         }
 
@@ -960,16 +964,36 @@ public class OrderServiceImpl implements OrderService {
         for (CartBO cart : cartItems) {
             ProductBO product = cart.getProduct();
 
-            items.add(OrderItemBO.builder()
+
+            long unitPrice = cart.isOnSale()
+                    ? cart.getOfferPrice()
+                    : cart.getPrice();
+
+            OrderItemBO item = OrderItemBO.builder()
                     .order(order)
                     .product(product)
                     .sellerId(product.getSeller().getId())
                     .productName(product.getName())
                     .productCategory(product.getCategoryName())
-                    .unitPrice(cart.getPrice())
+
+                    .unitPrice(unitPrice)
+                    .originalPrice(cart.isOnSale() ? cart.getPrice() : null)
                     .quantity(cart.getQuantity())
-                    .totalPrice(cart.getPrice() * cart.getQuantity())
-                    .build());
+                    .totalPrice(unitPrice * cart.getQuantity())
+                    .build();
+
+            items.add(item);
+
+//            items.add(OrderItemBO.builder()
+//                    .order(order)
+//                    .product(product)
+//                    .sellerId(product.getSeller().getId())
+//                    .productName(product.getName())
+//                    .productCategory(product.getCategoryName())
+//                    .unitPrice(cart.getPrice())
+//                    .quantity(cart.getQuantity())
+//                    .totalPrice(cart.getPrice() * cart.getQuantity())
+//                    .build());
         }
 
         order.setOrderItems(items);

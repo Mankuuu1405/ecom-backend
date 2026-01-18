@@ -34,6 +34,8 @@ public class ProductBO {
     @Column(nullable = false)
     private String name;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
 
     private Double price;

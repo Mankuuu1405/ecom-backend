@@ -55,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendWelcomeEmail(String toEmail, String fullName) {
         try {
             String html = buildWelcomeEmailTemplate(fullName);
-            sendHtmlEmail(toEmail, "Welcome to OneAim 🎉", html);
+            sendHtmlEmail(toEmail, "Welcome to Affordable 🎉", html);
         } catch (Exception e) {
             log.error("Failed to send welcome email to {}: {}", toEmail, e.getMessage(), e);
             // don't rethrow — welcome email failure shouldn't break flow
@@ -156,7 +156,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     public void sendVerificationEmail(String toEmail, String fullName, String token) {
         try {
-            String subject = "Verify Your Email - OneAim Platform";
+            String subject = "Verify Your Email - Affordable Platform";
             String link = verifyEmailUrl + "?token=" + token;
             String htmlContent = buildVerificationEmailTemplate(fullName, link);
             sendHtmlEmail(toEmail, subject, htmlContent);
@@ -182,14 +182,31 @@ public class EmailServiceImpl implements EmailService {
     public void sendSellerUnderReviewEmail(String toEmail, String fullName) {
         String subject = "Seller Account Under Review";
         String html = """
-            <html><body style='font-family: Arial'>
-                <h2>Hello %s,</h2>
-                <p>Your email has been verified successfully.</p>
-                <p>Your seller account is now <b>under review</b>.</p>
-                <p>Admin approval usually takes <b>3–7 days</b>.</p>
-                <br>
-                <p>Regards,<br>Team OneAim</p>
-            </body></html>
+            <html>
+                                    <body style="font-family: Arial, sans-serif; color: #333;">
+                                      <h2>Hello %s,</h2>
+                
+                                      <p>
+                                        Your email address has been <b>successfully verified</b>.
+                                      </p>
+                
+                                      <p>
+                                        Your seller account is now <b>under review</b> by our admin team.
+                                      </p>
+                
+                                      <p>
+                                        The review process typically takes <b>3–7 business days</b>. We’ll notify you once a decision has been made.
+                                      </p>
+                
+                                      <br>
+                
+                                      <p>
+                                        Regards,<br>
+                                        <b>Affordable Team</b>
+                                      </p>
+                                    </body>
+                                  </html>
+                
         """.formatted(fullName);
 
         try {
@@ -203,13 +220,25 @@ public class EmailServiceImpl implements EmailService {
     public void sendSellerApprovalEmail(String toEmail, String fullName) {
         String subject = "Seller Account Approved 🎉";
         String html = """
-            <html><body style='font-family: Arial'>
-                <h2>Congratulations %s! 🎉</h2>
-                <p>Your seller account has been <b>approved by admin</b>.</p>
-                <p>You can now start publishing your products on OneAim.</p>
-                <br>
-                <p>Best Wishes,<br>Team OneAim</p>
-            </body></html>
+            <html>
+                                    <body style="font-family: Arial, sans-serif; color: #333;">
+                                      <h2>🎉 Congratulations, %s!</h2>
+                
+                                      <p>We’re excited to inform you that your <b>seller account has been successfully approved</b> by our admin team.</p>
+                
+                                      <p>You can now log in and start publishing your products on <b>OneAim</b>.</p>
+                
+                                      <p>We’re thrilled to have you on board and look forward to your success with us.</p>
+                
+                                      <br>
+                
+                                      <p>
+                                        Best regards,<br>
+                                        <b>Team Affordable</b>
+                                      </p>
+                                    </body>
+                                  </html>
+                
         """.formatted(fullName);
 
         try {
@@ -225,15 +254,31 @@ public class EmailServiceImpl implements EmailService {
             String subject = "Your Seller Application Has Been Rejected";
 
             String body = """
-                    Hello %s,
+                    <html>
+                                     <body style="font-family: Arial, sans-serif; color: #333;">
+                                       <p>Hello %s,</p>
                     
-                    We regret to inform you that your seller application has been rejected.
-                    This may be due to incorrect or incomplete document verification.
+                                       <p>
+                                         We regret to inform you that your seller application has been <b>rejected</b>.
+                                       </p>
                     
-                    You can apply again after correcting the issues.
+                                       <p>
+                                         This decision was made due to incorrect or incomplete document verification.
+                                       </p>
                     
-                    Regards,
-                    AIMDEV Team
+                                       <p>
+                                         You may reapply after reviewing and correcting the identified issues.
+                                       </p>
+                    
+                                       <br>
+                    
+                                       <p>
+                                         Regards,<br>
+                                         <b>Affordable Team</b>
+                                       </p>
+                                     </body>
+                                   </html>
+                    
                     """.formatted(name);
 
             sendHtmlEmail(to, subject, body);
@@ -255,39 +300,97 @@ public class EmailServiceImpl implements EmailService {
 
     private String buildVerificationEmailTemplate(String fullName, String link) {
         return """
-            <html><body style='font-family: Arial'>
-                <h2>Hello %s,</h2>
-                <p>Click the button below to verify your email:</p>
-                <p style='text-align:center'>
-                    <a href='%s' style='padding:10px 20px;background:#007BFF;color:#fff;border-radius:5px;text-decoration:none'>Verify Email</a>
-                </p>
-                <p>This link expires in 24 hours.</p>
-            </body></html>
+            <html>
+                                    <body style="font-family: Arial, sans-serif; color: #333;">
+                                      <h2>Hello %s,</h2>
+                
+                                      <p>
+                                        Thank you for signing up! Please confirm your email address by clicking the button below.
+                                      </p>
+                
+                                      <p style="text-align: center; margin: 20px 0;">
+                                        <a href="%s"
+                                           style="padding: 12px 24px; background-color: #007BFF; color: #ffffff;
+                                                  border-radius: 5px; text-decoration: none; font-weight: bold;">
+                                          Verify Email
+                                        </a>
+                                      </p>
+                
+                                      <p>
+                                        This verification link will expire in <b>24 hours</b>. If you did not create an account,
+                                        you can safely ignore this email.
+                                      </p>
+                
+                                      <br>
+                
+                                      <p>
+                                        Regards,<br>
+                                        <b>Affordable Team</b>
+                                      </p>
+                                    </body>
+                                  </html>
+                
         """.formatted(fullName, link);
     }
 
     private String buildResetPasswordEmailTemplate(String resetURL) {
         return """
-            <html><body style='font-family: Arial'>
-                <h2>Reset Your Password</h2>
-                <p>Click below to reset your password:</p>
-                <p style='text-align:center'>
-                    <a href='%s' style='padding:10px 20px;background:#28a745;color:white;text-decoration:none;border-radius:5px'>
-                        Reset Password
-                    </a>
-                </p>
-                <p>If you didn't request this, ignore this email.</p>
-            </body></html>
+            <html>
+                                    <body style="font-family: Arial, sans-serif; color: #333;">
+                                      <h2>Reset Your Password</h2>
+                
+                                      <p>
+                                        We received a request to reset your account password. Click the button below to proceed.
+                                      </p>
+                
+                                      <p style="text-align: center; margin: 20px 0;">
+                                        <a href="%s"
+                                           style="padding: 12px 24px; background-color: #28a745; color: #ffffff;
+                                                  text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                          Reset Password
+                                        </a>
+                                      </p>
+                
+                                      <p>
+                                        This link is valid for a limited time. If you did not request a password reset,
+                                        you can safely ignore this email.
+                                      </p>
+                
+                                      <br>
+                
+                                      <p>
+                                        Regards,<br>
+                                        <b>Affordable Team</b>
+                                      </p>
+                                    </body>
+                                  </html>
+                
         """.formatted(resetURL);
     }
 
     private String buildWelcomeEmailTemplate(String fullName) {
         return """
-            <html><body style='font-family: Arial'>
-                <h2>Welcome %s 🎉</h2>
-                <p>Thank you for joining OneAim.</p>
-                <p>We’re excited to have you onboard!</p>
-            </body></html>
+            <html>
+                                    <body style="font-family: Arial, sans-serif; color: #333;">
+                                      <h2>🎉 Welcome, %s!</h2>
+                
+                                      <p>
+                                        Thank you for joining <b>Affordable</b>.
+                                      </p>
+                
+                                      <p>
+                                        We’re excited to have you on board and look forward to helping you get started.
+                                      </p>
+                
+                                      <br>
+                
+                                      <p>
+                                        Best regards,<br>
+                                        <b>Affordable Team</b>
+                                      </p>
+                                    </body>
+                                  </html>
+                
         """.formatted(fullName);
     }
 
